@@ -18,9 +18,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://maven.regulaforensics.com/RegulaDocumentReader") }
-        maven(url = "https://jitpack.io")
-        maven(url = "https://developer.huawei.com/repo/")
+//        maven { url = uri("https://maven.regulaforensics.com/RegulaDocumentReader") }
+//        maven(url = "https://jitpack.io")
+//        maven(url = "https://developer.huawei.com/repo/")
     }
 }
 

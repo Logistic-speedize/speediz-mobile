@@ -51,6 +51,23 @@ dependencies {
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
+//implementation(libs.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    //navigation
+    implementation(libs.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    //coil
+    implementation(libs.coil)
+    //room
+    implementation(libs.bundles.room.impl)
+    ksp(libs.room.compiler)
+    //retrofit
+    implementation(libs.bundles.retrofit)
+    //coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
+    //work manager
+    implementation(libs.work.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -5,6 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.analytic"
+    compileSdk = 34
 }
 
 dependencies {
