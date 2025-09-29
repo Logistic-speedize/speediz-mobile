@@ -9,6 +9,7 @@ plugins {
 android {
     namespace = "com.example.speediz"
     compileSdk = 36
+    ndkVersion = "26.1.10909125"
 
     defaultConfig {
         applicationId = "com.example.speediz"
@@ -18,6 +19,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""}\"")
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 
     buildTypes {
@@ -35,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -77,6 +86,15 @@ dependencies {
     implementation(libs.coroutines.android)
     //work manager
     implementation(libs.work.runtime.ktx)
+    //mapbox
+    implementation(libs.mapbox)
+//    implementation(libs.mapbox.directions){
+//        exclude(group = "com.mapbox.common", module = "okhttp")
+//    }
+//    implementation(libs.mapbox.navigation){
+//        exclude(group = "com.mapbox.common", module = "okhttp")
+//    }
+    implementation(libs.compose.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
