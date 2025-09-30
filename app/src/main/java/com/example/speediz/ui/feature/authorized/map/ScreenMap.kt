@@ -85,7 +85,10 @@ fun ScreenMap( modifier: Modifier) {
 fun getRouteFromMapbox(start: Point, end: Point): LineString? {
     val accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
     val url =
-        "https://api.mapbox.com/directions/v5/mapbox/driving/${start.longitude()},${start.latitude()};${end.longitude()},${end.latitude()}?geometries=geojson&access_token=$accessToken"
+        "https://api.mapbox.com/directions/v5/mapbox/driving/" +
+                "${start.longitude()},${start.latitude()};" +
+                "${end.longitude()},${end.latitude()}" +
+                "?geometries=geojson&access_token=$accessToken"
 
     val client = OkHttpClient()
     val request = Request.Builder().url(url).build()
