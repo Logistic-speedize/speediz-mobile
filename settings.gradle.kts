@@ -1,5 +1,16 @@
-import org.gradle.internal.configuration.problems.projectPathFrom
+import org.gradle.initialization.Environment
+import java.util.Properties
 
+fun getSecret(key : String): String? {
+    val file = rootDir.resolve("local.default.properties")
+    if ( file.exists()) {
+        val properties = Properties().apply {
+            load(file.inputStream())
+        }
+        return properties.getProperty(key)
+    }
+    return null
+}
 pluginManagement {
     repositories {
         google {
@@ -13,16 +24,6 @@ pluginManagement {
         gradlePluginPortal()
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
         maven(url = "https://developer.huawei.com/repo/")
-        maven {
-            url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
-            credentials {
-                username = "mapbox"
-                password = providers.gradleProperty("MAPBOX_ACCESS_TOKEN").orElse(System.getenv("MAPBOX_ACCESS_TOKEN")).get()
-                authentication {
-                    create<BasicAuthentication>("basic")
-                }
-            }
-        }
     }
 }
 dependencyResolutionManagement {
@@ -37,7 +38,7 @@ dependencyResolutionManagement {
             url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
             credentials {
                 username = "mapbox"
-                password = providers.gradleProperty("MAPBOX_ACCESS_TOKEN").orElse(System.getenv("MAPBOX_ACCESS_TOKEN")).get()
+                password = getSecret("MAPBOX_ACCESS_TOKEN")
                 authentication {
                     create<BasicAuthentication>("basic")
                 }

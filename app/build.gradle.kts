@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.android.hilt)
+    alias (libs.plugins.secrets.gradle)
 }
 
 android {
@@ -46,6 +47,10 @@ android {
         buildConfig = true
     }
 }
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.default.properties"
+}
 
 dependencies {
     implementation(project(":core:model"))
@@ -66,6 +71,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.serialization.json)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
@@ -88,12 +94,6 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     //mapbox
     implementation(libs.mapbox)
-//    implementation(libs.mapbox.directions){
-//        exclude(group = "com.mapbox.common", module = "okhttp")
-//    }
-//    implementation(libs.mapbox.navigation){
-//        exclude(group = "com.mapbox.common", module = "okhttp")
-//    }
     implementation(libs.compose.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
