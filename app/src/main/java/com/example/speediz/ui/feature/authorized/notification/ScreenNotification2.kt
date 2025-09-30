@@ -1,4 +1,4 @@
-package com.example.speediz.ui.feature.authorized
+package com.example.speediz.ui.feature.authorized.notification
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 
 
 //create notification channel
@@ -78,7 +77,7 @@ class ScreenNotification2: ComponentActivity() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         if (
             ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.POST_NOTIFICATIONS
+                this, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         ){
             with (NotificationManagerCompat.from(this)){

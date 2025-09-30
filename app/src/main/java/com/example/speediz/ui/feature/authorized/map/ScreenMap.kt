@@ -1,4 +1,4 @@
-package com.example.speediz.ui.feature.authorized
+package com.example.speediz.ui.feature.authorized.map
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import kotlin.toString
 
 @Composable
 fun ScreenMap( modifier: Modifier) {
