@@ -1,4 +1,4 @@
 package com.example.speediz.ui.base
 
-class BaseViewModel {
+open class BaseViewModel {
 }

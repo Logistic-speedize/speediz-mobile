@@ -1,4 +1,4 @@
-package com.example.speediz.ui.feature.authorized.notification
+package com.example.speediz.ui.feature.authorized.vendor.notification
 
 import android.Manifest
 import android.app.NotificationChannel

@@ -10,7 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.speediz.ui.feature.authorized.map.ScreenMap
+import com.example.speediz.ui.feature.authorized.vendor.map.ScreenMap
 import com.example.speediz.ui.theme.SpeedizTheme
 
 class MainActivity : ComponentActivity() {

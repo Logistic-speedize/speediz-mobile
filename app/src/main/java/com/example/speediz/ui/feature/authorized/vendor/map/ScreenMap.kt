@@ -1,4 +1,4 @@
-package com.example.speediz.ui.feature.authorized.map
+package com.example.speediz.ui.feature.authorized.vendor.map
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
