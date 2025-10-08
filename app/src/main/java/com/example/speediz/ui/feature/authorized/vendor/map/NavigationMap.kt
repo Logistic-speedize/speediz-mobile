@@ -1,9 +1,9 @@
-package com.example.speediz.ui.feature.authorized.delivery.map
+package com.example.speediz.ui.feature.authorized.vendor.map
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 
 fun NavGraphBuilder.screenMap() {
 }
-fun NavController.navigationMap() {
+fun NavController.navigateToMap() {
 }
