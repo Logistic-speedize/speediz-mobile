@@ -95,6 +95,8 @@ dependencies {
     //mapbox
     implementation(libs.mapbox)
     implementation(libs.compose.ui)
+    //navigation animation
+    implementation(libs.accompanist.navigation.animation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
