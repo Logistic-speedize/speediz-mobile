@@ -30,15 +30,7 @@ val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { nu
 
 object Graph {
     const val ROOT = "root_graph"
-    const val AUTH = "auth_graph"
+    const val AUTH_VENDOR = "auth_vendor_graph"
+    const val AUTH_DELIVERY = "auth_delivery_graph"
     const val UN_AUTH = "un_auth_graph"
-}
-sealed class Screen(val route: String) {
-    object Splash : Screen("splash_screen")
-    object SignIn : Screen("login_screen")
-    object SignUp : Screen("register_screen")
-    object ForgotPassword : Screen("forgot_password_screen")
-    object EmailVerification : Screen("email_verification_screen")
-    object Home : Screen("home_screen")
-    object Profile : Screen("profile_screen")
 }
