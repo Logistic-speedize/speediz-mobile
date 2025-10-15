@@ -28,59 +28,59 @@ import org.json.JSONObject
 
 @Composable
 fun ScreenMap( modifier: Modifier) {
-    AndroidView(
-        factory = { context ->
-            MapView(context).apply {
-                mapboxMap.loadStyle(Style.MAPBOX_STREETS) {
-                    style ->
-                    val annotationApi = annotations
-                    val pointManager = annotationApi.createPointAnnotationManager()
-
-                    //Start and end points
-                    val start = Point.fromLngLat(104.9007, 11.5732)
-                    val end = Point.fromLngLat(104.9236, 11.5536)
-
-                    //marker
-                    pointManager.create(PointAnnotationOptions().withPoint(start).withTextField("Start"))
-                    pointManager.create(PointAnnotationOptions().withPoint(end).withTextField("End"))
-
-                    val centerLng = (start.longitude() + end.longitude()) / 2
-                    val centerLat = (start.latitude() + end.latitude()) / 2
-                    mapboxMap.setCamera(
-                        CameraOptions.Builder()
-                            .center(Point.fromLngLat(centerLng, centerLat))
-                            .zoom(12.0)
-                            .build()
-                    )
-
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val route = getRouteFromMapbox(start, end)
-                        if ( route != null ){
-                            launch (Dispatchers.Main) {
-                                //Draw a stragiht line route
-                                style.addSource(
-                                    geoJsonSource("route-source") {
-                                        geometry(
-                                            route
-                                        )
-                                    }
-                                )
-                                style.addLayer(
-                                    lineLayer("route-layer", "route-source") {
-                                        lineColor("#009688")
-                                        lineWidth(5.0)
-                                        lineCap(LineCap.ROUND)
-                                        lineJoin(LineJoin.ROUND)
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        modifier = modifier.fillMaxSize()
-    )
+//    AndroidView(
+//        factory = { context ->
+//            MapView(context).apply {
+//                mapboxMap.loadStyle(Style.MAPBOX_STREETS) {
+//                    style ->
+//                    val annotationApi = annotations
+//                    val pointManager = annotationApi.createPointAnnotationManager()
+//
+//                    //Start and end points
+//                    val start = Point.fromLngLat(104.9007, 11.5732)
+//                    val end = Point.fromLngLat(104.9236, 11.5536)
+//
+//                    //marker
+//                    pointManager.create(PointAnnotationOptions().withPoint(start).withTextField("Start"))
+//                    pointManager.create(PointAnnotationOptions().withPoint(end).withTextField("End"))
+//
+//                    val centerLng = (start.longitude() + end.longitude()) / 2
+//                    val centerLat = (start.latitude() + end.latitude()) / 2
+//                    mapboxMap.setCamera(
+//                        CameraOptions.Builder()
+//                            .center(Point.fromLngLat(centerLng, centerLat))
+//                            .zoom(12.0)
+//                            .build()
+//                    )
+//
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        val route = getRouteFromMapbox(start, end)
+//                        if ( route != null ){
+//                            launch (Dispatchers.Main) {
+//                                //Draw a stragiht line route
+//                                style.addSource(
+//                                    geoJsonSource("route-source") {
+//                                        geometry(
+//                                            route
+//                                        )
+//                                    }
+//                                )
+//                                style.addLayer(
+//                                    lineLayer("route-layer", "route-source") {
+//                                        lineColor("#009688")
+//                                        lineWidth(5.0)
+//                                        lineCap(LineCap.ROUND)
+//                                        lineJoin(LineJoin.ROUND)
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        },
+//        modifier = modifier.fillMaxSize()
+//    )
 }
 fun getRouteFromMapbox(start: Point, end: Point): LineString? {
     val accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN

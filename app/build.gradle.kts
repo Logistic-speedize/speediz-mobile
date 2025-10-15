@@ -11,7 +11,6 @@ android {
     namespace = "com.example.speediz"
     compileSdk = 36
     ndkVersion = "26.1.10909125"
-
     defaultConfig {
         applicationId = "com.example.speediz"
         minSdk = 24
@@ -21,6 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""}\"")
+        buildConfigField ("String", "API_BASE_URL", "\"${project.findProperty("API_BASE_URL") ?: "https://default.url/"}\"")
     }
 
     packaging {
@@ -53,15 +53,6 @@ secrets {
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(project(":core:network"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:database"))
-    implementation(project(":core:data"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:analytic"))
-    implementation(project(":core:worker"))
-    //api(project(":core"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

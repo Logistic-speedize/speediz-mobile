@@ -49,14 +49,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Speediz"
 include(":app")
-include(":core:analytic")
-include(":core:data")
-include(":core:database")
-include(":core:datastore")
-include(":core:datastore-proto")
-include(":core:domain")
-include(":core:model")
-include(":core:network")
-include(":core:worker")
-include(":core:designsystem")
-include(":core:testing")

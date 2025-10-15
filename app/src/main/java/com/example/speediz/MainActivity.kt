@@ -1,30 +1,56 @@
 package com.example.speediz
 
 import android.os.Bundle
+import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.speediz.core.application.MySharePreferences
 import com.example.speediz.ui.feature.authorized.vendor.map.ScreenMap
+import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
+import com.example.speediz.ui.graphs.AppNavigation
 import com.example.speediz.ui.theme.SpeedizTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+            val sharePreferences: MySharePreferences = hiltViewModel<SignInViewModel>().sharePreferences
+            val viewModel = hiltViewModel<SignInViewModel>()
+            val isLoggedIn = remember { mutableStateOf(sharePreferences.getToken() != null) }
+            val showSplashScreen = remember { mutableStateOf(true) }
+            LaunchedEffect( navController) {
+                navController.addOnDestinationChangedListener {
+                    _, destination, _ ->
+                    isLoggedIn.value = sharePreferences.getToken() != null
+                }
+            }
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.delay(1500)
+                showSplashScreen.value = false
+            }
             SpeedizTheme {
                 // A surface container using the 'background' color from the theme
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { paddingValues ->
-                    ScreenMap(modifier = Modifier.padding(paddingValues))
-                }
+             if (showSplashScreen.value) {
+                 ScreenSplashScreen()
+
+                } else {
+                 AppNavigation(
+                     navController = navController,
+                     isLoggedIn = isLoggedIn.value,
+                     role = viewModel.role
+                 )
+             }
             }
         }
     }

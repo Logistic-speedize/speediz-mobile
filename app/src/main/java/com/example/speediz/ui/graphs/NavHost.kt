@@ -6,21 +6,46 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHost
-import androidx.navigation.compose.NavHost
+import androidx.navigation.NavHostController
 import com.example.speediz.MainViewModel
-import com.example.speediz.ui.SPAppState
+import com.example.speediz.ui.navigation.deliveryAuthorizedNavigate
+import com.example.speediz.ui.navigation.unauthorizedNavigate
+import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun NavHost(
-     mySPAppState: SPAppState,
-    AppViewModel : MainViewModel
+fun AppNavHost(
+    navController: NavHostController,
+    isLoggedIn: Boolean,
+    role: Int = 3
 ) {
     SharedTransitionLayout {
         CompositionLocalProvider(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
         ) {
+            androidx.navigation.compose.NavHost(
+                navController = navController,
+                startDestination = if (isLoggedIn) Graph.AUTH_DELIVERY else Graph.UN_AUTH,
+                modifier = Modifier,
+            ) {
+                if (isLoggedIn) {
+                    if (role == 3) {
+                        vendorAuthorizedNavigate(
+                            navController = navController
+                        )
+                    } else {
+                        deliveryAuthorizedNavigate(
+                            navController = navController
+                        )
+                    }
+                } else {
+                    unauthorizedNavigate(
+                        navController = navController
+                    )
+                }
+            }
         }
     }
 }
