@@ -2,50 +2,47 @@ package com.example.speediz.ui.graphs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.speediz.MainViewModel
+import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
+import com.example.speediz.ui.navigation.AuthorizedRoute
+import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.navigation.deliveryAuthorizedNavigate
 import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 
-enum class Roles(val value: Int) {
-    DELIVERY(1),
-    VENDOR(2);
-}
 @Composable
 fun AppNavigation(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     isLoggedIn: Boolean,
-    onLogin: () -> Unit,
-    onLogout: () -> Unit,
-    role : Roles = Roles.DELIVERY
+    role : Int = 3
 ) {
+    val signInViewModel = hiltViewModel<SignInViewModel>()
+    val userRole = signInViewModel.role
+    val startDestination = if (!isLoggedIn) UnauthorizedRoute.SignIn.route
+    else if (userRole == role) AuthorizedRoute.VendorRoute.Home.route
+    else AuthorizedRoute.DeliveryRoute.Home.route
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) Graph.AUTH_DELIVERY else Graph.UN_AUTH,
+        startDestination =  startDestination,
         modifier = modifier,
-        route = Graph.ROOT,
     ) {
         if (isLoggedIn) {
-            if ( role == Roles.VENDOR) {
+            if ( userRole == role) {
                  vendorAuthorizedNavigate(
-                     navController = navController,
-                     mainViewModel = MainViewModel()
+                     navController = navController
                  )
             } else {
                 deliveryAuthorizedNavigate(
-                    navController = navController,
-                    mainViewModel = MainViewModel()
+                    navController = navController
                 )
             }
         } else {
             unauthorizedNavigate(
-                navController = navController,
-                mainViewModel = MainViewModel()
+                navController = navController
             )
         }
     }

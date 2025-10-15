@@ -19,8 +19,7 @@ import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 fun AppNavHost(
     navController: NavHostController,
     isLoggedIn: Boolean,
-    role: Roles = Roles.DELIVERY,
-    mainViewModel: MainViewModel = MainViewModel() // Ideally use viewModel()
+    role: Int = 3
 ) {
     SharedTransitionLayout {
         CompositionLocalProvider(
@@ -32,21 +31,18 @@ fun AppNavHost(
                 modifier = Modifier,
             ) {
                 if (isLoggedIn) {
-                    if (role == Roles.VENDOR) {
+                    if (role == 3) {
                         vendorAuthorizedNavigate(
-                            navController = navController,
-                            mainViewModel = mainViewModel
+                            navController = navController
                         )
                     } else {
                         deliveryAuthorizedNavigate(
-                            navController = navController,
-                            mainViewModel = mainViewModel
+                            navController = navController
                         )
                     }
                 } else {
                     unauthorizedNavigate(
-                        navController = navController,
-                        mainViewModel = mainViewModel
+                        navController = navController
                     )
                 }
             }

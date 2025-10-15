@@ -11,7 +11,6 @@ android {
     namespace = "com.example.speediz"
     compileSdk = 36
     ndkVersion = "26.1.10909125"
-
     defaultConfig {
         applicationId = "com.example.speediz"
         minSdk = 24
@@ -21,6 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""}\"")
+        buildConfigField ("String", "API_BASE_URL", "\"${project.findProperty("API_BASE_URL") ?: "https://default.url/"}\"")
     }
 
     packaging {

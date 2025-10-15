@@ -22,7 +22,6 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-
     background = LightBackground,
     surface = LightSurface,
     primary = LightOrgange,
@@ -32,7 +31,6 @@ private val LightColorScheme = lightColorScheme(
     onBackground = LightTextFieldGray,
     onSurface = DarkSurface,
 )
-
 
 @Composable
 fun SpeedizTheme(
