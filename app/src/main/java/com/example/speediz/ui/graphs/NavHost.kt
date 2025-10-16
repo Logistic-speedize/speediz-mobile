@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import com.example.speediz.MainViewModel
+import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
 import com.example.speediz.ui.navigation.deliveryAuthorizedNavigate
 import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
@@ -41,9 +42,10 @@ fun AppNavHost(
                         )
                     }
                 } else {
-                    unauthorizedNavigate(
-                        navController = navController
-                    )
+//                    unauthorizedNavigate(
+//                        navController = navController,
+//                        signInViewModel = SignInViewModel
+//                    )
                 }
             }
         }

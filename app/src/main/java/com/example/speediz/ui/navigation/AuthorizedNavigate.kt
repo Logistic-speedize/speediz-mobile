@@ -11,8 +11,6 @@ import com.example.speediz.ui.feature.authorized.delivery.account.screenAccount
 import com.example.speediz.ui.feature.authorized.delivery.history.screenHistory
 import com.example.speediz.ui.feature.authorized.delivery.map.screenMap
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
-import com.example.speediz.ui.feature.authorized.vendor.ScreenHomeVendor
-import com.example.speediz.ui.feature.authorized.vendor.home.screenHome
 import com.example.speediz.ui.feature.authorized.vendor.screenHomeVendor
 import com.example.speediz.ui.graphs.Graph
 
@@ -20,7 +18,9 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
     navController: NavController
 ) {
            screenDeliveryHome(
-               onNavigateTo = {}
+               onNavigateTo = {route ->
+                     navController.navigate(route)
+               }
            )
 //        screenMap()
 //        screenPackage()
@@ -31,7 +31,9 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
     navController: NavController
 ) {
             screenHomeVendor(
-                onNavigateTo = {}
+                onNavigateTo = {route ->
+                    navController.navigate(route)
+                }
             )
 //        screenHomeVendor(
 //            onNavigateTo = {

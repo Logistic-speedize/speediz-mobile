@@ -1,7 +1,6 @@
 package com.example.speediz.ui.feature.authorized.vendor.notification
 
 import android.Manifest
-import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.pm.PackageManager
@@ -71,8 +70,8 @@ class ScreenNotification: ComponentActivity() {
     // Show notification
     private fun showNotification(){
         val builder = NotificationCompat.Builder(this, "Channel_Id")
-            .setSmallIcon(R.drawable.ic_dialog_info)
-            .setContentTitle("Title")
+//            .setSmallIcon(R.drawable.ic_dialog_info)
+//            .setContentTitle("Title")
             .setContentText("Content")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         if (
