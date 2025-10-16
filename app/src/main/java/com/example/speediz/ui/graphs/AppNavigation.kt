@@ -1,9 +1,14 @@
 package com.example.speediz.ui.graphs
 
 import android.util.Log
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -18,6 +23,7 @@ import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(
     navController: NavHostController,
@@ -32,23 +38,31 @@ fun AppNavigation(
         if (userRole == 3) AuthorizedRoute.VendorRoute.Home.route
         else AuthorizedRoute.DeliveryRoute.Home.route
     }
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier,
-    ) {
-        Log.d("AppNavigation", "isLogedIn: $isLoggedIn")
-        Log.d("AppNavigation", "User role: $userRole")
-        unauthorizedNavigate(
-                navController = navController
-            )
-        vendorAuthorizedNavigate(
+    SharedTransitionLayout {
+        CompositionLocalProvider(
+            LocalSharedTransitionScope provides this@SharedTransitionLayout,
+        )
+        {
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = modifier,
+            ) {
+                Log.d("AppNavigation", "isLogedIn: $isLoggedIn")
+                Log.d("AppNavigation", "User role: $userRole")
+                unauthorizedNavigate(
                     navController = navController
                 )
-        deliveryAuthorizedNavigate(
+                vendorAuthorizedNavigate(
+                    navController = navController
+                )
+                deliveryAuthorizedNavigate(
                     navController = navController
                 )
 
+            }
         }
-
+    }
 }
+@OptIn(ExperimentalSharedTransitionApi::class)
+val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { null }
