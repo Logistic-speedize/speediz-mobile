@@ -1,22 +1,24 @@
 package com.example.speediz.core.network.services
 
 import android.content.Context
-import com.example.speediz.MainApplication
+import android.os.Build
+import com.example.speediz.BuildConfig
 import com.example.speediz.core.data.model.SignInRequest
 import com.example.speediz.core.data.model.SignInResponse
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
-import com.example.speediz.ui.navigation.UnauthorizedRoute
-import com.mapbox.maps.MAPBOX_LOCALE
-import okhttp3.Response
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.POST
-import java.util.Properties
 
 interface ApiService {
-
+    @POST("api/mobile/login")
+    suspend fun signIn(
+        @Body info : SignInRequest
+    ) : Response<SignInResponse>
     companion object {
+        val baseUrl = BuildConfig.API_BASE_URL
         operator fun invoke(
             context: Context,
             networkConnectionInterceptor: NetworkConnectionInterceptor
@@ -31,7 +33,7 @@ interface ApiService {
                 .create()
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("https://logistic.laseavyong.com/") // Replace with your API base URL
+                .baseUrl(baseUrl) // Replace with your API base URL
                 .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create(gson))
                 .build()
                 .create(ApiService::class.java)

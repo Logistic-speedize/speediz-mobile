@@ -1,52 +1,64 @@
 package com.example.speediz.ui.graphs
 
+import android.util.Log
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.example.speediz.MainViewModel
+import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
+import com.example.speediz.ui.navigation.AuthorizedRoute
+import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.navigation.deliveryAuthorizedNavigate
 import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 
-enum class Roles(val value: Int) {
-    DELIVERY(1),
-    VENDOR(2);
-}
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
-    isLoggedIn: Boolean,
-    onLogin: () -> Unit,
-    onLogout: () -> Unit,
-    role : Roles = Roles.DELIVERY
+    modifier: Modifier = Modifier
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = if (isLoggedIn) Graph.AUTH_DELIVERY else Graph.UN_AUTH,
-        modifier = modifier,
-        route = Graph.ROOT,
-    ) {
-        if (isLoggedIn) {
-            if ( role == Roles.VENDOR) {
-                 vendorAuthorizedNavigate(
-                     navController = navController,
-                     mainViewModel = MainViewModel()
-                 )
-            } else {
-                deliveryAuthorizedNavigate(
-                    navController = navController,
-                    mainViewModel = MainViewModel()
-                )
-            }
-        } else {
-            unauthorizedNavigate(
+    val signInViewModel = hiltViewModel<SignInViewModel>()
+    val isLoggedIn = signInViewModel.isLoggedIn.collectAsState().value
+    val userRole = signInViewModel.role.collectAsState().value
+    val startDestination = if (!isLoggedIn) {
+        UnauthorizedRoute.SignIn.route
+    }else {
+        if (userRole == 3) AuthorizedRoute.VendorRoute.Home.route
+        else AuthorizedRoute.DeliveryRoute.Home.route
+    }
+    SharedTransitionLayout {
+        CompositionLocalProvider(
+            LocalSharedTransitionScope provides this@SharedTransitionLayout,
+        )
+        {
+            NavHost(
                 navController = navController,
-                mainViewModel = MainViewModel()
-            )
+                startDestination = startDestination,
+                modifier = modifier,
+            ) {
+                Log.d("AppNavigation", "isLogedIn: $isLoggedIn")
+                Log.d("AppNavigation", "User role: $userRole")
+                unauthorizedNavigate(
+                    navController = navController
+                )
+                vendorAuthorizedNavigate(
+                    navController = navController
+                )
+                deliveryAuthorizedNavigate(
+                    navController = navController
+                )
+
+            }
         }
     }
 }
+@OptIn(ExperimentalSharedTransitionApi::class)
+val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { null }

@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     background = LightBackground,
     surface = LightSurface,
-    primary = LightOrgange,
+    primary = LightOrange,
     onPrimary = DarkOrange,
     onSecondary = LightGray,
     onTertiary = White,
@@ -22,10 +22,9 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-
     background = LightBackground,
     surface = LightSurface,
-    primary = LightOrgange,
+    primary = LightOrange,
     onPrimary = DarkOrange,
     onSecondary = LightGray,
     onTertiary = White,
@@ -33,24 +32,21 @@ private val LightColorScheme = lightColorScheme(
     onSurface = DarkSurface,
 )
 
-
 @Composable
 fun SpeedizTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    useDynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val dynamicColor = useDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val colors = when {
+        dynamicColor && darkTheme -> dynamicDarkColorScheme(LocalContext.current)
+        dynamicColor && !darkTheme -> dynamicLightColorScheme(LocalContext.current)
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colors,
         typography = Typography,
         shapes = Shapes,
         content = content

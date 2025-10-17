@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ScreenHomeDelivery() {
+fun ScreenHomeDelivery(
+    onNavigateTo : (String) -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize()
     ){

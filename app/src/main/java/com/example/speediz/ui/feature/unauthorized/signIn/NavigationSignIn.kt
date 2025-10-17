@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.example.speediz.ui.navigation.UnauthorizedRoute
 
 fun NavGraphBuilder.screenSignIn(
-    onNavigateTo : () -> Unit,
+    onNavigateTo : (String) -> Unit ,
 ) {
     composable(route = UnauthorizedRoute.SignIn.route){
         ScreenSignIn(
