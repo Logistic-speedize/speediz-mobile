@@ -1,7 +1,5 @@
 package com.example.speediz.ui.theme
 
-import android.R
-import android.provider.CalendarContract
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -29,3 +27,4 @@ val LightBackground = Color(0xFFFFFFFF)
 val DarkBackground = Color(0xFF121212)
 val LightSurface = Color(0xFFFFFFFF)
 val DarkSurface = Color(0xFF121212)
+

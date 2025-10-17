@@ -13,24 +13,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.speediz.ui.feature.appwide.button.Button
 import com.example.speediz.ui.theme.FontSize
-import com.example.speediz.ui.theme.spacing
 
 @Composable
 fun OnBoardScreen(
@@ -87,9 +84,15 @@ fun OnBoardScreen(
                     .padding(horizontal = 16.dp)
                     .background(color = MaterialTheme.colorScheme.primary, shape = MaterialTheme.shapes.medium)
                 ,
-                onClick = {},
-               title = "Get Started"
-            )
+                onClick = {}
+            ){
+                Text(
+                    text = "Get Started",
+                    fontSize = FontSize.medium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }

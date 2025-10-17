@@ -5,6 +5,7 @@ import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,7 +29,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val sharePreferences: MySharePreferences = hiltViewModel<SignInViewModel>().sharePreferences
-            val viewModel = hiltViewModel<SignInViewModel>()
             val isLoggedIn = remember { mutableStateOf(sharePreferences.getToken() != null) }
             val showSplashScreen = remember { mutableStateOf(true) }
             LaunchedEffect( navController) {
@@ -42,14 +42,17 @@ class MainActivity : ComponentActivity() {
                 showSplashScreen.value = false
             }
                 // A surface container using the 'background' color from the theme
-             if (showSplashScreen.value) {
-                 ScreenSplashScreen()
+           SpeedizTheme {
+               if (showSplashScreen.value) {
+                   ScreenSplashScreen()
 
-                } else {
-                 AppNavigation(
-                     navController = navController
-                 )
-             }
+               } else {
+                   AppNavigation(
+                       navController = navController
+                   )
+               }
+           }
+
         }
     }
 }
