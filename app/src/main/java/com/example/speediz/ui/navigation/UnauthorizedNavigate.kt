@@ -7,6 +7,7 @@ import androidx.navigation.navigation
 import com.example.speediz.MainViewModel
 import com.example.speediz.ui.feature.unauthorized.forgotPassword.screenForgotPassword
 import com.example.speediz.ui.feature.unauthorized.signIn.ScreenSignIn
+import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
 import com.example.speediz.ui.feature.unauthorized.signIn.screenSignIn
 import com.example.speediz.ui.feature.unauthorized.signup.screenSignup
 import com.example.speediz.ui.feature.unauthorized.verifyEmail.screenVerifyEmail
@@ -16,8 +17,8 @@ fun NavGraphBuilder.unauthorizedNavigate(
     navController: NavHostController
 ) {
     screenSignIn(
-        onNavigateTo = {
-            navController.navigate(UnauthorizedRoute.SignIn.route)
+        onNavigateTo = { route ->
+            navController.navigate(route)
         }
     )
     screenSignup(

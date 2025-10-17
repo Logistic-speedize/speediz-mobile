@@ -1,5 +1,6 @@
 package com.example.speediz.ui.feature.unauthorized.signIn
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,25 +39,30 @@ fun ScreenSignIn(
 ) {
     val viewModel = hiltViewModel<SignInViewModel>()
     val signInState = viewModel.signInState.collectAsState().value
+    val role = viewModel.role.collectAsState().value
     val context = LocalContext.current
-    LaunchedEffect(signInState) {
+    LaunchedEffect(signInState, role) {
         when (signInState) {
             is SignInState.Success -> {
                 Toast.makeText(context, "Sign in successful", Toast.LENGTH_SHORT).show()
+                Log.d("SignIn", "Token: ${signInState.token} Role: ${viewModel.role}")
+                if (role == 3) {
+                    Log.d("SignIn", "Navigating to Vendor Home")
+                    onNavigateTo(AuthorizedRoute.VendorRoute.Home.route)
+                } else {
+                    Log.d("SignIn", "Navigating to Delivery Home")
+                    onNavigateTo(AuthorizedRoute.DeliveryRoute.Home.route)
+                }
             }
-            is SignInState.DeliveryRoute -> onNavigateTo(AuthorizedRoute.DeliveryRoute.Home.route)
-            is SignInState.VendorRoute -> onNavigateTo(AuthorizedRoute.VendorRoute.Home.route)
-            else -> {
-                Toast.makeText(context, "Sign in failed or unknown state", Toast.LENGTH_SHORT).show()
-                SignInState.Error(
-                    (signInState as? SignInState.Error)?.message ?: "Unknown error occurred"
-                )
+            is SignInState.Error -> {
+                Toast.makeText(context, signInState.message, Toast.LENGTH_SHORT).show()
             }
+            else -> Unit
         }
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(8.dp)
     ) {
             innerPadding ->
         Column(
@@ -80,7 +87,7 @@ fun ScreenSignIn(
                 value = viewModel.email ,
                 onValueChange = {
                    viewModel.onEmailChanged( it)
-                    viewModel.email = it
+                   // viewModel.email = it
                 } ,
                 label = { Text("Email", color = Color.DarkGray) } ,
                 modifier = Modifier
@@ -91,7 +98,7 @@ fun ScreenSignIn(
                 value = viewModel.password ,
                 onValueChange = {
                     viewModel.onPasswordChanged(it)
-                    viewModel.password = it
+                   // viewModel.password = it
                 },
                 label = { Text("Password", color = Color.DarkGray) },
                 modifier = Modifier

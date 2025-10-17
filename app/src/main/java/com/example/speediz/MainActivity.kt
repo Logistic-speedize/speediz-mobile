@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -39,23 +41,18 @@ class MainActivity : ComponentActivity() {
                 kotlinx.coroutines.delay(1500)
                 showSplashScreen.value = false
             }
-            SpeedizTheme {
                 // A surface container using the 'background' color from the theme
              if (showSplashScreen.value) {
                  ScreenSplashScreen()
 
                 } else {
                  AppNavigation(
-                     navController = navController,
-                     isLoggedIn = isLoggedIn.value,
-                     role = viewModel.role
+                     navController = navController
                  )
              }
-            }
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

@@ -2,8 +2,11 @@ package com.example.speediz.ui.feature.unauthorized.signIn
 
 import android.util.Log
 import android.util.Patterns
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +14,7 @@ import com.example.speediz.core.application.MySharePreferences
 import com.example.speediz.core.data.model.SignInRequest
 import com.example.speediz.core.repository.SignInRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,17 +26,20 @@ class SignInViewModel @Inject constructor(
     val sharePreferences : MySharePreferences
     ) : ViewModel() {
         private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
+    private val _isLoggedIn = MutableStateFlow( sharePreferences.getToken() != null )
+    val isLoggedIn : StateFlow<Boolean> = _isLoggedIn
     val signInState : StateFlow<SignInState> = _signInState
     var email by mutableStateOf("")
     var password by mutableStateOf("")
     fun onEmailChanged(newEmail: String) {
         email = newEmail
-        validateInput()
+       validateInput()
     }
-    var role = 3
+    private var _role = MutableStateFlow(3)
+    val role = _role
     fun onPasswordChanged(newPassword: String) {
         password = newPassword
-        validateInput()
+      validateInput()
     }
     private fun validateInput(){
         val emailError = if(email.isEmpty()) "Email is required"
@@ -56,16 +63,14 @@ class SignInViewModel @Inject constructor(
             _signInState.value = SignInState.Loading
             try {
                 val response = repository.userSignIn(signInRequest)
+                val success = response.data?.accessToken?:""
                 Log.d("TAG", "Sign in successful. Token: ${response.data?.accessToken}")
-                if (response.data?.accessToken != null) {
-                    role = response.data?.user?.role ?: 3
-                    when ( role ) {
-                        3 -> _signInState.value = SignInState.VendorRoute
-                        4 -> _signInState.value = SignInState.DeliveryRoute
-                        else -> _signInState.value = SignInState.Success(response.data?.accessToken.toString())
-                    }
+                if (success.isNotEmpty()) {
                     _signInState.value = SignInState.Success(response.data?.accessToken.toString())
+                    _isLoggedIn.value = true
                     sharePreferences.saveToken(response.data?.accessToken.toString())
+                    _role.value = response.data?.user?.role ?: 3
+                    Log.d( "TAG", "signIn: role ${response.data?.user?.role}" )
                 } else {
                     _signInState.value = SignInState.Error("Invalid response from server")
                 }
