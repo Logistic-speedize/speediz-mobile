@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val sharePreferences: MySharePreferences = hiltViewModel<SignInViewModel>().sharePreferences
-            val viewModel = hiltViewModel<SignInViewModel>()
             val isLoggedIn = remember { mutableStateOf(sharePreferences.getToken() != null) }
             val showSplashScreen = remember { mutableStateOf(true) }
             LaunchedEffect( navController) {

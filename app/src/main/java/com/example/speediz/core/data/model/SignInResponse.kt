@@ -10,7 +10,7 @@ data class SignInResponse(
     data class Data(
         @SerializedName("token")
         var accessToken : String? = null,
-        @SerializedName("data")
+        @SerializedName("user")
         var user: User? = User()
     ){
         data class User(
