@@ -3,7 +3,6 @@ package com.example.speediz.ui.feature.unauthorized.verifyEmail
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.example.speediz.ui.feature.appwide.button.Button
 
 @Composable
 fun ScreenEmailVerify(
