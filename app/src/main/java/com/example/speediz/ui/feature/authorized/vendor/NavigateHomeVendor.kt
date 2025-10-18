@@ -14,6 +14,7 @@ fun NavGraphBuilder.screenHomeVendor(
         )
     }
 }
+
 fun NavController.navigateToHomeVendor(){
     this.navigate(AuthorizedRoute.VendorRoute.Home.route)
 }
