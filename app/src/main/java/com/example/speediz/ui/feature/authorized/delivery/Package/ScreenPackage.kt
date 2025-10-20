@@ -131,7 +131,7 @@ fun PackageCard(item: PackageItem) {
         ) {
             Text(
                 text = item.id,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp
             )
             Box(
@@ -142,7 +142,7 @@ fun PackageCard(item: PackageItem) {
                 Text(
                     text = item.status,
                     color = Color.White,
-                    fontSize = 13.sp
+                    fontSize = 14.sp
                 )
             }
         }
@@ -154,12 +154,12 @@ fun PackageCard(item: PackageItem) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
-                Text("From", fontWeight = FontWeight.SemiBold)
-                Text(item.senderName)
+                Text("From", fontSize = 13.sp, color = Color.Gray)
+                Text(item.senderName, fontWeight = FontWeight.Medium)
             }
             Column {
-                Text("To", fontWeight = FontWeight.SemiBold)
-                Text(item.receiverName)
+                Text("To", fontSize = 13.sp, color = Color.Gray)
+                Text(item.receiverName, fontWeight = FontWeight.Medium)
             }
         }
 
