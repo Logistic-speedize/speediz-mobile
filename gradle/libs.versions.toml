@@ -108,7 +108,7 @@ retrofit = [
     "retrofit",
     "converter-gson",
     "okhttp",
-    "logging-interceptor",
+    #"logging-interceptor",
     "gson",
 ]
 coroutines = [
