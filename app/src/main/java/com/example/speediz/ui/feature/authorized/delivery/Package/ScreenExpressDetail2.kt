@@ -116,11 +116,15 @@ fun ScreenExpressDetail2() {
                     )
                     StatusItem(
                         title = "In_Transit",
-                        active = currentStatus == "Shippin"
+                        active = currentStatus == "In_Transit"
                     )
                     StatusItem(
                         title = "Delivered",
                         active = currentStatus == "Delivered"
+                    )
+                    StatusItem(
+                        title = "Cancelled",
+                        active = currentStatus == "Cancelled"
                     )
                 }
 
