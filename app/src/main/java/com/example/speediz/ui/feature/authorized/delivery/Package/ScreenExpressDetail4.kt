@@ -118,7 +118,7 @@ fun ScreenExpressDetail4() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StatusStepItem("Packed", currentStatus)
-                    StatusStepItem("In Transit", currentStatus)
+                    StatusStepItem("In_Transit", currentStatus)
                     StatusStepItem("Delivered", currentStatus)
                     StatusStepItem("Cancelled", currentStatus)
                 }
@@ -161,7 +161,7 @@ fun ScreenExpressDetail4() {
 @Composable
 fun StatusStepItem(title: String, currentStatus: String) {
     val active = when (title) {
-        "Packed", "In Transit", "Delivered" -> true  // Always active
+        "Packed", "In_Transit", "Delivered" -> true  // Always active
         "Cancelled" -> currentStatus == "Cancelled"  // Only active if cancelled
         else -> false
     }
@@ -184,7 +184,7 @@ fun StatusStepItem(title: String, currentStatus: String) {
 
 // --- Simulate API status fetch ---
 fun getPackageStatus(): String {
-    val statuses = listOf("Packed", "In Transit", "Delivered", "Cancelled")
+    val statuses = listOf("Packed", "In_Transit", "Delivered", "Cancelled")
     return statuses.random()
 }
 
