@@ -1,10 +1,10 @@
-package com.example.speediz.ui.feature.authorized.delivery.Package
+package com.example.speediz.ui.feature.authorized.delivery.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +18,9 @@ import com.example.speediz.R
 import com.example.speediz.ui.theme.SpeedizTheme
 
 @Composable
-fun ScreenExpressDetail5() {
+fun ScreenExpressDetail2() {
+    var currentStatus by remember { mutableStateOf("Shipping") } // simulate current status
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +53,7 @@ fun ScreenExpressDetail5() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // --- Bottom Sheet Content ---
+        // --- Bottom Sheet ---
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,25 +91,42 @@ fun ScreenExpressDetail5() {
                     }
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFE53935), RoundedCornerShape(50))
+                            .background(Color(0xFF4AA8F8), RoundedCornerShape(50))
                             .padding(horizontal = 12.dp, vertical = 4.dp)
                     ) {
-                        Text("Cancelled", color = Color.White, fontSize = 14.sp)
+                        Text("On hold", color = Color.White, fontSize = 14.sp)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- Status Timeline: all active ---
+                // --- Timeline with connecting line ---
+                val statuses = listOf("Packed", "In_Transit", "Delivered", "Cancelled")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    StatusStepItem("Packed")
-                    StatusStepItem("In_Transit")
-                    StatusStepItem("Delivered")
-                    StatusStepItem("Cancelled")
+                    statuses.forEachIndexed { index, title ->
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            // Line to next item (except last)
+                            if (index != statuses.lastIndex) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(2.dp)
+                                        .fillMaxWidth()
+                                        .background(
+                                            color = if (isActive(title, currentStatus)) MaterialTheme.colorScheme.primary else Color.Gray
+                                        )
+                                        .align(Alignment.CenterEnd)
+                                )
+                            }
+
+                            StatusItemWithLine(title, currentStatus)
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))
@@ -144,29 +163,39 @@ fun ScreenExpressDetail5() {
     }
 }
 
-// --- Lightweight StatusStepItem, always active ---
 @Composable
-fun StatusStepItem(title: String) {
+fun StatusItemWithLine(title: String, currentStatus: String) {
+    val active = isActive(title, currentStatus)
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = painterResource(id = R.drawable.ic_radio_button_checked),
             contentDescription = title,
-            tint = MaterialTheme.colorScheme.primary,  // always active
+            tint = if (active) MaterialTheme.colorScheme.primary else Color.Gray,
             modifier = Modifier.size(28.dp)
         )
         Text(
             text = title,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.primary, // always active
+            color = if (active) MaterialTheme.colorScheme.primary else Color.Gray,
             textAlign = TextAlign.Center
         )
     }
 }
 
+fun isActive(title: String, currentStatus: String): Boolean {
+    return when (title) {
+        "Packed" -> currentStatus in listOf("Packed", "Shipping", "Delivered")
+        "In_Transit" -> currentStatus in listOf("Shipping", "In_Transit", "Delivered")
+        "Delivered" -> currentStatus == "Delivered"
+        "Cancelled" -> currentStatus == "Cancelled"
+        else -> false
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun ExpressDetailPreview5() {
+fun ExpressDetailPreview2() {
     SpeedizTheme {
-        ScreenExpressDetail5()
+        ScreenExpressDetail2()
     }
 }
