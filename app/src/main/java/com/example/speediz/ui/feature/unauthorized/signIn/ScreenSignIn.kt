@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -24,17 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-
 import com.example.speediz.R
 import com.example.speediz.core.data.model.SignInRequest
 import com.example.speediz.ui.navigation.AuthorizedRoute
-import com.example.speediz.ui.theme.SpeedizTheme
+import com.example.speediz.ui.navigation.UnauthorizedRoute
 
 @Composable
 fun ScreenSignIn(
@@ -134,15 +133,41 @@ fun ScreenSignIn(
                         color = Color.White
                     )
                 }
-                Spacer( modifier = Modifier.padding(24.dp))
-                Text(
-                    text = "Don't have an account? Sign Up" ,
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize ,
-                    fontWeight = FontWeight.Medium ,
+                Row(
                     modifier = Modifier
-                        .align(alignment = Alignment.CenterHorizontally) ,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+
+                    Text(
+                        text = "Don't have an account?" ,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize ,
+                        fontWeight = FontWeight.Medium ,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Button(
+                        modifier = Modifier
+                            .background(color = Color.Transparent)
+                        ,
+                        colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ),
+                        onClick = {
+                            onNavigateTo(UnauthorizedRoute.ChooseToSignUp.route)
+                        },
+                    ){
+                        Text(
+                            text = "Sign Up" ,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize ,
+                            fontWeight = FontWeight.Bold ,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
             }
         }
 }
