@@ -1,10 +1,10 @@
-package com.example.speediz.ui.feature.authorized.delivery.Package
+package com.example.speediz.ui.feature.authorized.delivery.Express
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,13 +18,15 @@ import com.example.speediz.R
 import com.example.speediz.ui.theme.SpeedizTheme
 
 @Composable
-fun ScreenExpressDetail5() {
+fun ScreenExpressDetail2() {
+    var currentStatus by remember { mutableStateOf("Shipping") } // simulate current status
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8FAF6))
     ) {
-        // --- Top Bar ---
+        // --- Top Bar (outside sheet) ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,7 +53,7 @@ fun ScreenExpressDetail5() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // --- Bottom Sheet Content ---
+        // --- Bottom Sheet ---
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,7 +79,7 @@ fun ScreenExpressDetail5() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- Package Info ---
+                // Package Info
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -89,30 +91,45 @@ fun ScreenExpressDetail5() {
                     }
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFE53935), RoundedCornerShape(50))
+                            .background(
+                                Color(0xFF4AA8F8),
+                                shape = RoundedCornerShape(50)
+                            )
                             .padding(horizontal = 12.dp, vertical = 4.dp)
                     ) {
-                        Text("Cancelled", color = Color.White, fontSize = 14.sp)
+                        Text("On hold", color = Color.White, fontSize = 14.sp)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- Status Timeline: all active ---
+                // Timeline
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    StatusStepItem("Packed")
-                    StatusStepItem("In_Transit")
-                    StatusStepItem("Delivered")
-                    StatusStepItem("Cancelled")
+                    StatusItem(
+                        title = "Packed",
+                        active = currentStatus == "Packed" || currentStatus == "Shipping" || currentStatus == "Delivered"
+                    )
+                    StatusItem(
+                        title = "In_Transit",
+                        active = currentStatus == ""
+                    )
+                    StatusItem(
+                        title = "Delivered",
+                        active = currentStatus == "Delivered"
+                    )
+                    StatusItem(
+                        title = "Cancelled",
+                        active = currentStatus == "Cancelled"
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // --- Sender & Receiver Info ---
+                // Sender & Receiver Info
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -133,31 +150,64 @@ fun ScreenExpressDetail5() {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // --- Price Info ---
+                // Price Info
                 Column {
                     Text("Package price(\$):  \$100.00", fontWeight = FontWeight.Bold)
                     Text("Package price(riel):  410000.00", fontWeight = FontWeight.Bold)
                     Text("Delivery Fee:  \$2.00", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = { /* Cancel */ },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                    ) {
+                        Text("Cancel", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = { /* Start shipping */ },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                    ) {
+                        Text("Start Shipping", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
     }
 }
 
-// --- Lightweight StatusStepItem, always active ---
 @Composable
-fun StatusStepItem(title: String) {
+fun StatusItem(title: String, active: Boolean) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             painter = painterResource(id = R.drawable.ic_radio_button_checked),
             contentDescription = title,
-            tint = MaterialTheme.colorScheme.primary,  // always active
+            tint = if (active) MaterialTheme.colorScheme.primary else Color.Gray,
             modifier = Modifier.size(28.dp)
         )
         Text(
             text = title,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.primary, // always active
+            color = if (active) MaterialTheme.colorScheme.primary else Color.Gray,
             textAlign = TextAlign.Center
         )
     }
@@ -165,8 +215,9 @@ fun StatusStepItem(title: String) {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun ExpressDetailPreview5() {
+fun ExpressDetailPreview() {
     SpeedizTheme {
-        ScreenExpressDetail5()
+        ScreenExpressDetail2()
     }
 }
+

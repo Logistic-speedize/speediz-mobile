@@ -1,4 +1,0 @@
-package com.example.speediz.ui.feature.authorized.delivery.Package
-
-class PackageVM {
-}
