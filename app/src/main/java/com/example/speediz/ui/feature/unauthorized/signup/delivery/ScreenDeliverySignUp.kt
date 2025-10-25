@@ -1,9 +1,13 @@
-package com.example.speediz.ui.feature.unauthorized.signup
+package com.example.speediz.ui.feature.unauthorized.signup.delivery
 
-import android.content.res.Resources
-import android.graphics.drawable.Icon
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +17,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
@@ -25,10 +32,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,8 +55,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.speediz.R
+import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 import com.example.speediz.ui.theme.SpeedizTheme
-import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 
 @Composable
 fun ScreenDeliverySignUp(
@@ -65,17 +73,22 @@ fun ScreenDeliverySignUp(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var cvPath by remember { mutableStateOf<Uri?>(null) }
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var expandedGender by remember { mutableStateOf(false) }
 
-    Scaffold { padding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.White,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+    ){ padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
-                .padding(20.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Icon(
@@ -86,8 +99,8 @@ fun ScreenDeliverySignUp(
                 tint = Color.Black
             )
             Image(
-                painter = painterResource( id = R.drawable.ic_logo),
-                contentDescription = "Logo",
+                painter = painterResource( id = R.drawable.ic_logo) ,
+                contentDescription = "Logo" ,
                 modifier = Modifier.fillMaxWidth().height(100.dp)
                     .align(alignment = Alignment.CenterHorizontally)
             )
@@ -102,18 +115,27 @@ fun ScreenDeliverySignUp(
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text("First Name") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Ascii
+                    ),
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text("Last Name") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Ascii
+                    ),
+                    singleLine = true
                 )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Gender Dropdown
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
                         value = gender,
@@ -136,55 +158,51 @@ fun ScreenDeliverySignUp(
                     )
                     DropdownMenu(
                         expanded = expandedGender,
-                        onDismissRequest = { expandedGender = false }
+                        onDismissRequest = { expandedGender = false },
+                        modifier = Modifier
+                            .focusable()
+                            .background( color = Color.White)
                     ) {
                         genderOptions.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option) },
+                                text = { Text(option, color = Color.Black) },
                                 onClick = {
                                     gender = option
                                     expandedGender = false
-                                }
+                                },
+                                modifier = Modifier.fillMaxWidth().background( color = Color.White),
                             )
                         }
                     }
                 }
-
-                // CV Upload
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    label = { Text("CV Upload") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = null
-                        )
-                    },
-                    readOnly = true,
-                    modifier = Modifier.weight(1f)
-                )
+                Box(modifier = Modifier.weight(1f)) {
+                    CVUploadField(
+                        selectedCV = cvPath,
+                        onCVSelected = { cvPath = it }
+                    )
+                }
             }
-
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = dob,
-                    onValueChange = { dob = it },
-                    label = { Text("DOB") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
-                    },
+                Box(
                     modifier = Modifier.weight(1f)
-                )
+                ) {
+                    SpDatePickerInput(
+                        onValueChange = {
+                            dob = it
+                        },
+                        placeholderText = "DOB"
+                    )
+                }
                 OutlinedTextField(
                     value = phone,
                     onValueChange = { phone = it },
                     label = { Text("Contact") },
                     placeholder = { Text("phone number") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+                    ),
+                    singleLine = true
                 )
             }
 
@@ -199,7 +217,8 @@ fun ScreenDeliverySignUp(
                         contentDescription = null
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             OutlinedTextField(
@@ -207,7 +226,8 @@ fun ScreenDeliverySignUp(
                 onValueChange = { email = it },
                 label = { Text("Email Address") },
                 placeholder = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -217,15 +237,8 @@ fun ScreenDeliverySignUp(
                     label = { Text("Password") },
                     placeholder = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-//                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-//                            Icon(
-//                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-//                                contentDescription = null
-//                            )
-//                        }
-                    },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
                 )
 
                 OutlinedTextField(
@@ -234,15 +247,8 @@ fun ScreenDeliverySignUp(
                     label = { Text("Password") },
                     placeholder = { Text("Password") },
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-//                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-//                            Icon(
-//                                imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-//                                contentDescription = null
-//                            )
-//                        }
-                    },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
                 )
             }
 
@@ -272,5 +278,67 @@ fun PreviewScreenDeliverySignUp() {
             onNavigateTo = {},
             onBackPress = {}
         )
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CVUploadField(
+    selectedCV: Uri?,
+    onCVSelected: (Uri) -> Unit
+) {
+    var showSheet by remember { mutableStateOf(false) }
+
+    // Gallery launcher
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            onCVSelected(it) // store URI as String
+            Log.d("CVUploadField" , "Selected CV URI: ${uri}")
+            showSheet = false
+        }
+    }
+    OutlinedTextField(
+        value = "" , // leave empty because we will show the image below
+        onValueChange = {} ,
+        label = {
+           if ( selectedCV == null ) {
+               Text("Upload NID")
+           } else {
+               Text("Uploaded")
+           }
+       } ,
+        trailingIcon = {
+            if ( selectedCV == null ) {
+                Icon(
+                    imageVector =  Icons.Default.AddCircle,
+                    contentDescription = "Upload CV",
+                )
+            } else {
+                Icon(
+                    imageVector =  Icons.Default.CheckCircle,
+                    contentDescription = "Change CV",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        } ,
+        readOnly = true ,
+        enabled = false ,
+        modifier = Modifier
+            .clickable { showSheet = !showSheet }
+        ,
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledBorderColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
+            disabledTextColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface ,
+            disabledLabelColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
+            disabledLeadingIconColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
+            disabledTrailingIconColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
+        )
+    )
+
+    if (showSheet) {
+        galleryLauncher.launch("image/*")
     }
 }
