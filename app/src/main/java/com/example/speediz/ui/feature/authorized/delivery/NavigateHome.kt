@@ -5,14 +5,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import com.example.speediz.ui.navigation.AuthorizedRoute
+import com.example.speediz.ui.screens.ScreenHomeDelivery
 
 fun  NavGraphBuilder.screenDeliveryHome(
     onNavigateTo : (String) -> Unit
 ) {
     composable( route = AuthorizedRoute.DeliveryRoute.Home.route) {
-        ScreenHomeDelivery(
-            onNavigateTo = onNavigateTo
-        )
+        ScreenHomeDelivery()
     }
 }
 fun NavController.screenHomeDelivery(
