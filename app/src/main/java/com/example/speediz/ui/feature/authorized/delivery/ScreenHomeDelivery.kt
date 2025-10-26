@@ -1,4 +1,4 @@
-package com.example.speediz.ui.screens // <-- change to your actual package name
+package com.example.speediz.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -98,29 +99,35 @@ fun ScreenHomeDelivery() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Search Bar (with border)
+        // 🔍 Search Bar — Subtle black stroke + soft shadow
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .shadow(
+                    elevation = 6.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    clip = false
+                )
                 .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
                 .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                    width = 1.dp,
+                    color = Color(0xFF2E2E2E), // subtle dark gray stroke, not pure black
                     shape = RoundedCornerShape(12.dp)
                 )
-                .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "Search",
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
+                colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.8f))
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Enter company name",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color.Black.copy(alpha = 0.7f),
                 fontSize = 14.sp
             )
         }
