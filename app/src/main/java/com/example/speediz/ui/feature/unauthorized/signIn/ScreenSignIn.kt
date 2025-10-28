@@ -124,6 +124,10 @@ fun ScreenSignIn(
                     ,
                     onClick = {
                         onSignIn( viewModel, SignInRequest(viewModel.email, viewModel.password))
+                        Log.d( "TAG", "ScreenSignIn: ${onSignIn(
+                            viewModel ,
+                            SignInRequest(viewModel.email, viewModel.password)
+                        )}" )
                     },
                 ){
                     Text(

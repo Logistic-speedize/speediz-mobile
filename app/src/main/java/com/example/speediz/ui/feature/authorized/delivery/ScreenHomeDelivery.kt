@@ -1,4 +1,4 @@
-package com.example.speediz.ui.screens // <-- change to your actual package name
+package com.example.speediz.ui.feature.authorized.delivery
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

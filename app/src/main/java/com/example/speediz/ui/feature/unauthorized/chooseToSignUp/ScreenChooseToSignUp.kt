@@ -66,7 +66,7 @@ fun ScreenChooseToSignUp(
                     }
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.ic_choose_to_sign_up_foreground),
+                    painter = painterResource(id = R.drawable.ic_choose_to_sign_up),
                     contentDescription = "OnBoard Image",
                     modifier = Modifier.fillMaxWidth()
                         .height(400.dp)
@@ -113,7 +113,7 @@ fun ScreenChooseToSignUp(
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_vendor_foreground),
+                                    painter = painterResource(id = R.drawable.ic_vendor),
                                     contentDescription = "Sign In Image",
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -152,7 +152,7 @@ fun ScreenChooseToSignUp(
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_delivery_foreground),
+                                    painter = painterResource(id = R.drawable.ic_delivery),
                                     contentDescription = "Sign In Image",
                                     modifier = Modifier
                                         .fillMaxWidth()
