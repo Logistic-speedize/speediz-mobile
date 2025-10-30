@@ -7,7 +7,7 @@ import com.example.speediz.ui.navigation.UnauthorizedRoute
 
 
 fun NavGraphBuilder.screenVendorSignUp(
-    onNavigateTo: (String) -> Unit,
+    onNavigateTo: () -> Unit,
     onBackPress: () -> Unit
 ) {
     composable(UnauthorizedRoute.VendorSignUp.route){

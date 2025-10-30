@@ -21,6 +21,7 @@ import java.util.*
 @Composable
 fun SpDatePickerInput(
     placeholderText: String = "",
+    formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
     onValueChange: (String) -> Unit = {}
 ) {
     var dateText by remember { mutableStateOf("") }
@@ -54,7 +55,6 @@ fun SpDatePickerInput(
     if (showSheet) {
         BottomSheetDatePicker(
             onDateSelected = { calendar ->
-                val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 dateText = formatter.format(calendar.time)
                 onValueChange(dateText)
                 showSheet = false // close sheet after selection

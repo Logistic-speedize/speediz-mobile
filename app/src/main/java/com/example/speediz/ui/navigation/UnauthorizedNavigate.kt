@@ -27,7 +27,7 @@ fun NavGraphBuilder.unauthorizedNavigate(
     )
     screenDeliverySignup(
         onNavigateTo = {
-            navController.navigate(UnauthorizedRoute.DeliverySignUp.route)
+            navController.navigate(UnauthorizedRoute.SignIn.route)
         } ,
         onBackPress = {
             navController.popBackStack()
@@ -35,7 +35,7 @@ fun NavGraphBuilder.unauthorizedNavigate(
     )
     screenVendorSignUp(
         onNavigateTo = {
-            navController.navigate(UnauthorizedRoute.VendorSignUp.route)
+            navController.navigate(UnauthorizedRoute.SignIn.route)
         },
         onBackPress = {
             navController.popBackStack()
