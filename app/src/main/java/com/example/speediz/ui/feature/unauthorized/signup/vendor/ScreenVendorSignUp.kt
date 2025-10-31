@@ -1,5 +1,9 @@
 package com.example.speediz.ui.feature.unauthorized.signup.vendor
 
+import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +36,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,35 +45,114 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.toLowerCase
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speediz.R
+import com.example.speediz.core.data.model.SignUpVendorRequest
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
+import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
+import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
+import com.example.speediz.ui.navigation.UnauthorizedRoute
+import com.example.speediz.ui.utils.dateFormat
+import java.util.Locale
+import java.util.Locale.getDefault
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenVendorSignUp(
-    onNavigateTo : (String) -> Unit,
+    onNavigateTo : () -> Unit,
     onBackPress : () -> Unit,
 ) {
     val genderOptions = listOf("Male", "Female", "Other")
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var expandedGender by remember { mutableStateOf(false) }
+    val signUpViewModel = hiltViewModel<VendorSignUpVM>()
+    val signUpState = signUpViewModel.signUpUiState.collectAsState().value
+    val firstName = remember {
+        mutableStateOf("")
+    }
+    val lastName = remember {
+        mutableStateOf("")
+    }
+    val gender = remember {
+        mutableStateOf("")
+    }
+    val dob = remember {
+        mutableStateOf("")
+    }
+    val phone = remember {
+        mutableStateOf("")
+    }
+    val location= remember {
+        mutableStateOf("")
+    }
+    val email = remember {
+        mutableStateOf("")
+    }
+    val password= remember {
+        mutableStateOf("")
+    }
+    val confirmPassword =remember {
+        mutableStateOf("")
+    }
+    val businessName =remember {
+        mutableStateOf("")
+    }
+    val context = LocalContext.current
+    LaunchedEffect(signUpState) {
+        when (signUpState) {
+            is SignUPState.Loading -> {
+                // Show loading indicator if needed
+            }
+            is SignUPState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Vendor registered successfully!",
+                    Toast.LENGTH_LONG
+                ).show()
+                onNavigateTo()
+                Log.d("Navigation", "Navigating to: ${UnauthorizedRoute.SignIn.route}")
+            }
+            is SignUPState.Error -> {
+                Toast.makeText(
+                    context,
+                    signUpState.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else -> {
+                // Handle other states if necessary
+            }
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun onSubmit (){
+        val request = SignUpVendorRequest(
+            firstName = firstName.value ,
+            lastName = lastName.value ,
+            gender =  gender.value.lowercase(getDefault()) ,
+            dob = dateFormat(dob.value) ,
+            contactNumber = phone.value ,
+            address = location.value ,
+            email = email.value ,
+            password = password.value ,
+            passwordConfirm = confirmPassword.value ,
+            businessName = businessName.value ,
+        )
+        signUpViewModel.signUpVendor(request)
+    }
 
     Scaffold(
         modifier = Modifier.wrapContentSize(),
@@ -103,16 +188,18 @@ fun ScreenVendorSignUp(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
+                    value = firstName.value,
+                    onValueChange = { firstName.value = it },
                     label = { Text("First Name") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
                 )
                 OutlinedTextField(
-                    value = lastName,
-                    onValueChange = { lastName = it },
+                    value = lastName.value,
+                    onValueChange = { lastName.value = it },
                     label = { Text("Last Name") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
                 )
             }
 
@@ -123,8 +210,10 @@ fun ScreenVendorSignUp(
                 // Gender Dropdown
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
-                        value = gender,
-                        onValueChange = {},
+                        value = gender.value,
+                        onValueChange = {
+                            gender.value = it
+                        },
                         label = { Text("Gender") },
                         trailingIcon = {
                             Icon(
@@ -152,7 +241,7 @@ fun ScreenVendorSignUp(
                             DropdownMenuItem(
                                 text = { Text(option, color = Color.Black) },
                                 onClick = {
-                                    gender = option
+                                    gender.value = option
                                     expandedGender = false
                                 },
                                 modifier = Modifier.fillMaxWidth().background( color = Color.White),
@@ -165,7 +254,7 @@ fun ScreenVendorSignUp(
                 ) {
                     SpDatePickerInput(
                         onValueChange = {
-                            dob = it
+                            dob.value = it
                         },
                         placeholderText = "DOB"
                     )
@@ -174,75 +263,85 @@ fun ScreenVendorSignUp(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
+                    value = businessName.value,
+                    onValueChange = { businessName.value = it },
+                    label = { Text("Business name") },
+                    placeholder = { Text("Business name") },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    supportingText = {
+                        Text(
+                            if ( businessName.value.isEmpty()){
+                                "Enter your business name"
+                            } else {
+                                ""
+                            },
+                            color = if ( businessName.value.isEmpty()){
+                                Color.Red
+                            } else {
+                                Color.Transparent
+                            }
+                        )
+                    }
+                )
+                OutlinedTextField(
+                    value = phone.value,
+                    onValueChange = { phone.value = it },
                     label = { Text("Contact") },
                     placeholder = { Text("phone number") },
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    label = { Text("Location") },
-                    placeholder = { Text("Select Location") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = null
-                        )
-                    },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
                 )
             }
-
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = location.value,
+                onValueChange = { location.value = it },
+                label = { Text("Location") },
+                placeholder = { Text("Select Location") },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+            )
+            OutlinedTextField(
+                value = email.value,
+                onValueChange = { email.value = it },
                 label = { Text("Email Address") },
                 placeholder = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
             )
-
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = password.value,
+                    onValueChange = { password.value = it },
                     label = { Text("Password") },
                     placeholder = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-//                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-//                            Icon(
-//                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-//                                contentDescription = null
-//                            )
-//                        }
-                    },
                     modifier = Modifier.weight(1f)
                 )
 
                 OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    value = confirmPassword.value,
+                    onValueChange = { confirmPassword.value = it },
                     label = { Text("Password") },
-                    placeholder = { Text("Password") },
+                    placeholder = { Text("Confirm Password") },
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-//                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-//                            Icon(
-//                                imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-//                                contentDescription = null
-//                            )
-//                        }
-                    },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick ={},
+                onClick ={
+                    onSubmit()
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
@@ -255,4 +354,13 @@ fun ScreenVendorSignUp(
             }
         }
     }
+}
+
+@Preview ( showBackground = true )
+@Composable
+fun ScreenVendorSignUpPreview() {
+    ScreenVendorSignUp(
+        onNavigateTo = {},
+        onBackPress = {}
+    )
 }

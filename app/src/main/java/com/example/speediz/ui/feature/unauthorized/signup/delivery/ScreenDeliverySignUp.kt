@@ -2,6 +2,7 @@ package com.example.speediz.ui.feature.unauthorized.signup.delivery
 
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -40,6 +41,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -54,9 +58,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
+import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
+import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.theme.SpeedizTheme
+import com.example.speediz.ui.utils.dateFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Locale.getDefault
 
 @Composable
 fun ScreenDeliverySignUp(
@@ -64,21 +75,72 @@ fun ScreenDeliverySignUp(
     onBackPress: () -> Unit,
 ) {
     val genderOptions = listOf("Male", "Female", "Other")
+    val deliveryOptions = listOf("Motorcycle", "Car", "Van", "Truck")
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var cvPath by remember { mutableStateOf<Uri?>(null) }
+    var deliveryType by remember { mutableStateOf("") }
+    var zone by remember { mutableStateOf("") }
+
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var expandedGender by remember { mutableStateOf(false) }
+    var expandedDelivery by remember { mutableStateOf(false) }
 
+    val viewModel = hiltViewModel<DeliveryVM>()
+    val signUpState = viewModel.signUpUiState.collectAsState().value
+    val context = LocalContext.current
+    LaunchedEffect(
+        signUpState
+    ) {
+        when (signUpState) {
+            is SignUPState.Loading -> {
+                // Show loading indicator if needed
+            }
+            is SignUPState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Vendor registered successfully!",
+                    Toast.LENGTH_LONG
+                ).show()
+                onNavigateTo()
+                Log.d("Navigation", "Navigating to: ${UnauthorizedRoute.SignIn.route}")
+            }
+            is SignUPState.Error -> {
+                Toast.makeText(
+                    context,
+                    signUpState.message,
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d( "ScreenDeliverySignUp", "Sign up error: ${signUpState.message}" )
+            }
+            else -> {
+                // Handle other states if necessary
+            }
+        }
+    }
+
+    fun onSubmit(){
+        viewModel.firstName.value = firstName
+        viewModel.lastName.value = lastName
+        viewModel.dob.value = dob
+        viewModel.gender.value = gender.lowercase(getDefault())
+        viewModel.contactNumber.value = phone
+        viewModel.email.value = email
+        viewModel.password.value = password
+        viewModel.passwordConfirm.value = confirmPassword
+        viewModel.zone.value = zone
+        viewModel.nidUri.value = cvPath
+        viewModel.driverType.value = deliveryType
+        viewModel.deliverySignUp()
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.White,
@@ -139,7 +201,9 @@ fun ScreenDeliverySignUp(
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
                         value = gender,
-                        onValueChange = {},
+                        onValueChange = {
+                            gender = it
+                        },
                         label = { Text("Gender") },
                         trailingIcon = {
                             Icon(
@@ -190,7 +254,8 @@ fun ScreenDeliverySignUp(
                         onValueChange = {
                             dob = it
                         },
-                        placeholderText = "DOB"
+                        placeholderText = "DOB",
+                        formatter = SimpleDateFormat("MM/dd/yyyy", getDefault())
                     )
                 }
                 OutlinedTextField(
@@ -207,8 +272,8 @@ fun ScreenDeliverySignUp(
             }
 
             OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
+                value = zone,
+                onValueChange = { zone = it },
                 label = { Text("Location") },
                 placeholder = { Text("Select Location") },
                 trailingIcon = {
@@ -220,7 +285,47 @@ fun ScreenDeliverySignUp(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
-
+            Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = deliveryType,
+                    onValueChange = {
+                        deliveryType = it
+                    },
+                    label = { Text("Driver Type") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = if (expandedDelivery)
+                                Icons.Default.KeyboardArrowUp
+                            else
+                                Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { expandedDelivery = !expandedDelivery }
+                        )
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expandedDelivery = !expandedDelivery }
+                )
+                DropdownMenu(
+                    expanded = expandedDelivery,
+                    onDismissRequest = { expandedDelivery = false },
+                    modifier = Modifier
+                        .focusable()
+                        .background( color = Color.White)
+                ) {
+                    deliveryOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, color = Color.Black) },
+                            onClick = {
+                                deliveryType = option
+                                expandedDelivery = false
+                            },
+                            modifier = Modifier.fillMaxWidth().background( color = Color.White),
+                        )
+                    }
+                }
+            }
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -251,11 +356,11 @@ fun ScreenDeliverySignUp(
                     singleLine = true
                 )
             }
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Button(
-                onClick = onNavigateTo,
+                onClick = {
+                    onSubmit()
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
@@ -307,7 +412,7 @@ fun CVUploadField(
            if ( selectedCV == null ) {
                Text("Upload NID")
            } else {
-               Text("Uploaded")
+               Text("Uploaded CV")
            }
        } ,
         trailingIcon = {
