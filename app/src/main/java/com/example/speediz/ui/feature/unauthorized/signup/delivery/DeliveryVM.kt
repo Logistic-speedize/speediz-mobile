@@ -61,7 +61,7 @@ class DeliveryVM @Inject constructor(
             contactNumber = contactNumber.value,
             driverType = driverType.value,
             zone = zone.value,
-            nid = nidUri.value
+            image = nidUri.value
         )
         Log.d( "DeliveryVM", "Starting delivery sign up with request: $request")
         _isLoading.value = true

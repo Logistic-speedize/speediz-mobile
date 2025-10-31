@@ -27,5 +27,5 @@ data class SignUpDeliveryRequest(
     @SerialName("zone")
     val zone: String,
     @SerialName("image")
-    val nid: Uri?= null
+    val image: Uri?= null
 )

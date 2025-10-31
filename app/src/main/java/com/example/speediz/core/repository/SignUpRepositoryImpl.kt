@@ -29,9 +29,6 @@ class SignUpRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deliverySignUp(signUpDeliveryRequest: SignUpDeliveryRequest): SignUpDriverResponse {
-        val image = signUpDeliveryRequest.nid?.let {
-            createMultipartFromUri("nid", signUpDeliveryRequest.nid)
-        }
         return apiRequest {
             api.deliverySignUp(
                 signUpDeliveryRequest.firstname.toRequestBody(MultipartBody.FORM),
@@ -44,18 +41,15 @@ class SignUpRepositoryImpl @Inject constructor(
                 signUpDeliveryRequest.contactNumber.toRequestBody(MultipartBody.FORM),
                 signUpDeliveryRequest.driverType.toRequestBody(MultipartBody.FORM),
                 signUpDeliveryRequest.zone.toRequestBody(MultipartBody.FORM),
-                image
+                createMultipartFromUri("image" , signUpDeliveryRequest.image)
             )
         }
     }
-    private fun String.toPart(): RequestBody =
-        this.toRequestBody("image/*".toMediaTypeOrNull())
-
     private fun createMultipartFromUri(partName: String, uri: Uri?): MultipartBody.Part? {
         if (uri == null) return null
         return try {
             val contentResolver = context.contentResolver
-            val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
+            val mimeType = contentResolver.getType(uri) ?: "image/*"
             val inputStream = contentResolver.openInputStream(uri) ?: return null
             val bytes = inputStream.readBytes()
             inputStream.close()
@@ -63,10 +57,10 @@ class SignUpRepositoryImpl @Inject constructor(
             val fileName = getFileName(uri)
             MultipartBody.Part.createFormData(partName, fileName, requestBody)
         } catch (e: Exception) {
-            Log.e("SignUpRepo", "Failed to create multipart from URI", e)
             null
         }
     }
+
 
     private fun getFileName(uri: Uri): String {
         var name = "nid_image.jpeg"

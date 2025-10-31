@@ -75,6 +75,7 @@ fun ScreenDeliverySignUp(
     onBackPress: () -> Unit,
 ) {
     val genderOptions = listOf("Male", "Female", "Other")
+    val deliveryOptions = listOf("Motorcycle", "Car", "Van", "Truck")
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
@@ -91,6 +92,7 @@ fun ScreenDeliverySignUp(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var expandedGender by remember { mutableStateOf(false) }
+    var expandedDelivery by remember { mutableStateOf(false) }
 
     val viewModel = hiltViewModel<DeliveryVM>()
     val signUpState = viewModel.signUpUiState.collectAsState().value
@@ -137,7 +139,6 @@ fun ScreenDeliverySignUp(
         viewModel.zone.value = zone
         viewModel.nidUri.value = cvPath
         viewModel.driverType.value = deliveryType
-        Log.d( "ScreenDeliverySignUp", "Submitting sign up with: $firstName, $lastName, $dob, $gender, $phone, $email, $zone, $cvPath" )
         viewModel.deliverySignUp()
     }
     Scaffold(
@@ -284,7 +285,47 @@ fun ScreenDeliverySignUp(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
-
+            Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = deliveryType,
+                    onValueChange = {
+                        deliveryType = it
+                    },
+                    label = { Text("Driver Type") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = if (expandedDelivery)
+                                Icons.Default.KeyboardArrowUp
+                            else
+                                Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { expandedDelivery = !expandedDelivery }
+                        )
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expandedDelivery = !expandedDelivery }
+                )
+                DropdownMenu(
+                    expanded = expandedDelivery,
+                    onDismissRequest = { expandedDelivery = false },
+                    modifier = Modifier
+                        .focusable()
+                        .background( color = Color.White)
+                ) {
+                    deliveryOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, color = Color.Black) },
+                            onClick = {
+                                deliveryType = option
+                                expandedDelivery = false
+                            },
+                            modifier = Modifier.fillMaxWidth().background( color = Color.White),
+                        )
+                    }
+                }
+            }
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -315,16 +356,6 @@ fun ScreenDeliverySignUp(
                     singleLine = true
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = deliveryType,
-                onValueChange = { deliveryType = it },
-                label = { Text("Email Address") },
-                placeholder = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
@@ -381,7 +412,7 @@ fun CVUploadField(
            if ( selectedCV == null ) {
                Text("Upload NID")
            } else {
-               Text("Uploaded")
+               Text("Uploaded CV")
            }
        } ,
         trailingIcon = {
