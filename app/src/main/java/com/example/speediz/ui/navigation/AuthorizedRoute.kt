@@ -4,8 +4,9 @@ package com.example.speediz.ui.navigation
 sealed class AuthorizedRoute{
     sealed class DeliveryRoute ( val route : String) : AuthorizedRoute(){
         data object Home : DeliveryRoute(route = "delivery_home")
-        data object Package : DeliveryRoute(route = "delivery_package")
-        data object PackageDetail : DeliveryRoute(route = "package_detail/{id}")
+        data object Express : DeliveryRoute(route = "delivery_express")
+        data object ExpressDetail : DeliveryRoute(route = "express_detail/{id}")
+        data object History: DeliveryRoute(route = "history")
         data object Map : DeliveryRoute(route = "map")
         data object Account : DeliveryRoute(route = "account")
     }

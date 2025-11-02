@@ -64,7 +64,7 @@ class SignInViewModel @Inject constructor(
                 if (success.isNotEmpty()) {
                     _signInState.value = SignInState.Success(response.data?.accessToken.toString())
                     _isLoggedIn.value = true
-                    sharePreferences.saveToken(response.data?.accessToken.toString())
+                    sharePreferences.saveToken(response.data?.accessToken.toString(), response.data?.user?.role.toString())
                     _role.value = response.data?.user?.role ?: 3
                     Log.d( "TAG", "signIn: role ${response.data?.user?.role}" )
                 } else {
