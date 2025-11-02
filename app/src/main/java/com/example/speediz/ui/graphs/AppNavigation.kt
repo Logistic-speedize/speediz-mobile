@@ -22,12 +22,13 @@ import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+    navController : NavHostController ,
+    modifier : Modifier = Modifier ,
+    role : Int? ,
 ) {
     val signInViewModel = hiltViewModel<SignInViewModel>()
     val isLoggedIn = signInViewModel.isLoggedIn.collectAsState().value
-    val userRole = signInViewModel.role.collectAsState().value
+    val userRole = role
     val startDestination = if (!isLoggedIn) {
         UnauthorizedRoute.SignIn.route
     }else {

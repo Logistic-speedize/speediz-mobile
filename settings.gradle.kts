@@ -1,5 +1,3 @@
-import org.gradle.initialization.Environment
-import java.util.Properties
 
 pluginManagement {
     repositories {
