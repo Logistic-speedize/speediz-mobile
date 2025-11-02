@@ -28,3 +28,16 @@ val DarkBackground = Color(0xFF121212)
 val LightSurface = Color(0xFFFFFFFF)
 val DarkSurface = Color(0xFF121212)
 
+object SPColor {
+    val primary = LightOrange
+    val onPrimary = DarkOrange
+    val background = LightBackground
+    val surface = LightSurface
+    val onBackground = LightTextFieldGray
+    val onSurface = DarkSurface
+    val error = RedError
+    val blueInfo = BlueInfo
+    val greenSuccess = GreenSuccess
+    val yellowWarning = YellowWarning
+}
+

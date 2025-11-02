@@ -3,6 +3,7 @@ package com.example.speediz.core.network.services
 import android.content.Context
 import android.util.Log
 import com.example.speediz.BuildConfig
+import com.example.speediz.core.data.model.ExpressResponse
 import com.example.speediz.core.data.model.ResponseErrorModel
 import com.example.speediz.core.data.model.SignInRequest
 import com.example.speediz.core.data.model.SignInResponse
@@ -16,6 +17,7 @@ import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -47,6 +49,9 @@ interface ApiService {
         @Part image: MultipartBody.Part? = null
 
     ): Response<SignUpDriverResponse>
+
+    @GET("api/delivery/express")
+    suspend fun deliveryExpress(): Response<ExpressResponse>
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL
         operator fun invoke(
