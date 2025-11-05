@@ -19,7 +19,8 @@ fun NavGraphBuilder.screenExpressDetail(
         val expressId = backStackEntry.arguments?.getString("id") ?: ""
         ScreenExpressDetail(
             onBack = onBack,
-            navigateTo = navigateTo
+            navigateTo = navigateTo,
+            id = expressId
         )
     }
 }

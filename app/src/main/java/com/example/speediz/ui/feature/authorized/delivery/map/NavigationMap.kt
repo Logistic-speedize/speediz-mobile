@@ -9,7 +9,7 @@ fun NavGraphBuilder.screenMap(
     navigateTo: (String) -> Unit
 ) {
     composable(AuthorizedRoute.DeliveryRoute.Map.route){
-        ScreenMap()
+
     }
 }
 fun NavController.navigationMap() {
