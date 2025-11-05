@@ -22,7 +22,6 @@ android {
         buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""}\"")
         buildConfigField ("String", "API_BASE_URL", "\"${project.findProperty("API_BASE_URL") ?: "https://default.url/"}\"")
     }
-
     packaging {
         jniLibs {
             useLegacyPackaging = false
@@ -86,7 +85,13 @@ dependencies {
     //work manager
     implementation(libs.work.runtime.ktx)
     //mapbox
-    implementation(libs.mapbox)
+//    implementation(libs.mapbox.sdk)
+//    implementation(libs.mapbox.compose)
+//   // implementation(libs.mapbox.directions)
+//    implementation(libs.mapbox.navigation)
+//    implementation(libs.mapbox.navigation.core)
+    implementation(libs.mapbox.maps)
+//    implementation(libs.mapbox.navigation)
     implementation(libs.compose.ui)
     //navigation animation
     implementation(platform(libs.androidx.compose.bom))

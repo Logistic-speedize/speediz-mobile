@@ -1,5 +1,6 @@
 package com.example.speediz.core.repository
 
+import com.example.speediz.core.data.model.ExpressDetailResponse
 import com.example.speediz.core.data.model.ExpressResponse
 import com.example.speediz.core.network.SafeApiRequest
 import com.example.speediz.core.network.services.ApiService
@@ -14,4 +15,11 @@ class ExpressRepositoryImpl @Inject constructor(
             api.deliveryExpress()
         }
     }
+
+    override suspend fun expressDetail(id : Int) : ExpressDetailResponse {
+        return apiRequest {
+            api.deliveryExpressDetail(id)
+        }
+    }
+
 }
