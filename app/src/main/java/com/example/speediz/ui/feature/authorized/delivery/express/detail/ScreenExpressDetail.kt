@@ -19,9 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
+import com.example.speediz.core.data.model.CompletedStatusRequest
 import com.example.speediz.core.data.model.ExpressDetailResponse
+import com.example.speediz.core.data.model.PickUpStatusRequest
+import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
+import com.example.speediz.ui.theme.SPColor
+import com.mapbox.maps.extension.style.expressions.dsl.generated.pi
 
 @Composable
 fun ScreenExpressDetail(
@@ -110,7 +116,8 @@ fun ScreenExpressDetail(
             BottomSheetShowExpressDetail(
                expressDetail = expressDetail?.data,
                 currentStatus = currentStatus,
-                navigateTo = navigateTo
+                navigateTo = navigateTo,
+               viewModel = viewModel
            )
         }
 
@@ -122,7 +129,8 @@ fun ScreenExpressDetail(
 fun BottomSheetShowExpressDetail(
     expressDetail: ExpressDetailResponse.ExpressDetailData ?= null,
     currentStatus: String,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    viewModel : ExpressDetailViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -160,7 +168,8 @@ fun BottomSheetShowExpressDetail(
                 ExpressDetail(
                     expressDetail = expressDetail,
                     currentStatus = currentStatus,
-                    navigateTo = navigateTo
+                    navigateTo = navigateTo,
+                    viewModel = viewModel
                 )
             }
         }
@@ -171,14 +180,130 @@ fun BottomSheetShowExpressDetail(
 fun ExpressDetail(
     expressDetail: ExpressDetailResponse.ExpressDetailData ?= null,
     currentStatus: String,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    viewModel : ExpressDetailViewModel
 ) {
+    val completedState = viewModel.completedStatus.collectAsState().value
+    val cancelState = viewModel.cancelStatus.collectAsState().value
+    val rollbackState = viewModel.rollbackStatus.collectAsState().value
+    val pickUpState = viewModel.pickUpStatus.collectAsState().value
     val vendorName = expressDetail?.vendor?.firstName + " " + expressDetail?.vendor?.lastName
     val customerName = expressDetail?.customer?.firstName + " " + expressDetail?.customer?.lastName
     val vendorPhone = expressDetail?.vendor?.contactNumber
     val customerPhone = expressDetail?.customer?.contactNumber
     val packageInDollar = expressDetail?.price?.toDoubleOrNull() ?: 0.0
     val packageInRiel = packageInDollar * 4100 // Assuming 1 USD
+    val reason = remember { mutableStateOf("") }
+
+    var isCompleted by remember { mutableStateOf(false) }
+    var isCancelled by remember { mutableStateOf(false) }
+    var isRollback by remember { mutableStateOf(false) }
+    var isPickUp by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    LaunchedEffect(completedState , cancelState , rollbackState , pickUpState) {
+        when(completedState) {
+            is StatusUiState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Completed Successfully",
+                    Toast.LENGTH_LONG
+                ).show()
+                isCompleted = false
+            }
+            is StatusUiState.Error -> {
+                val message = (completedState).message
+                Toast.makeText(
+                    context,
+                    "Error: $message",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else -> {}
+        }
+        when (cancelState) {
+            is StatusUiState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Cancelled Successfully",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d( "ExpressDetail2" , "SUccesss" )
+                isCancelled = false
+            }
+            is StatusUiState.Error -> {
+                val message = (cancelState).message
+                Log.d( "ExpressDetail2" , "Cancel Error Message: $message" )
+                Toast.makeText(
+                    context,
+                    "Error: $message",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else -> {}
+        }
+        when (rollbackState) {
+            is StatusUiState.Success -> {
+                isRollback = false
+                Toast.makeText(
+                    context ,
+                    "Rollback Successfully" ,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            is StatusUiState.Error -> {
+                val message = (rollbackState).message
+                Toast.makeText(
+                    context ,
+                    "Error: $message" ,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            else -> {}
+        }
+        when (rollbackState){
+            is StatusUiState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Rollback Successfully",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            is StatusUiState.Error -> {
+                val message = (rollbackState).message
+                Toast.makeText(
+                    context,
+                    "Error: $message",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else -> {}
+        }
+
+        when (pickUpState){
+            is StatusUiState.Success -> {
+                isPickUp = false
+                Toast.makeText(
+                    context,
+                    "Pick Up Successfully",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            is StatusUiState.Error -> {
+                val message = (pickUpState).message
+                Toast.makeText(
+                    context,
+                    "Error: $message",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else -> {}
+        }
+
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -201,7 +326,12 @@ fun ExpressDetail(
             Box(
                 modifier = Modifier
                     .background(
-                        Color(0xFF4AA8F8),
+                        color =when (currentStatus) {
+                            "In_transit" -> SPColor.blueInfo
+                            "Completed" -> SPColor.greenSuccess
+                            "Cancelled" -> Color.Red
+                            else -> SPColor.yellowWarning
+                        },
                         shape = RoundedCornerShape(50)
                     )
                     .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -267,38 +397,156 @@ fun ExpressDetail(
         }
 
         Spacer(modifier = Modifier.height(28.dp))
+        Box{
+            // Buttons
+           when (currentStatus){
+               "In_transit" -> {
+                   Row(
+                       modifier = Modifier.fillMaxWidth(),
+                       horizontalArrangement = Arrangement.SpaceBetween
+                   ) {
+                       Button(
+                           onClick = {
+                               isCancelled = true
+                           } ,
+                           colors = ButtonDefaults.buttonColors(containerColor = SPColor.blueInfo) ,
+                           shape = RoundedCornerShape(12.dp) ,
+                           modifier = Modifier
+                               .weight(1f)
+                               .height(52.dp)
+                       ) {
+                           Text("Cancel" , color = Color.White , fontWeight = FontWeight.Bold)
+                       }
 
-        // Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = { /* Cancel */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(52.dp)
-            ) {
-                Text("Cancel", color = Color.White, fontWeight = FontWeight.Bold)
-            }
+                       Spacer(modifier = Modifier.width(16.dp))
 
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Button(
-                onClick = { /* Start shipping */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(52.dp)
-            ) {
-                Text("Start Shipping", color = Color.White, fontWeight = FontWeight.Bold)
-            }
+                       Button(
+                           onClick = {
+                               isCompleted = true
+                           } ,
+                           colors = ButtonDefaults.buttonColors(
+                               containerColor = MaterialTheme.colorScheme.primary
+                           ) ,
+                           shape = RoundedCornerShape(12.dp) ,
+                           modifier = Modifier
+                               .weight(1f)
+                               .height(52.dp)
+                       ) {
+                           Text(
+                               "Complete" ,
+                               color = Color.White ,
+                               fontWeight = FontWeight.Bold
+                           )
+                       }
+                   }
+               }
+               "Completed" , "Cancelled" -> {
+                   Button(
+                       onClick = {
+                            isRollback = true
+                       },
+                       modifier = Modifier
+                           .fillMaxWidth()
+                           .height(50.dp),
+                       shape = RoundedCornerShape(12.dp)
+                   ) {
+                       Text( "Rollback", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                   }
+               }
+               else -> {
+                   Button(
+                       onClick = {
+                           isPickUp = true
+                       },
+                       modifier = Modifier
+                           .fillMaxWidth()
+                           .height(50.dp),
+                       shape = RoundedCornerShape(12.dp),
+                       colors = ButtonDefaults.buttonColors(
+                           containerColor = Color.Red
+                       )
+                   ) {
+                       Text( "Pick up", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                   }
+               }
+           }
         }
+    }
+    if ( isPickUp){
+        DialogDelivery(
+            title = "Pick Up Delivery",
+            description = "Are you sure you want to pick up this delivery?",
+            onDismissRequest = {
+                isPickUp = false
+            },
+            onConfirm = { it ->
+                val request = PickUpStatusRequest(
+                    id = expressDetail?.id ?: 0
+                )
+                viewModel.getPickUpStatus(request)
+                Log.d("ExpressDetail2" , "Pick Up Confirmed for ID: ${expressDetail?.id}" )
+            },
+            isEnablePassValue = false
+        )
+    }
+    if ( isCompleted){
+        DialogDelivery(
+            title = "Complete Delivery",
+            description = "Are you sure you want to complete this delivery?",
+            onDismissRequest = {
+                isCompleted = false
+            },
+            onConfirm = { it ->
+                val request = CompletedStatusRequest(
+                    id = expressDetail?.number.toString()
+                )
+                viewModel.getCompletedStatus(request)
+            },
+            isEnablePassValue = false
+        )
+    }
+
+    if (isCancelled){
+        DialogDelivery(
+            title = "Cancel Delivery",
+            description = "Please provide a reason for cancelling this delivery.",
+            onDismissRequest = {
+                isCancelled = false
+            },
+            onConfirm = { it ->
+                val request = StatusRequest(
+                    id = expressDetail?.number.toString(),
+                    reason = it
+                )
+                viewModel.getCancelStatus(request)
+                isCancelled = false
+            },
+           isEnablePassValue = true,
+            onChangeValue = {
+                reason.value = it
+            }
+        )
+    }
+    if (isRollback){
+        DialogDelivery(
+            title = "Rollback Delivery",
+            description = "Please provide a reason for rolling back this delivery.",
+            onDismissRequest = {
+                isRollback = false
+            },
+            onConfirm = { it ->
+                val request = StatusRequest(
+                    id = expressDetail?.number.toString(),
+                    reason = it
+                )
+                viewModel.getRollbackStatus(request)
+                isRollback = false
+            },
+            isEnablePassValue = true,
+            onChangeValue = {
+                reason.value = it
+            }
+        )
     }
 }
 @Composable

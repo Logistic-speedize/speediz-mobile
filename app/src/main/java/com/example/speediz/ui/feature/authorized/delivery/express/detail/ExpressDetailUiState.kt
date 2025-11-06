@@ -7,3 +7,10 @@ sealed class ExpressDetailUiState {
     data class Success(val detail: ExpressDetailResponse) : ExpressDetailUiState()
     data class Error(val message: String) : ExpressDetailUiState()
 }
+
+sealed class StatusUiState {
+    object Idle : StatusUiState()
+    object Loading : StatusUiState()
+    data class Success(val message: String) : StatusUiState()
+    data class Error(val message: String) : StatusUiState()
+}

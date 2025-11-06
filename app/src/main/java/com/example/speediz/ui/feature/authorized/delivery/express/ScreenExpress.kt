@@ -182,6 +182,7 @@ fun ExpressCard(item: ExpressResponse.Data.ExpressItems, onNavigateTo : () -> Un
                         when (item.status) {
                             "in_transit" -> SPColor.blueInfo
                             "completed" -> SPColor.greenSuccess
+                            "cancelled" -> SPColor.error
                             else -> SPColor.yellowWarning
                         } ,
                         shape = RoundedCornerShape(50)
@@ -191,6 +192,7 @@ fun ExpressCard(item: ExpressResponse.Data.ExpressItems, onNavigateTo : () -> Un
                 val statusText = when (item.status) {
                     "in_transit" -> "In Transit"
                     "completed" -> "Completed"
+                    "cancelled" -> "Cancelled"
                     else -> "Pending"
                 }
                 Text(

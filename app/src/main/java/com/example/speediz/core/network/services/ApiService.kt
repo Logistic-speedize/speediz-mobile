@@ -2,14 +2,19 @@ package com.example.speediz.core.network.services
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.interaction.DragInteraction
 import com.example.speediz.BuildConfig
+import com.example.speediz.core.data.model.CompletedStatusRequest
 import com.example.speediz.core.data.model.ExpressDetailResponse
 import com.example.speediz.core.data.model.ExpressResponse
+import com.example.speediz.core.data.model.PickUpStatusRequest
+import com.example.speediz.core.data.model.ResponseErrorModel
 import com.example.speediz.core.data.model.SignInRequest
 import com.example.speediz.core.data.model.SignInResponse
 import com.example.speediz.core.data.model.SignUpDriverResponse
 import com.example.speediz.core.data.model.SignUpVendorRequest
 import com.example.speediz.core.data.model.SignUpVendorResponse
+import com.example.speediz.core.data.model.StatusRequest
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
 import okhttp3.MultipartBody
@@ -57,6 +62,27 @@ interface ApiService {
     suspend fun deliveryExpressDetail(
         @Path ("id") id: Int,
     ): Response<ExpressDetailResponse>
+
+    @POST("api/delivery/express/delivered")
+    suspend fun completedStatus(
+        @Body info: CompletedStatusRequest
+    ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/express/cancel")
+    suspend fun cancelStatus(
+        @Body info: StatusRequest
+    ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/express/rollback")
+    suspend fun rollbackStatus(
+        @Body info: StatusRequest
+    ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/express/pickup")
+    suspend fun pickUpStatus(
+        @Body info: PickUpStatusRequest
+    ): Response<ResponseErrorModel>
+
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL
         operator fun invoke(
