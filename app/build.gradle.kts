@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.android.hilt)
     alias (libs.plugins.secrets.gradle)
+    alias(libs.plugins.google.services)  //  plugin for Firebase
 }
 
 android {
@@ -65,6 +66,7 @@ dependencies {
     implementation(libs.serialization.json)
     implementation(libs.androidx.tv.material)
     implementation(libs.play.services.location)
+    implementation(libs.firebase.inappmessaging.display)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
@@ -95,6 +97,9 @@ dependencies {
 //    implementation(libs.mapbox.navigation)
     implementation(libs.compose.ui)
     //navigation animation
+    //firebase
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.analytics.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
