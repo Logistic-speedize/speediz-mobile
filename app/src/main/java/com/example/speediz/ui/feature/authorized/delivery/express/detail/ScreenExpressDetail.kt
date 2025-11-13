@@ -26,6 +26,7 @@ import com.example.speediz.core.data.model.StatusRequest
 import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
+import com.example.speediz.ui.feature.appwide.button.getCurrentLocation
 import com.example.speediz.ui.theme.SPColor
 import com.mapbox.maps.extension.style.expressions.dsl.generated.pi
 
@@ -480,10 +481,14 @@ fun ExpressDetail(
                 isPickUp = false
             },
             onConfirm = { it ->
-                val request = PickUpStatusRequest(
-                    id = expressDetail?.id ?: 0
-                )
-                viewModel.getPickUpStatus(request)
+                getCurrentLocation(context) { lat, lng ->
+                    val request = PickUpStatusRequest(
+                        id = expressDetail?.id ?: 0,
+                        lng = lng,
+                        lat = lat
+                    )
+                    viewModel.getPickUpStatus(request)
+                }
                 Log.d("ExpressDetail2" , "Pick Up Confirmed for ID: ${expressDetail?.id}" )
             },
             isEnablePassValue = false
@@ -499,6 +504,7 @@ fun ExpressDetail(
             onConfirm = { it ->
                 val request = CompletedStatusRequest(
                     id = expressDetail?.number.toString()
+
                 )
                 viewModel.getCompletedStatus(request)
             },

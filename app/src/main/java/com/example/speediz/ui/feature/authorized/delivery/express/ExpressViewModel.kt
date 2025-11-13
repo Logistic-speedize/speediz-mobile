@@ -25,6 +25,7 @@ class ExpressViewModel @Inject constructor(
     val isLoading = _isLoading.asStateFlow()
     init {
         fetchExpressData()
+        expressFilter
     }
     fun fetchExpressData() {
         _isLoading.value = true
@@ -46,7 +47,6 @@ class ExpressViewModel @Inject constructor(
     }
 
     fun searchExpressById(searchId: String) {
-        val filteredList = _expressList.value
 
         if ( searchId.isBlank()){
             _expressFilter.value = _expressList.value
@@ -58,6 +58,7 @@ class ExpressViewModel @Inject constructor(
             }.filterValues {
                 it.isNotEmpty()
             }
+            _expressFilter.value = filtered
         }
 
     }

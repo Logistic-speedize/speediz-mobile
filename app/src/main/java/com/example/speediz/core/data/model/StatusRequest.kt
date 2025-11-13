@@ -6,9 +6,11 @@ data class StatusRequest(
 )
 
 data class PickUpStatusRequest(
-    val id: Int
+    val id: Int,
+    val lng: Double,
+    val lat: Double
 )
 
 data class CompletedStatusRequest(
-    val id: String
+    val id: String,
 )
