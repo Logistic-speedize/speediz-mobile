@@ -2,6 +2,8 @@ package com.example.speediz.core.repository.di
 
 import com.example.speediz.core.repository.SignInRepository
 import com.example.speediz.core.repository.SignInRepositoryImpl
+import com.example.speediz.core.repository.VendorRepository
+import com.example.speediz.core.repository.VendorRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -16,4 +18,10 @@ abstract class RepositoryModule {
     abstract fun bindSignInRepository(
         impl: SignInRepositoryImpl
     ): SignInRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVendorRepository(
+        impl: VendorRepositoryImpl
+    ): VendorRepository
 }

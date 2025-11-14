@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.serialization.json)
     implementation(libs.androidx.tv.material)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
