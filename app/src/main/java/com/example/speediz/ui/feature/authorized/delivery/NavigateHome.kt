@@ -11,7 +11,7 @@ fun  NavGraphBuilder.screenDeliveryHome(
 ) {
     composable( route = AuthorizedRoute.DeliveryRoute.Home.route) {
         ScreenHomeDelivery(
-            onNavigateTo = onNavigateTo
+            onNavigateTo
         )
     }
 }

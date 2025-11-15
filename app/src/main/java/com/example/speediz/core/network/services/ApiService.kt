@@ -1,22 +1,88 @@
 package com.example.speediz.core.network.services
 
 import android.content.Context
-import android.os.Build
+import android.util.Log
+import androidx.compose.foundation.interaction.DragInteraction
 import com.example.speediz.BuildConfig
+import com.example.speediz.core.data.model.CompletedStatusRequest
+import com.example.speediz.core.data.model.ExpressDetailResponse
+import com.example.speediz.core.data.model.ExpressResponse
+import com.example.speediz.core.data.model.PickUpStatusRequest
+import com.example.speediz.core.data.model.ResponseErrorModel
 import com.example.speediz.core.data.model.SignInRequest
 import com.example.speediz.core.data.model.SignInResponse
+import com.example.speediz.core.data.model.SignUpDriverResponse
+import com.example.speediz.core.data.model.SignUpVendorRequest
+import com.example.speediz.core.data.model.SignUpVendorResponse
+import com.example.speediz.core.data.model.StatusRequest
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface ApiService {
     @POST("api/mobile/login")
     suspend fun signIn(
         @Body info : SignInRequest
     ) : Response<SignInResponse>
+
+    @POST("api/vendor/register")
+    suspend fun vendorSignUp(
+        @Body info: SignUpVendorRequest
+    ): Response<SignUpVendorResponse>
+
+    @Multipart
+    @POST("api/delivery/register")
+    suspend fun deliverySignUp(
+        @Part("first_name") firstName: RequestBody ,
+        @Part("last_name") lastName: RequestBody ,
+        @Part("dob") dob: RequestBody ,
+        @Part("gender") gender: RequestBody ,
+        @Part("email") email: RequestBody ,
+        @Part("password") password: RequestBody ,
+        @Part("password_confirmation") passwordConfirm: RequestBody ,
+        @Part("contact_number") contactNumber: RequestBody ,
+        @Part("driver_type") driverType: RequestBody ,
+        @Part("zone") zone: RequestBody ,
+        @Part image: MultipartBody.Part? = null
+
+    ): Response<SignUpDriverResponse>
+    @GET("api/delivery/express")
+    suspend fun deliveryExpress(): Response<ExpressResponse>
+
+    @GET("api/delivery/express/{id}")
+    suspend fun deliveryExpressDetail(
+        @Path ("id") id: Int,
+    ): Response<ExpressDetailResponse>
+
+    @POST("api/delivery/express/delivered")
+    suspend fun completedStatus(
+        @Body info: CompletedStatusRequest
+    ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/express/cancel")
+    suspend fun cancelStatus(
+        @Body info: StatusRequest
+    ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/express/rollback")
+    suspend fun rollbackStatus(
+        @Body info: StatusRequest
+    ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/express/pickup")
+    suspend fun pickUpStatus(
+        @Body info: PickUpStatusRequest
+    ): Response<ResponseErrorModel>
+
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL
         operator fun invoke(
@@ -25,16 +91,17 @@ interface ApiService {
         ) : ApiService {
             val tokenInterceptor = TokenInterceptor(context)
             val okHttpClient = okhttp3.OkHttpClient.Builder()
-                .addInterceptor(tokenInterceptor)
                 .addInterceptor(networkConnectionInterceptor)
+                .addInterceptor(tokenInterceptor).addInterceptor { chain ->
+                    val request = chain.request()
+                    Log.d("REQUEST-URL" , request.url.toString())
+                    chain.proceed(request)
+                }
                 .build()
-            val gson = com.google.gson.GsonBuilder()
-                .setLenient()
-                .create()
             return Retrofit.Builder()
+                .baseUrl(baseUrl)
                 .client(okHttpClient)
-                .baseUrl(baseUrl) // Replace with your API base URL
-                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create(gson))
+                .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
                 .build()
                 .create(ApiService::class.java)
         }
