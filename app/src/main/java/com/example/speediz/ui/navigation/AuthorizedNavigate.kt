@@ -8,7 +8,10 @@ import com.example.speediz.ui.feature.authorized.delivery.express.screenExpress
 import com.example.speediz.ui.feature.authorized.delivery.history.screenHistory
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
 import com.example.speediz.ui.feature.authorized.vendor.map.screenMap
-import com.example.speediz.ui.feature.authorized.vendor.screenHomeVendor
+import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoiceList.screenInvoice
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.packageList.screenPackage
+import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPackageTracking
+import com.example.speediz.ui.feature.authorized.vendor.home.screenHomeVendor
 
 fun NavGraphBuilder.deliveryAuthorizedNavigate(
     navController: NavController
@@ -47,6 +50,29 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
     navController: NavController
 ) {
             screenHomeVendor(
+                onNavigateTo = {route ->
+                    navController.navigate(route)
+                }
+            )
+
+    screenPackageTracking(
+        onNavigateTo = {route ->
+            navController.navigate(route)
+        }
+    )
+            screenPackage(
+                onNavigateTo = {route ->
+                    navController.navigate(route)
+                }
+            )
+
+            screenPackageTracking(
+                onNavigateTo = {route ->
+                    navController.navigate(route)
+                }
+            )
+
+            screenInvoice(
                 onNavigateTo = {route ->
                     navController.navigate(route)
                 }

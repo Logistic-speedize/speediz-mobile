@@ -16,6 +16,8 @@ sealed class AuthorizedRoute{
         data object PackageDetail : VendorRoute(route = "package_detail/{id}")
         data object Map : VendorRoute(route = "map")
         data object Account : VendorRoute(route = "account")
+        data object Invoice: VendorRoute(route = "vendor_invoice")
+        data object PackageTracking : VendorRoute(route = "vendor_package_tracking")
     }
 
 }

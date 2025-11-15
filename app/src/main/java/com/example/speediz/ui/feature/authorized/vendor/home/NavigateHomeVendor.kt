@@ -1,4 +1,4 @@
-package com.example.speediz.ui.feature.authorized.vendor
+package com.example.speediz.ui.feature.authorized.vendor.home
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder

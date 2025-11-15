@@ -41,7 +41,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
     buildFeatures {
         compose = true
@@ -65,6 +64,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.serialization.json)
     implementation(libs.androidx.tv.material)
+    implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.play.services.location)
     implementation(libs.firebase.inappmessaging.display)
     ksp(libs.bundles.dagger.ksp)
