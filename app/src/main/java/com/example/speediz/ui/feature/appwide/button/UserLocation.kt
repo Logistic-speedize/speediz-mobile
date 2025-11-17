@@ -15,8 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.BuildConfig
 import com.example.speediz.R
+import com.example.speediz.ui.feature.authorized.delivery.express.detail.ExpressDetailViewModel
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -265,7 +267,7 @@ private fun distanceBetween(p1: Point, p2: Point): Double {
     return hypot(dx * 111320, dy * 110540)
 }
 
-private fun fetchRoute(origin: Point, destination: Point): LineString? {
+fun fetchRoute(origin: Point, destination: Point): LineString? {
     val accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
     val url =
         "https://api.mapbox.com/directions/v5/mapbox/driving/${origin.longitude()},${origin.latitude()};${destination.longitude()},${destination.latitude()}?geometries=geojson&access_token=$accessToken"
@@ -324,7 +326,7 @@ fun MapboxUserLocationBox(
     }
 }
 @SuppressLint("MissingPermission")
-fun getCurrentLocation(context: Context, onResult: (Double, Double) -> Unit) {
+fun getCurrentLocation(context: Context, onResult: (Double, Double) -> Unit){
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     fusedLocationClient.lastLocation

@@ -1,13 +1,18 @@
 package com.example.speediz.ui.feature.authorized.delivery.express.detail
 
 import com.example.speediz.core.data.model.ExpressDetailResponse
+import com.example.speediz.core.data.model.TrackingLocationRequest
 
 sealed class ExpressDetailUiState {
     object Loading : ExpressDetailUiState()
     data class Success(val detail: ExpressDetailResponse) : ExpressDetailUiState()
     data class Error(val message: String) : ExpressDetailUiState()
 }
-
+sealed class TrackingUiState{
+    object Loading : TrackingUiState()
+    data class Success(val  message: String) : TrackingUiState()
+    data class Error(val message: String) : TrackingUiState()
+}
 sealed class StatusUiState {
     object Idle : StatusUiState()
     object Loading : StatusUiState()

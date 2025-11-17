@@ -6,11 +6,13 @@ import androidx.navigation.compose.composable
 import com.example.speediz.ui.navigation.AuthorizedRoute
 
 fun NavGraphBuilder.screenPackageTracking(
-    onNavigateTo : (String) -> Unit
+    onNavigateTo : (String) -> Unit,
+    onBack: () -> Unit
 ) {
     composable(AuthorizedRoute.VendorRoute.PackageTracking.route) {
         ScreenPackageTracking(
-            onNavigateTo = onNavigateTo
+            onNavigateTo = onNavigateTo,
+            onBack = onBack
         )
     }
 }

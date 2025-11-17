@@ -6,6 +6,7 @@ import com.example.speediz.core.data.model.ExpressResponse
 import com.example.speediz.core.data.model.PickUpStatusRequest
 import com.example.speediz.core.data.model.ResponseErrorModel
 import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.model.TrackingLocationRequest
 
 interface ExpressRepository {
     suspend fun express(): ExpressResponse
@@ -18,4 +19,6 @@ interface ExpressRepository {
     suspend fun rollbackStatusExpress( request: StatusRequest ): ResponseErrorModel
 
     suspend fun pickUpStatusExpress( request : PickUpStatusRequest): ResponseErrorModel
+
+    suspend fun trackingDeliveryLocation(request: TrackingLocationRequest): ResponseErrorModel
 }
