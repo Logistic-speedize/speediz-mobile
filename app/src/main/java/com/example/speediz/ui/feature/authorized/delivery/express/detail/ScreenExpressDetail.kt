@@ -23,12 +23,14 @@ import com.example.speediz.core.data.model.CompletedStatusRequest
 import com.example.speediz.core.data.model.ExpressDetailResponse
 import com.example.speediz.core.data.model.PickUpStatusRequest
 import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.model.TrackingLocationRequest
 import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.getCurrentLocation
 import com.example.speediz.ui.theme.SPColor
 import com.mapbox.maps.extension.style.expressions.dsl.generated.pi
+import kotlinx.coroutines.delay
 
 @Composable
 fun ScreenExpressDetail(
@@ -42,6 +44,7 @@ fun ScreenExpressDetail(
     var currentStatus by remember { mutableStateOf("") }
     val currentLat = expressDetail?.data?.location?.lat ?: 0.0
     val currentLon = expressDetail?.data?.location?.lng ?: 0.0
+
     LaunchedEffect(id, expressDetail, uiState) {
         viewModel.getExpressDetail(id.toInt())
     }
@@ -201,6 +204,18 @@ fun ExpressDetail(
     var isRollback by remember { mutableStateOf(false) }
     var isPickUp by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        getCurrentLocation(context){
+            lat, lng ->
+            val trackingRequest = TrackingLocationRequest(
+                packageId = expressDetail?.id ?: 0,
+                lat = lat,
+                lng = lng
+            )
+            viewModel.getTrackingDeliveryLocation(trackingRequest)
+        }
+    }
 
     LaunchedEffect(completedState , cancelState , rollbackState , pickUpState) {
         when(completedState) {

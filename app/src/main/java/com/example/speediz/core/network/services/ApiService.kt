@@ -2,11 +2,12 @@ package com.example.speediz.core.network.services
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.interaction.DragInteraction
 import com.example.speediz.BuildConfig
 import com.example.speediz.core.data.model.CompletedStatusRequest
 import com.example.speediz.core.data.model.ExpressDetailResponse
 import com.example.speediz.core.data.model.ExpressResponse
+import com.example.speediz.core.data.model.PackageTrackingDetailResponse
+import com.example.speediz.core.data.model.PackageResponse
 import com.example.speediz.core.data.model.PickUpStatusRequest
 import com.example.speediz.core.data.model.ResponseErrorModel
 import com.example.speediz.core.data.model.SignInRequest
@@ -15,6 +16,7 @@ import com.example.speediz.core.data.model.SignUpDriverResponse
 import com.example.speediz.core.data.model.SignUpVendorRequest
 import com.example.speediz.core.data.model.SignUpVendorResponse
 import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.model.TrackingLocationRequest
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
 import okhttp3.MultipartBody
@@ -82,6 +84,19 @@ interface ApiService {
     suspend fun pickUpStatus(
         @Body info: PickUpStatusRequest
     ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/tracking")
+    suspend fun deliveryTracking(
+        @Body info: TrackingLocationRequest
+    ): Response<ResponseErrorModel>
+
+    @GET("api/vendor/packages")
+    suspend fun packageList(): Response<PackageResponse>
+
+    @GET("api/vendor/packages/map/{id}")
+    suspend fun packageTrackingDetail(
+        @Path ("id") id: Int,
+    ): Response<PackageTrackingDetailResponse>
 
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL

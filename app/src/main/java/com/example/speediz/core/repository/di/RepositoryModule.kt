@@ -2,6 +2,8 @@ package com.example.speediz.core.repository.di
 
 import com.example.speediz.core.repository.ExpressRepository
 import com.example.speediz.core.repository.ExpressRepositoryImpl
+import com.example.speediz.core.repository.PackageRepository
+import com.example.speediz.core.repository.PackageRepositoryImpl
 import com.example.speediz.core.repository.SignInRepository
 import com.example.speediz.core.repository.SignInRepositoryImpl
 import com.example.speediz.core.repository.SignUpRepository
@@ -40,4 +42,11 @@ abstract class RepositoryModule {
     abstract fun bindVendorRepository(
         impl: VendorRepositoryImpl
     ): VendorRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPackageRepository(
+        impl: PackageRepositoryImpl
+    ): PackageRepository
+
 }

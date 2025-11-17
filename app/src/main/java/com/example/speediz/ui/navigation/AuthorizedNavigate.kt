@@ -12,6 +12,9 @@ import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoic
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.packageList.screenPackage
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPackageTracking
 import com.example.speediz.ui.feature.authorized.vendor.home.screenHomeVendor
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.screenPackageDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.navigationTrackingDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.screenTrackingDetail
 
 fun NavGraphBuilder.deliveryAuthorizedNavigate(
     navController: NavController
@@ -54,27 +57,34 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
                     navController.navigate(route)
                 }
             )
+    screenPackage(
+        onNavigateTo = {route ->
+            navController.navigate(route)
+        },
+        onBack = {
+            navController.popBackStack()
+        }
+    )
 
     screenPackageTracking(
+        onNavigateTo = { id ->
+            navController.navigationTrackingDetail(id)
+        },
+        onBack = {
+            navController.popBackStack()
+        }
+    )
+    screenTrackingDetail(
+        onBack = {
+            navController.popBackStack()
+        },
+        onNavigateTo = { route ->
+            navController.navigate(route)
+        }
+    )
+    screenInvoice(
         onNavigateTo = {route ->
             navController.navigate(route)
         }
     )
-            screenPackage(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
-
-            screenPackageTracking(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
-
-            screenInvoice(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
 }

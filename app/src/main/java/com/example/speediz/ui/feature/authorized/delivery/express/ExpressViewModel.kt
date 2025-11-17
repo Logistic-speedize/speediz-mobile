@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speediz.core.data.model.ExpressResponse
+import com.example.speediz.core.data.model.TrackingLocationRequest
 import com.example.speediz.core.repository.ExpressRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,6 +61,6 @@ class ExpressViewModel @Inject constructor(
             }
             _expressFilter.value = filtered
         }
-
     }
+
 }
