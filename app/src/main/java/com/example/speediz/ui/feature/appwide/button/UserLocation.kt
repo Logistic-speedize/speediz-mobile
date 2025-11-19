@@ -165,7 +165,6 @@ fun MapboxUserRoute(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    Log.d("MapboxUserRoute", "Destination: ($destinationLat, $destinationLon)")
     MapboxOptions.accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
 
     AndroidView(factory = { ctx ->

@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
 import com.example.speediz.core.data.model.PackageTrackingDetailResponse
-import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.VendorDriverRouteMap
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.StatusItem
 import com.example.speediz.ui.theme.SPColor
@@ -58,12 +57,22 @@ fun ScreenTrackingDetail(
     val viewModel = hiltViewModel<TrackingDetailViewModel>()
     val uiState = viewModel.uiState.collectAsState()
     val packageDetail = viewModel.packageDetail.collectAsState().value
+    val driverLat = packageDetail?.data?.destinationInfo?.latitude ?: 0.0
+    val driverLon = packageDetail?.data?.destinationInfo?.longitude ?: 0.0
+    val customerLat = packageDetail?.data?.driverLocation?.lat ?: 0.0
+    val customerLon = packageDetail?.data?.driverLocation?.lng ?: 0.0
 //    LaunchedEffect(id, packageDetail, uiState) {
 //        viewModel.getPackageDetail(id)
 //    }
     LaunchedEffect(Unit) {
         viewModel.getPackageDetail(id)
         delay(2000L)
+    }
+    LaunchedEffect(driverLat, driverLon, customerLat, customerLon) {
+        if (driverLat != 0.0 && driverLon != 0.0 && customerLat != 0.0 && customerLon != 0.0) {
+            viewModel.getPackageDetail(id) // refresh package detail if needed
+            // You can also trigger any route fetch logic here if needed
+        }
     }
     Scaffold(
         modifier = Modifier.fillMaxSize().statusBarsPadding().padding(8.dp),
@@ -106,12 +115,17 @@ fun ScreenTrackingDetail(
                     "TrackingDetailViewModel" ,
                     "Package Detail in Screen: $packageDetail"
                 )
+                if ( driverLon == 0.0 || driverLat == 0.0 || customerLon == 0.0 || customerLat == 0.0 ) {
+                    val context = LocalContext.current
+                    Toast.makeText(context, "Location data is not available", Toast.LENGTH_SHORT).show()
+                } else {
                     VendorDriverRouteMap(
-                        driverLat = packageDetail?.data?.destinationInfo?.latitude ?: 0.0 ,
-                        driverLon = packageDetail?.data?.destinationInfo?.longitude ?: 0.0 ,
-                        customerLat = packageDetail?.data?.driverLocation?.lat ?: 0.0 ,
-                        customerLon = packageDetail?.data?.driverLocation?.lng ?: 0.0,
+                        driverLon = driverLon,
+                        driverLat = driverLat,
+                        customerLon = customerLon,
+                        customerLat = customerLat,
                     )
+                }
                // Log.d("ExpressDetail" , "Lat: ${packageDetail.data.} , Lon: ${expressDetail?.data?.location?.lng}" )
             }
             BottomSheetShowPackageDetail(
