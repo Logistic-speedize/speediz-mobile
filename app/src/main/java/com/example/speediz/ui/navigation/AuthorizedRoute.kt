@@ -12,8 +12,9 @@ sealed class AuthorizedRoute{
     }
     sealed class VendorRoute ( val route : String) : AuthorizedRoute(){
         data object Home : VendorRoute(route = "vendor_home")
+
         data object Package : VendorRoute(route = "vendor_package")
-        data object PackageDetail : VendorRoute(route = "package_detail/{id}")
+        data object PackageDetail : VendorRoute(route = "vendor_package/{id}")
         data object Map : VendorRoute(route = "map")
         data object Account : VendorRoute(route = "account")
         data object Invoice: VendorRoute(route = "vendor_invoice")

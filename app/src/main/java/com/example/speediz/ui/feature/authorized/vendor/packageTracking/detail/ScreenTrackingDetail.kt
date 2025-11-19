@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,11 +28,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
 import com.example.speediz.core.data.model.PackageTrackingDetailResponse
-import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.VendorDriverRouteMap
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.StatusItem
 import com.example.speediz.ui.theme.SPColor
@@ -58,12 +55,22 @@ fun ScreenTrackingDetail(
     val viewModel = hiltViewModel<TrackingDetailViewModel>()
     val uiState = viewModel.uiState.collectAsState()
     val packageDetail = viewModel.packageDetail.collectAsState().value
+    val driverLat = packageDetail?.data?.destinationInfo?.latitude ?: 0.0
+    val driverLon = packageDetail?.data?.destinationInfo?.longitude ?: 0.0
+    val customerLat = packageDetail?.data?.driverLocation?.lat ?: 0.0
+    val customerLon = packageDetail?.data?.driverLocation?.lng ?: 0.0
 //    LaunchedEffect(id, packageDetail, uiState) {
 //        viewModel.getPackageDetail(id)
 //    }
     LaunchedEffect(Unit) {
         viewModel.getPackageDetail(id)
         delay(2000L)
+    }
+    LaunchedEffect(driverLat, driverLon, customerLat, customerLon) {
+        if (driverLat != 0.0 && driverLon != 0.0 && customerLat != 0.0 && customerLon != 0.0) {
+            viewModel.getPackageDetail(id) // refresh package detail if needed
+            // You can also trigger any route fetch logic here if needed
+        }
     }
     Scaffold(
         modifier = Modifier.fillMaxSize().statusBarsPadding().padding(8.dp),
@@ -106,12 +113,17 @@ fun ScreenTrackingDetail(
                     "TrackingDetailViewModel" ,
                     "Package Detail in Screen: $packageDetail"
                 )
+                if ( driverLon == 0.0 || driverLat == 0.0 || customerLon == 0.0 || customerLat == 0.0 ) {
+                    val context = LocalContext.current
+                    Toast.makeText(context, "Location data is not available", Toast.LENGTH_SHORT).show()
+                } else {
                     VendorDriverRouteMap(
-                        driverLat = packageDetail?.data?.destinationInfo?.latitude ?: 0.0 ,
-                        driverLon = packageDetail?.data?.destinationInfo?.longitude ?: 0.0 ,
-                        customerLat = packageDetail?.data?.driverLocation?.lat ?: 0.0 ,
-                        customerLon = packageDetail?.data?.driverLocation?.lng ?: 0.0,
+                        driverLon = driverLon,
+                        driverLat = driverLat,
+                        customerLon = customerLon,
+                        customerLat = customerLat,
                     )
+                }
                // Log.d("ExpressDetail" , "Lat: ${packageDetail.data.} , Lon: ${expressDetail?.data?.location?.lng}" )
             }
             BottomSheetShowPackageDetail(
@@ -175,6 +187,7 @@ fun BottomSheetShowPackageDetail(
 fun PackageDetail(
     packageDetail: PackageTrackingDetailResponse.PackageDetail ?= null,
     status: String,
+    modifier: Modifier = Modifier
 ) {
     val customerName = packageDetail?.packageDetail?.customerName.toString()
     val deliveryName =  packageDetail?.deliveryInfo?.driverName.toString()
@@ -196,6 +209,7 @@ fun PackageDetail(
                 shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
             )
             .padding(20.dp)
+            .then(modifier)
     ) {
         // Package Info
         Row(
@@ -203,14 +217,18 @@ fun PackageDetail(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text( "#SP${packageDetail?.id.toString()}" , fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                Text(packageDetail?.destinationInfo?.location.toString(), fontSize = 15.sp, color = Color.Gray)
+                Text(packageDetail?.destinationInfo?.location.toString(),
+                    fontSize = 15.sp, color = Color.Gray, maxLines = 3
+                )
             }
             Box(
                 modifier = Modifier
                     .background(
-                        color =when (currentStatus.value) {
+                        color =when (packageDetail?.packageDetail?.status) {
                             "in_transit" -> SPColor.blueInfo
                             "completed" -> SPColor.greenSuccess
                             "cancelled" -> Color.Red
@@ -230,7 +248,6 @@ fun PackageDetail(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             StatusItem(
                 title = "Pending",
