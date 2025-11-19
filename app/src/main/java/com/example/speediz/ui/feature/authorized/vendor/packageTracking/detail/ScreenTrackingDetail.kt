@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,11 +28,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -189,6 +187,7 @@ fun BottomSheetShowPackageDetail(
 fun PackageDetail(
     packageDetail: PackageTrackingDetailResponse.PackageDetail ?= null,
     status: String,
+    modifier: Modifier = Modifier
 ) {
     val customerName = packageDetail?.packageDetail?.customerName.toString()
     val deliveryName =  packageDetail?.deliveryInfo?.driverName.toString()
@@ -210,6 +209,7 @@ fun PackageDetail(
                 shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
             )
             .padding(20.dp)
+            .then(modifier)
     ) {
         // Package Info
         Row(
@@ -217,14 +217,18 @@ fun PackageDetail(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text( "#SP${packageDetail?.id.toString()}" , fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                Text(packageDetail?.destinationInfo?.location.toString(), fontSize = 15.sp, color = Color.Gray)
+                Text(packageDetail?.destinationInfo?.location.toString(),
+                    fontSize = 15.sp, color = Color.Gray, maxLines = 3
+                )
             }
             Box(
                 modifier = Modifier
                     .background(
-                        color =when (currentStatus.value) {
+                        color =when (packageDetail?.packageDetail?.status) {
                             "in_transit" -> SPColor.blueInfo
                             "completed" -> SPColor.greenSuccess
                             "cancelled" -> Color.Red
@@ -244,7 +248,6 @@ fun PackageDetail(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             StatusItem(
                 title = "Pending",
