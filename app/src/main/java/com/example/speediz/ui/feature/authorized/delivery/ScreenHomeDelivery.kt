@@ -177,6 +177,9 @@ fun ScreenHomeDelivery(
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .padding(16.dp)
+                            .clickable{
+                                onNavigateTo(AuthorizedRoute.DeliveryRoute.History.route)
+                            }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(

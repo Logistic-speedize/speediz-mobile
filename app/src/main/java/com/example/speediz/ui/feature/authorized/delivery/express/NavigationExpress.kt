@@ -16,5 +16,3 @@ fun NavGraphBuilder.screenExpress(
         )
     }
 }
-fun NavController.navigationPackage() {
-}

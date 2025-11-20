@@ -172,7 +172,6 @@ fun BottomSheetShowExpressDetail(
                 ExpressDetail(
                     expressDetail = expressDetail,
                     currentStatus = currentStatus,
-                    navigateTo = navigateTo,
                     viewModel = viewModel
                 )
             }
@@ -184,7 +183,6 @@ fun BottomSheetShowExpressDetail(
 fun ExpressDetail(
     expressDetail: ExpressDetailResponse.ExpressDetailData ?= null,
     currentStatus: String,
-    navigateTo: (String) -> Unit,
     viewModel : ExpressDetailViewModel
 ) {
     val completedState = viewModel.completedStatus.collectAsState().value
