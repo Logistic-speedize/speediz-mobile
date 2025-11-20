@@ -5,6 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.navigationExpressDetail
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.screenExpressDetail
 import com.example.speediz.ui.feature.authorized.delivery.express.screenExpress
+import com.example.speediz.ui.feature.authorized.delivery.history.detail.navigateToHistoryDetail
+import com.example.speediz.ui.feature.authorized.delivery.history.detail.screenHistoryDetail
 import com.example.speediz.ui.feature.authorized.delivery.history.screenHistory
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
 import com.example.speediz.ui.feature.authorized.vendor.map.screenMap
@@ -43,10 +45,18 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
         }
     )
         screenHistory(
-            onNavigateTo = {route ->
-                navController.navigate(route)
+            onNavigateTo = {id ->
+                navController.navigateToHistoryDetail(id)
+            },
+            onBack = {
+                navController.popBackStack()
             }
         )
+    screenHistoryDetail (
+        onBack = {
+            navController.popBackStack()
+        }
+    )
 
     //        screenAccount()
 }

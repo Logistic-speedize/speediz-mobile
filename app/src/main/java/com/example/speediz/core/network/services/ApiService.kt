@@ -17,6 +17,8 @@ import com.example.speediz.core.data.model.SignUpVendorRequest
 import com.example.speediz.core.data.model.SignUpVendorResponse
 import com.example.speediz.core.data.model.StatusRequest
 import com.example.speediz.core.data.model.TrackingLocationRequest
+import com.example.speediz.core.data.model.delivery.PackageHistoryDetailResponse
+import com.example.speediz.core.data.model.delivery.PackageHistoryResponse
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
 import okhttp3.MultipartBody
@@ -97,6 +99,14 @@ interface ApiService {
     suspend fun packageTrackingDetail(
         @Path ("id") id: Int,
     ): Response<PackageTrackingDetailResponse>
+
+    @GET("api/delivery/express/history")
+    suspend fun packageHistory(): Response<PackageHistoryResponse>
+
+    @GET("api/delivery/express/history/{id}")
+    suspend fun packageHistoryDetail(
+        @Path ("id") id: Int,
+    ): Response<PackageHistoryDetailResponse>
 
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL

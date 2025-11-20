@@ -7,6 +7,7 @@ sealed class AuthorizedRoute{
         data object Express : DeliveryRoute(route = "delivery_express")
         data object ExpressDetail : DeliveryRoute(route = "express_detail/{id}")
         data object History: DeliveryRoute(route = "history")
+        data object HistoryDetail: DeliveryRoute(route = "history/{id}")
         data object Map : DeliveryRoute(route = "map")
         data object Account : DeliveryRoute(route = "account")
     }
