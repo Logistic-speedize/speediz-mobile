@@ -14,14 +14,6 @@ pluginManagement {
         maven(url = "https://developer.huawei.com/repo/")
         maven {
             url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
-            authentication {
-                create("basic", BasicAuthentication::class)
-            }
-            credentials {
-                username = "mapbox"
-                password = providers.gradleProperty("MAPBOX_ACCESS_TOKEN").orNull
-                    ?: System.getenv("MAPBOX_ACCESS_TOKEN")
-            }
         }
     }
 }
@@ -32,14 +24,6 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
-            authentication {
-                create("basic", BasicAuthentication::class)
-            }
-            credentials {
-                username = "mapbox"
-                password = providers.gradleProperty("MAPBOX_ACCESS_TOKEN").orNull
-                    ?: System.getenv("MAPBOX_ACCESS_TOKEN")
-            }
         }
     }
 }
