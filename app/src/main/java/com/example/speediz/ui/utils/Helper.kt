@@ -46,6 +46,18 @@ fun dateFormat(date: String): String{
         return date
     }
 }
+@RequiresApi(Build.VERSION_CODES.O)
+fun convertDateCalendar(date: String, inputPattern: String, outputPattern: String): String {
+    return try {
+        val inputFormatter = DateTimeFormatter.ofPattern(inputPattern, Locale.getDefault())
+        val outputFormatter = DateTimeFormatter.ofPattern(outputPattern, Locale.getDefault())
+        val dateTime = ZonedDateTime.parse(date, inputFormatter.withZone(ZoneId.systemDefault()))
+        dateTime.format(outputFormatter)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        date
+    }
+}
 fun resizeImage(context: Context, uri: Uri, maxWidth: Int, maxHeight: Int): Bitmap? {
     val inputStream =  context.contentResolver.openInputStream(uri) ?: return null
     val originalBitmap = BitmapFactory.decodeStream(inputStream)

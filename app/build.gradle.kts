@@ -5,7 +5,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.android.hilt)
     alias (libs.plugins.secrets.gradle)
-    alias(libs.plugins.google.services)  //  plugin for Firebase
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)  //  plugin for Firebase
 }
 
 android {
@@ -67,6 +68,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.play.services.location)
     implementation(libs.firebase.inappmessaging.display)
+    implementation(libs.firebase.crashlytics)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)

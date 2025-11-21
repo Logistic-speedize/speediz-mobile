@@ -1,17 +1,17 @@
-package com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail
+package com.example.speediz.ui.feature.authorized.delivery.history.detail
 
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.ScreenTrackingDetail
 import com.example.speediz.ui.navigation.AuthorizedRoute
 
-fun NavGraphBuilder.screenPackageDetail(
+fun NavGraphBuilder.screenHistoryDetail(
     onBack: () -> Unit
 ) {
-    val route = AuthorizedRoute.VendorRoute.PackageDetail.route
+    val route = AuthorizedRoute.DeliveryRoute.HistoryDetail.route
     val argumentName = listOf(
         navArgument("id") {
             type = NavType.StringType
@@ -22,17 +22,16 @@ fun NavGraphBuilder.screenPackageDetail(
         arguments = argumentName
     ) { backStackEntry ->
         val packageId = backStackEntry.arguments?.getString("id") ?: ""
-        ScreenPackageDetail(
+        ScreenHistoryDetail(
             id = packageId,
             onBack = onBack
         )
     }
 }
 
-fun NavController.navigationPackageDetail(
-    packageId: String
-){
+
+fun NavController.navigateToHistoryDetail(packageId: String) {
     this.navigate(
-        AuthorizedRoute.VendorRoute.PackageDetail.route.replace("{id}", packageId)
+        AuthorizedRoute.DeliveryRoute.HistoryDetail.route.replace("{id}", packageId)
     )
 }

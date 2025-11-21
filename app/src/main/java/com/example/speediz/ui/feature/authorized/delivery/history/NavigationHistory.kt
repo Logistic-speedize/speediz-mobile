@@ -7,10 +7,14 @@ import androidx.navigation.compose.composable
 import com.example.speediz.ui.navigation.AuthorizedRoute
 
 fun NavGraphBuilder.screenHistory(
-    onNavigateTo : ( String) -> Unit
+    onNavigateTo : ( String) -> Unit,
+    onBack: () -> Unit,
 ) {
     composable(AuthorizedRoute.DeliveryRoute.History.route){
-        ScreenHistory()
+        ScreenHistory(
+            onNavigateTo = onNavigateTo,
+            onBack = onBack
+        )
     }
 }
 fun NavController.navigationHistory() {

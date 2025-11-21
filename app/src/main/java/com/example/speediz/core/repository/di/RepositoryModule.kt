@@ -2,6 +2,8 @@ package com.example.speediz.core.repository.di
 
 import com.example.speediz.core.repository.ExpressRepository
 import com.example.speediz.core.repository.ExpressRepositoryImpl
+import com.example.speediz.core.repository.PackageHistoryRepository
+import com.example.speediz.core.repository.PackageHistoryRepositoryImpl
 import com.example.speediz.core.repository.PackageRepository
 import com.example.speediz.core.repository.PackageRepositoryImpl
 import com.example.speediz.core.repository.SignInRepository
@@ -49,4 +51,9 @@ abstract class RepositoryModule {
         impl: PackageRepositoryImpl
     ): PackageRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindPackageHistoryRepository(
+        impl: PackageHistoryRepositoryImpl
+    ) : PackageHistoryRepository
 }
