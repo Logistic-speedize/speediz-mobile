@@ -18,6 +18,7 @@ import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.navigation.deliveryAuthorizedNavigate
 import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
+import com.example.speediz.ui.utils.hasFirebasePermission
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -50,12 +51,14 @@ fun AppNavigation(
                 unauthorizedNavigate(
                     navController = navController
                 )
-                vendorAuthorizedNavigate(
-                    navController = navController
-                )
-                deliveryAuthorizedNavigate(
-                    navController = navController
-                )
+                if (hasFirebasePermission()){
+                    vendorAuthorizedNavigate(
+                        navController = navController
+                    )
+                    deliveryAuthorizedNavigate(
+                        navController = navController
+                    )
+                }
 
             }
         }

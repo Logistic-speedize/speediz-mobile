@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.firebase.inappmessaging.display)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
