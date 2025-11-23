@@ -1,6 +1,6 @@
 package com.example.speediz.ui.feature.authorized.delivery.history
 
-import com.example.speediz.core.data.model.delivery.PackageHistoryResponse
+import com.example.speediz.core.data.delivery.PackageHistoryResponse
 
 sealed class HistoryState{
     object Loading : HistoryState()

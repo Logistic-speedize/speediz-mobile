@@ -19,18 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.CompletedStatusRequest
-import com.example.speediz.core.data.model.ExpressDetailResponse
-import com.example.speediz.core.data.model.PickUpStatusRequest
-import com.example.speediz.core.data.model.StatusRequest
-import com.example.speediz.core.data.model.TrackingLocationRequest
+import com.example.speediz.core.data.delivery.CompletedStatusRequest
+import com.example.speediz.core.data.delivery.ExpressDetailResponse
+import com.example.speediz.core.data.delivery.PickUpStatusRequest
+import com.example.speediz.core.data.delivery.StatusRequest
+import com.example.speediz.core.data.delivery.TrackingLocationRequest
 import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.getCurrentLocation
 import com.example.speediz.ui.theme.SPColor
-import com.mapbox.maps.extension.style.expressions.dsl.generated.pi
-import kotlinx.coroutines.delay
 
 @Composable
 fun ScreenExpressDetail(

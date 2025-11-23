@@ -1,22 +1,15 @@
 package com.example.speediz.ui.feature.unauthorized.signup.vendor
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalGraphicsContext
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speediz.core.data.model.SignInResponse
-import com.example.speediz.core.data.model.SignUpVendorRequest
+import com.example.speediz.core.data.vendor.SignUpVendorRequest
 import com.example.speediz.core.repository.SignUpRepository
-import com.example.speediz.ui.base.BaseViewModel
 import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel

@@ -1,8 +1,7 @@
-package com.example.speediz.core.data.model
+package com.example.speediz.core.data.delivery
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class ExpressResponse(

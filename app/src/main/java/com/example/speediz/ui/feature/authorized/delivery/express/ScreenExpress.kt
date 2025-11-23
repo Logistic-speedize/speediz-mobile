@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.ExpressResponse
+import com.example.speediz.core.data.delivery.ExpressResponse
 import com.example.speediz.ui.theme.SPColor
 
 @Composable

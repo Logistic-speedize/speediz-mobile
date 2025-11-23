@@ -3,10 +3,9 @@ package com.example.speediz.ui.feature.unauthorized.signup.delivery
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speediz.core.data.model.SignUpDeliveryRequest
+import com.example.speediz.core.data.delivery.SignUpDeliveryRequest
 import com.example.speediz.core.repository.SignUpRepository
 import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
 import dagger.hilt.android.lifecycle.HiltViewModel

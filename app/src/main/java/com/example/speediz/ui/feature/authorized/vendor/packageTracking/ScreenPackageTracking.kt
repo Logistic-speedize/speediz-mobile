@@ -1,6 +1,5 @@
 package com.example.speediz.ui.feature.authorized.vendor.packageTracking
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.PackageResponse
+import com.example.speediz.core.data.vendor.PackageResponse
 import com.example.speediz.ui.theme.SPColor
 
 @Composable

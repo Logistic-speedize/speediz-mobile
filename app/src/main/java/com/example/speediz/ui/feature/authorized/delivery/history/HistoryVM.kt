@@ -1,9 +1,8 @@
 package com.example.speediz.ui.feature.authorized.delivery.history
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speediz.core.data.model.delivery.PackageHistoryResponse
+import com.example.speediz.core.data.delivery.PackageHistoryResponse
 import com.example.speediz.core.repository.PackageHistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

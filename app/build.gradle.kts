@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.firebase.inappmessaging.display)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.messaging)
+    implementation(libs.androidx.compose.material3)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
