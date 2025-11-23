@@ -1,8 +1,7 @@
 package com.example.speediz.core.repository
 
-import com.example.speediz.core.data.model.PackageResponse
-import com.example.speediz.core.data.model.PackageTrackingDetailResponse
-import okhttp3.Response
+import com.example.speediz.core.data.vendor.PackageResponse
+import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
 
 interface PackageRepository {
     suspend fun packageList(): PackageResponse

@@ -1,4 +1,4 @@
-package com.example.speediz.core.data.model
+package com.example.speediz.core.data.vendor
 
 import com.example.speediz.R
 

@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speediz.core.application.MySharePreferences
-import com.example.speediz.core.data.model.SignInRequest
+import com.example.speediz.core.data.SignInRequest
 import com.example.speediz.core.repository.SignInRepository
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel

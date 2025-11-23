@@ -3,7 +3,7 @@ package com.example.speediz.ui.feature.authorized.vendor.packageTracking
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speediz.core.data.model.PackageResponse
+import com.example.speediz.core.data.vendor.PackageResponse
 import com.example.speediz.core.repository.PackageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

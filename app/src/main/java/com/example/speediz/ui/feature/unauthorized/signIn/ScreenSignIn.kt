@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.SignInRequest
+import com.example.speediz.core.data.SignInRequest
 import com.example.speediz.ui.navigation.AuthorizedRoute
 import com.example.speediz.ui.navigation.UnauthorizedRoute
 

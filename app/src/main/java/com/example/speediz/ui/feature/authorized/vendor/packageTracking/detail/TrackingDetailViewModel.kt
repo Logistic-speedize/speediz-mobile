@@ -3,10 +3,9 @@ package com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speediz.core.data.model.PackageTrackingDetailResponse
+import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
 import com.example.speediz.core.repository.PackageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

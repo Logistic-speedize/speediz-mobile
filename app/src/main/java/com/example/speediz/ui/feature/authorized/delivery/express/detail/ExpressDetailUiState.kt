@@ -1,7 +1,6 @@
 package com.example.speediz.ui.feature.authorized.delivery.express.detail
 
-import com.example.speediz.core.data.model.ExpressDetailResponse
-import com.example.speediz.core.data.model.TrackingLocationRequest
+import com.example.speediz.core.data.delivery.ExpressDetailResponse
 
 sealed class ExpressDetailUiState {
     object Loading : ExpressDetailUiState()

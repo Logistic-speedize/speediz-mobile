@@ -1,6 +1,6 @@
 package com.example.speediz.ui.feature.authorized.delivery.express
 
-import com.example.speediz.core.data.model.ExpressResponse
+import com.example.speediz.core.data.delivery.ExpressResponse
 
 sealed class ExpressUiState {
     object Loading : ExpressUiState()

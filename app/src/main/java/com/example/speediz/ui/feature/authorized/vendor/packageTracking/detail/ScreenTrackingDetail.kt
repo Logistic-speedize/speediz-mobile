@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.PackageTrackingDetailResponse
+import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
 import com.example.speediz.ui.feature.appwide.button.VendorDriverRouteMap
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.StatusItem
 import com.example.speediz.ui.theme.SPColor

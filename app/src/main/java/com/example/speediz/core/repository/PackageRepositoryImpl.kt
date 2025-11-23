@@ -1,6 +1,6 @@
 package com.example.speediz.core.repository
 
-import com.example.speediz.core.data.model.PackageTrackingDetailResponse
+import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
 import com.example.speediz.core.network.SafeApiRequest
 import com.example.speediz.core.network.services.ApiService
 import javax.inject.Inject

@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,7 +42,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.speediz.core.data.model.delivery.PackageHistoryResponse
+import com.example.speediz.core.data.delivery.PackageHistoryResponse
+import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 
 @Composable
 fun ScreenHistory(
@@ -129,14 +129,14 @@ fun ScreenHistory(
             }
 
             /** ---------------- Select Dates Button ------------------- **/
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.align(Alignment.End),
-                shape = RoundedCornerShape(8.dp)
+            Box(
+                modifier = Modifier.width(200.dp)
+                    .align(Alignment.End),
             ) {
-                Text("Select Dates")
-                Spacer(Modifier.width(6.dp))
-                Icon(Icons.Default.DateRange, contentDescription = null)
+                SpDatePickerInput(
+                    placeholderText = "Select date",
+                    onValueChange = {}
+                )
             }
 
             Spacer(Modifier.height(16.dp))

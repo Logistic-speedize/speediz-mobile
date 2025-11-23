@@ -1,4 +1,4 @@
-package com.example.speediz.core.data.model.delivery
+package com.example.speediz.core.data.delivery
 
 import com.google.gson.annotations.SerializedName
 
