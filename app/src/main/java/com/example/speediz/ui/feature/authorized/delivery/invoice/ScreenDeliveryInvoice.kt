@@ -1,5 +1,8 @@
 package com.example.speediz.ui.feature.authorized.delivery.invoice
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,12 +29,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,12 +54,16 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.speediz.core.data.delivery.InvoiceResponse
+import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.SelectDate
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 import com.example.speediz.ui.theme.SPColor
 import com.example.speediz.ui.theme.SpeedizTheme
 import com.example.speediz.ui.utils.dateFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.logging.SimpleFormatter
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenDeliveryInvoice(
@@ -61,8 +72,16 @@ fun ScreenDeliveryInvoice(
 ) {
     val viewModel = hiltViewModel<DeliveryInvoiceViewModel>()
     val responseUiState = viewModel.responseUIState.collectAsState().value
+    val dateFilter = viewModel.dateFilter
+    var search = viewModel.searchQuery.collectAsState().value
     LaunchedEffect(viewModel) {
         viewModel.fetchInvoiceData()
+    }
+    LaunchedEffect(dateFilter) {
+        viewModel.filterByDate(dateFilter.value)
+    }
+    LaunchedEffect(search) {
+        viewModel.filterByQuery(search)
     }
     Scaffold(
         topBar = {
@@ -106,7 +125,13 @@ fun ScreenDeliveryInvoice(
                 .padding(16.dp),
         ) {
             // Search box
-            SearchBox()
+            SearchBox(
+                value = search,
+                onChange = {
+                    search = it
+                    viewModel.filterByQuery(search)
+                }
+            )
             Spacer(Modifier.height(16.dp))
             // Select date button
             Box(
@@ -116,7 +141,10 @@ fun ScreenDeliveryInvoice(
             ) {
                 SpDatePickerInput(
                     placeholderText = "Select date",
-                    onValueChange = {}
+                    onValueChange = {
+                        dateFilter.value = it
+                        viewModel.filterByDate(dateFilter.value)
+                    },
                 )
             }
             Spacer(Modifier.height(16.dp))
@@ -131,40 +159,54 @@ fun ScreenDeliveryInvoice(
 }
 
 @Composable
-fun SearchBox() {
+fun SearchBox(
+    onChange: (String) -> Unit = { },
+    value: String = ""
+) {
+    val displayText = rememberSaveable { mutableStateOf(value) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(55.dp),
+            .height(55.dp)
+            .padding(horizontal = 8.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         TextField(
-            value = "" ,
-            onValueChange = {} ,
+            value = displayText.value,
+            onValueChange = {
+                displayText.value = it
+                onChange(it)
+            },
             placeholder = {
                 Text(
-                    text = "Search invoice..." ,
-                    color = Color.Gray ,
+                    text = "Search invoice...",
+                    color = Color.Gray,
                     fontSize = 14.sp
                 )
-            } ,
+            },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.Search ,
-                    contentDescription = "" ,
-                    tint = Color.Gray
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null
                 )
-            } ,
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(20.dp),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .background(Color.White)
-                .clip(RoundedCornerShape(20.dp))
-                .border(1.dp,MaterialTheme.colorScheme.inverseSurface.copy(0.5f), RoundedCornerShape(20.dp)),
+                .fillMaxSize()
+                .border(1.dp, MaterialTheme.colorScheme.inverseSurface.copy(0.5f), RoundedCornerShape(20.dp)),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
+            )
         )
     }
+
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InvoiceCard(
     item : InvoiceResponse.Data.InvoiceItems
@@ -199,16 +241,16 @@ fun InvoiceCard(
 
         Spacer(Modifier.height(10.dp))
 
-        Text(text = "Date" , color = Color.Gray , fontSize = 14.sp)
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            text = dateFormat(item.invoiceDate),
-            color = Color.Black ,
-            fontSize = 14.sp ,
-            fontWeight = FontWeight.Medium
-        )
+        Row {
+            Text(text = "Date" , color = Color.Gray , fontSize = 14.sp)
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = dateFormat(item.invoiceDate),
+                color = Color.Black ,
+                fontSize = 14.sp ,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 
