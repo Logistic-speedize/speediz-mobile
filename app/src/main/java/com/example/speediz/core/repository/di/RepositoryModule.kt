@@ -2,6 +2,8 @@ package com.example.speediz.core.repository.di
 
 import com.example.speediz.core.repository.ExpressRepository
 import com.example.speediz.core.repository.ExpressRepositoryImpl
+import com.example.speediz.core.repository.InvoiceRepository
+import com.example.speediz.core.repository.InvoiceRepositoryImpl
 import com.example.speediz.core.repository.PackageHistoryRepository
 import com.example.speediz.core.repository.PackageHistoryRepositoryImpl
 import com.example.speediz.core.repository.PackageRepository
@@ -12,6 +14,7 @@ import com.example.speediz.core.repository.SignUpRepository
 import com.example.speediz.core.repository.SignUpRepositoryImpl
 import com.example.speediz.core.repository.VendorRepository
 import com.example.speediz.core.repository.VendorRepositoryImpl
+import com.google.android.gms.common.SignInButton
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -56,4 +59,10 @@ abstract class RepositoryModule {
     abstract fun bindPackageHistoryRepository(
         impl: PackageHistoryRepositoryImpl
     ) : PackageHistoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindInvoiceRepository(
+        impl: InvoiceRepositoryImpl
+    ) : InvoiceRepository
 }
