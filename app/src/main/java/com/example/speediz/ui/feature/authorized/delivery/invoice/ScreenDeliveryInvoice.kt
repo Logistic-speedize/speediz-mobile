@@ -1,7 +1,11 @@
 package com.example.speediz.ui.feature.authorized.delivery.invoice
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,130 +15,208 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.example.speediz.core.data.delivery.InvoiceResponse
+import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.SelectDate
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
+import com.example.speediz.ui.theme.SPColor
 import com.example.speediz.ui.theme.SpeedizTheme
+import com.example.speediz.ui.utils.dateFormat
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.logging.SimpleFormatter
-
-@Composable
-fun ScreenDeliveryInvoice1(
-    onNavigate: (String) -> Unit,
-    onBack: () -> Unit,
-) {
-}
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenDeliveryInvoice(
-    invoices: List<InvoiceItem> = sampleInvoices()
+    onNavigateTo: (String) -> Unit,
+    onBackPress: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(horizontal = 20.dp)
-    ) {
-        Spacer(Modifier.height(20.dp))
-
-        // Top title row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Invoice",
-                style = TextStyle(
-                    fontSize = 22.sp ,
-                    fontWeight = FontWeight.Bold ,
-                    color = Color.Black
+    val viewModel = hiltViewModel<DeliveryInvoiceViewModel>()
+    val responseUiState = viewModel.responseUIState.collectAsState().value
+    val dateFilter = viewModel.dateFilter
+    var search = viewModel.searchQuery.collectAsState().value
+    LaunchedEffect(viewModel) {
+        viewModel.fetchInvoiceData()
+    }
+    LaunchedEffect(dateFilter) {
+        viewModel.filterByDate(dateFilter.value)
+    }
+    LaunchedEffect(search) {
+        viewModel.filterByQuery(search)
+    }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Invoices",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                },
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable { onBackPress() }
+                    )
+                },
+                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
-        }
+        },
+        modifier = Modifier.fillMaxSize().statusBarsPadding(),
+        containerColor = Color.Transparent
 
-        Spacer(Modifier.height(20.dp))
-
-        // Search box
-        SearchBox()
-
-        Spacer(Modifier.height(16.dp))
-
-        // Select date button
-        Box(
-            modifier = Modifier.width(200.dp)
-                .align(Alignment.End),
+    ) {
+        innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(innerPadding)
+                .padding(16.dp),
         ) {
-            SpDatePickerInput(
-                placeholderText = "Select date",
-                onValueChange = {}
+            // Search box
+            SearchBox(
+                value = search,
+                onChange = {
+                    search = it
+                    viewModel.filterByQuery(search)
+                }
             )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        LazyColumn {
-            items(invoices) { item ->
-                InvoiceCard(item)
-                Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(16.dp))
+            // Select date button
+            Box(
+                modifier = Modifier.width(200.dp)
+                    .height(60.dp)
+                    .align(Alignment.End),
+            ) {
+                SpDatePickerInput(
+                    placeholderText = "Select date",
+                    onValueChange = {
+                        dateFilter.value = it
+                        viewModel.filterByDate(dateFilter.value)
+                    },
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            LazyColumn {
+                items(responseUiState) { item ->
+                    InvoiceCard(item = item)
+                    Spacer(Modifier.height(14.dp))
+                }
             }
         }
     }
 }
 
 @Composable
-fun SearchBox() {
+fun SearchBox(
+    onChange: (String) -> Unit = { },
+    value: String = ""
+) {
+    val displayText = rememberSaveable { mutableStateOf(value) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(55.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
-            .border(1.dp, Color(0xFFE9E9E9), RoundedCornerShape(20.dp)),
+            .padding(horizontal = 8.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Icon(
-                imageVector = Icons.Default.Search ,
-                contentDescription = "" ,
-                tint = Color.Gray
+        TextField(
+            value = displayText.value,
+            onValueChange = {
+                displayText.value = it
+                onChange(it)
+            },
+            placeholder = {
+                Text(
+                    text = "Search invoice...",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null
+                )
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .border(1.dp, MaterialTheme.colorScheme.inverseSurface.copy(0.5f), RoundedCornerShape(20.dp)),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
             )
-            Spacer(Modifier.width(10.dp))
-            Text(
-                text = "Search shipment number",
-                color = Color.Gray,
-                fontSize = 15.sp
-            )
-        }
+        )
     }
+
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun InvoiceCard(item: InvoiceItem) {
+fun InvoiceCard(
+    item : InvoiceResponse.Data.InvoiceItems
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, Color(0xFFF2B246), RoundedCornerShape(16.dp))
-            .background(Color(0x1AF2B246))
+            .border(2.dp, androidx.compose.material3.MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
 
@@ -142,11 +224,11 @@ fun InvoiceCard(item: InvoiceItem) {
             Icon(
                 imageVector = Icons.Default.ShoppingCart ,
                 contentDescription = "" ,
-                tint = Color(0xFFF2B246)
+                tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.width(10.dp))
             Text(
-                text = "Invoice - ${item.number}" ,
+                text = "Invoice - ${item.invoiceNumber}" ,
                 color = Color.Black ,
                 fontSize = 16.sp ,
                 fontWeight = FontWeight.SemiBold
@@ -155,38 +237,22 @@ fun InvoiceCard(item: InvoiceItem) {
 
         Spacer(Modifier.height(10.dp))
 
-        HorizontalDivider(thickness = 1.dp , color = Color(0xFFE7E7E7))
+        HorizontalDivider(thickness = 1.dp , color = androidx.compose.material3.MaterialTheme.colorScheme.inverseSurface.copy(0.3f))
 
         Spacer(Modifier.height(10.dp))
 
-        Text(text = "Date" , color = Color.Gray , fontSize = 14.sp)
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            text = item.date ,
-            color = Color.Black ,
-            fontSize = 14.sp ,
-            fontWeight = FontWeight.Medium
-        )
+        Row {
+            Text(text = "Date" , color = Color.Gray , fontSize = 14.sp)
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = dateFormat(item.invoiceDate),
+                color = Color.Black ,
+                fontSize = 14.sp ,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
-data class InvoiceItem(
-    val number: String,
-    val date: String
-)
 
-fun sampleInvoices() = List(5) {
-    InvoiceItem(
-        number = "00000001",
-        date = "2025-09-29 11:32 PM"
-    )
-}
-@Preview (showBackground = true)
-@Composable
-fun PreviewScreenDeliveryInvoice() {
-    SpeedizTheme {
-        ScreenDeliveryInvoice()
-    }
-}
+
 

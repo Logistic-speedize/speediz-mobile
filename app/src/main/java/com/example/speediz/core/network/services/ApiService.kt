@@ -12,6 +12,8 @@ import com.example.speediz.core.data.delivery.PickUpStatusRequest
 import com.example.speediz.core.data.ResponseErrorModel
 import com.example.speediz.core.data.SignInRequest
 import com.example.speediz.core.data.SignInResponse
+import com.example.speediz.core.data.delivery.InvoiceDetailResponse
+import com.example.speediz.core.data.delivery.InvoiceResponse
 import com.example.speediz.core.data.delivery.SignUpDriverResponse
 import com.example.speediz.core.data.vendor.SignUpVendorResponse
 import com.example.speediz.core.data.delivery.StatusRequest
@@ -107,6 +109,15 @@ interface ApiService {
     suspend fun packageHistoryDetail(
         @Path ("id") id: Int,
     ): Response<PackageHistoryDetailResponse>
+
+    @GET("api/delivery/invoice/{id}")
+    suspend fun invoiceDeliveryDetail(
+        @Path ("id") id: Int,
+    ): Response<InvoiceDetailResponse>
+
+    @GET("api/delivery/invoice")
+    suspend fun invoiceDelivery(): Response<InvoiceResponse>
+
 
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL

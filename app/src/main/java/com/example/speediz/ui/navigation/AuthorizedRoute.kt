@@ -10,6 +10,8 @@ sealed class AuthorizedRoute{
         data object HistoryDetail: DeliveryRoute(route = "history/{id}")
         data object Map : DeliveryRoute(route = "map")
         data object Account : DeliveryRoute(route = "account")
+        data object Invoice : DeliveryRoute(route = "invoice")
+        data object InvoiceDetail : DeliveryRoute(route = "invoice/{id}")
     }
     sealed class VendorRoute ( val route : String) : AuthorizedRoute(){
         data object Home : VendorRoute(route = "vendor_home")
