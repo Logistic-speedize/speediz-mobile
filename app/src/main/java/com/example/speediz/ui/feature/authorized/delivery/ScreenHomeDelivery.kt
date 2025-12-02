@@ -68,6 +68,9 @@ fun ScreenHomeDelivery(
                         contentDescription = "Menu",
                         tint = MaterialTheme.colorScheme.surfaceVariant,
                         modifier = Modifier.size(48.dp)
+                            .clickable{
+                                onNavigateTo(AuthorizedRoute.DeliveryRoute.Account.route)
+                            }
                     )
                 }
                 Spacer( modifier = Modifier.padding( MaterialTheme.spacing.small ) )
