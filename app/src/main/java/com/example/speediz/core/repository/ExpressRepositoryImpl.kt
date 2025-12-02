@@ -1,11 +1,12 @@
 package com.example.speediz.core.repository
 
-import com.example.speediz.core.data.model.CompletedStatusRequest
-import com.example.speediz.core.data.model.ExpressDetailResponse
-import com.example.speediz.core.data.model.ExpressResponse
-import com.example.speediz.core.data.model.PickUpStatusRequest
-import com.example.speediz.core.data.model.ResponseErrorModel
-import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.delivery.CompletedStatusRequest
+import com.example.speediz.core.data.delivery.ExpressDetailResponse
+import com.example.speediz.core.data.delivery.ExpressResponse
+import com.example.speediz.core.data.delivery.PickUpStatusRequest
+import com.example.speediz.core.data.ResponseErrorModel
+import com.example.speediz.core.data.delivery.StatusRequest
+import com.example.speediz.core.data.delivery.TrackingLocationRequest
 import com.example.speediz.core.network.SafeApiRequest
 import com.example.speediz.core.network.services.ApiService
 import javax.inject.Inject
@@ -47,6 +48,12 @@ class ExpressRepositoryImpl @Inject constructor(
     override suspend fun pickUpStatusExpress(request: PickUpStatusRequest) : ResponseErrorModel {
         return apiRequest {
             api.pickUpStatus(request)
+        }
+    }
+
+    override suspend fun trackingDeliveryLocation(request : TrackingLocationRequest) : ResponseErrorModel {
+        return apiRequest {
+            api.deliveryTracking(request)
         }
     }
 

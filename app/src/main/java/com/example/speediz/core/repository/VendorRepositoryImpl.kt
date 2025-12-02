@@ -1,6 +1,6 @@
 package com.example.speediz.core.repository
 
-import com.example.speediz.core.data.model.Vendor
+import com.example.speediz.core.data.vendor.Vendor
 import jakarta.inject.Inject
 
 class VendorRepositoryImpl @Inject constructor(

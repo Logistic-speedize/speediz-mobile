@@ -5,13 +5,20 @@ import androidx.navigation.NavGraphBuilder
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.navigationExpressDetail
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.screenExpressDetail
 import com.example.speediz.ui.feature.authorized.delivery.express.screenExpress
+import com.example.speediz.ui.feature.authorized.delivery.history.detail.navigateToHistoryDetail
+import com.example.speediz.ui.feature.authorized.delivery.history.detail.screenHistoryDetail
 import com.example.speediz.ui.feature.authorized.delivery.history.screenHistory
+import com.example.speediz.ui.feature.authorized.delivery.invoice.screenDeliveryInvoice
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
 import com.example.speediz.ui.feature.authorized.vendor.map.screenMap
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoiceList.screenInvoice
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.packageList.screenPackage
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPackageTracking
 import com.example.speediz.ui.feature.authorized.vendor.home.screenHomeVendor
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.navigationPackageDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.screenPackageDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.navigationTrackingDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.screenTrackingDetail
 
 fun NavGraphBuilder.deliveryAuthorizedNavigate(
     navController: NavController
@@ -39,11 +46,26 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
         }
     )
         screenHistory(
-            onNavigateTo = {route ->
-                navController.navigate(route)
+            onNavigateTo = {id ->
+                navController.navigateToHistoryDetail(id)
+            },
+            onBack = {
+                navController.popBackStack()
             }
         )
-
+    screenHistoryDetail (
+        onBack = {
+            navController.popBackStack()
+        }
+    )
+    screenDeliveryInvoice(
+        onNavigateTo = {route ->
+            navController.navigate(route)
+        },
+        onBackPress = {
+            navController.popBackStack()
+        }
+    )
     //        screenAccount()
 }
 fun NavGraphBuilder.vendorAuthorizedNavigate(
@@ -54,27 +76,38 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
                     navController.navigate(route)
                 }
             )
-
+    screenPackage(
+        onNavigateTo = {id ->
+            navController.navigationPackageDetail(id)
+        },
+        onBack = {
+            navController.popBackStack()
+        }
+    )
+    screenPackageDetail(
+        onBack = {
+            navController.popBackStack()
+        }
+    )
     screenPackageTracking(
+        onNavigateTo = { id ->
+            navController.navigationTrackingDetail(id)
+        },
+        onBack = {
+            navController.popBackStack()
+        }
+    )
+    screenTrackingDetail(
+        onBack = {
+            navController.popBackStack()
+        },
+        onNavigateTo = { route ->
+            navController.navigate(route)
+        }
+    )
+    screenInvoice(
         onNavigateTo = {route ->
             navController.navigate(route)
         }
     )
-            screenPackage(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
-
-            screenPackageTracking(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
-
-            screenInvoice(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
 }

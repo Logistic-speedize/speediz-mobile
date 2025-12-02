@@ -50,20 +50,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.SignUpVendorRequest
+import com.example.speediz.core.data.vendor.SignUpVendorRequest
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
-import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
 import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
 import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.utils.dateFormat
-import java.util.Locale
 import java.util.Locale.getDefault
 
 @OptIn(ExperimentalMaterial3Api::class)

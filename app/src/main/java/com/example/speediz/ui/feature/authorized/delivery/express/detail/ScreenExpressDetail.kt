@@ -19,16 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.core.data.model.CompletedStatusRequest
-import com.example.speediz.core.data.model.ExpressDetailResponse
-import com.example.speediz.core.data.model.PickUpStatusRequest
-import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.delivery.CompletedStatusRequest
+import com.example.speediz.core.data.delivery.ExpressDetailResponse
+import com.example.speediz.core.data.delivery.PickUpStatusRequest
+import com.example.speediz.core.data.delivery.StatusRequest
+import com.example.speediz.core.data.delivery.TrackingLocationRequest
 import com.example.speediz.ui.feature.appwide.button.DialogDelivery
 import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.getCurrentLocation
 import com.example.speediz.ui.theme.SPColor
-import com.mapbox.maps.extension.style.expressions.dsl.generated.pi
 
 @Composable
 fun ScreenExpressDetail(
@@ -42,6 +42,7 @@ fun ScreenExpressDetail(
     var currentStatus by remember { mutableStateOf("") }
     val currentLat = expressDetail?.data?.location?.lat ?: 0.0
     val currentLon = expressDetail?.data?.location?.lng ?: 0.0
+
     LaunchedEffect(id, expressDetail, uiState) {
         viewModel.getExpressDetail(id.toInt())
     }
@@ -169,7 +170,6 @@ fun BottomSheetShowExpressDetail(
                 ExpressDetail(
                     expressDetail = expressDetail,
                     currentStatus = currentStatus,
-                    navigateTo = navigateTo,
                     viewModel = viewModel
                 )
             }
@@ -181,7 +181,6 @@ fun BottomSheetShowExpressDetail(
 fun ExpressDetail(
     expressDetail: ExpressDetailResponse.ExpressDetailData ?= null,
     currentStatus: String,
-    navigateTo: (String) -> Unit,
     viewModel : ExpressDetailViewModel
 ) {
     val completedState = viewModel.completedStatus.collectAsState().value
@@ -201,6 +200,18 @@ fun ExpressDetail(
     var isRollback by remember { mutableStateOf(false) }
     var isPickUp by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        getCurrentLocation(context){
+            lat, lng ->
+            val trackingRequest = TrackingLocationRequest(
+                packageId = expressDetail?.id ?: 0,
+                lat = lat,
+                lng = lng
+            )
+            viewModel.getTrackingDeliveryLocation(trackingRequest)
+        }
+    }
 
     LaunchedEffect(completedState , cancelState , rollbackState , pickUpState) {
         when(completedState) {

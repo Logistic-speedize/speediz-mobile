@@ -2,18 +2,15 @@ package com.example.speediz.core.repository
 
 import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
-import android.util.Log
-import com.example.speediz.core.data.model.SignUpDeliveryRequest
-import com.example.speediz.core.data.model.SignUpDriverResponse
-import com.example.speediz.core.data.model.SignUpVendorRequest
-import com.example.speediz.core.data.model.SignUpVendorResponse
+import com.example.speediz.core.data.delivery.SignUpDeliveryRequest
+import com.example.speediz.core.data.delivery.SignUpDriverResponse
+import com.example.speediz.core.data.vendor.SignUpVendorRequest
+import com.example.speediz.core.data.vendor.SignUpVendorResponse
 import com.example.speediz.core.network.SafeApiRequest
 import com.example.speediz.core.network.services.ApiService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 

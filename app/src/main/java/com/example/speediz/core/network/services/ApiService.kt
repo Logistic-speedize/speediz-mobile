@@ -2,19 +2,25 @@ package com.example.speediz.core.network.services
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.interaction.DragInteraction
 import com.example.speediz.BuildConfig
-import com.example.speediz.core.data.model.CompletedStatusRequest
-import com.example.speediz.core.data.model.ExpressDetailResponse
-import com.example.speediz.core.data.model.ExpressResponse
-import com.example.speediz.core.data.model.PickUpStatusRequest
-import com.example.speediz.core.data.model.ResponseErrorModel
-import com.example.speediz.core.data.model.SignInRequest
-import com.example.speediz.core.data.model.SignInResponse
-import com.example.speediz.core.data.model.SignUpDriverResponse
-import com.example.speediz.core.data.model.SignUpVendorRequest
-import com.example.speediz.core.data.model.SignUpVendorResponse
-import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.delivery.CompletedStatusRequest
+import com.example.speediz.core.data.delivery.ExpressDetailResponse
+import com.example.speediz.core.data.delivery.ExpressResponse
+import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
+import com.example.speediz.core.data.vendor.PackageResponse
+import com.example.speediz.core.data.delivery.PickUpStatusRequest
+import com.example.speediz.core.data.ResponseErrorModel
+import com.example.speediz.core.data.SignInRequest
+import com.example.speediz.core.data.SignInResponse
+import com.example.speediz.core.data.delivery.InvoiceDetailResponse
+import com.example.speediz.core.data.delivery.InvoiceResponse
+import com.example.speediz.core.data.delivery.SignUpDriverResponse
+import com.example.speediz.core.data.vendor.SignUpVendorResponse
+import com.example.speediz.core.data.delivery.StatusRequest
+import com.example.speediz.core.data.delivery.TrackingLocationRequest
+import com.example.speediz.core.data.delivery.PackageHistoryDetailResponse
+import com.example.speediz.core.data.delivery.PackageHistoryResponse
+import com.example.speediz.core.data.vendor.SignUpVendorRequest
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
 import okhttp3.MultipartBody
@@ -82,6 +88,36 @@ interface ApiService {
     suspend fun pickUpStatus(
         @Body info: PickUpStatusRequest
     ): Response<ResponseErrorModel>
+
+    @POST("api/delivery/tracking")
+    suspend fun deliveryTracking(
+        @Body info: TrackingLocationRequest
+    ): Response<ResponseErrorModel>
+
+    @GET("api/vendor/packages")
+    suspend fun packageList(): Response<PackageResponse>
+
+    @GET("api/vendor/packages/map/{id}")
+    suspend fun packageTrackingDetail(
+        @Path ("id") id: Int,
+    ): Response<PackageTrackingDetailResponse>
+
+    @GET("api/delivery/express/history")
+    suspend fun packageHistory(): Response<PackageHistoryResponse>
+
+    @GET("api/delivery/express/history/{id}")
+    suspend fun packageHistoryDetail(
+        @Path ("id") id: Int,
+    ): Response<PackageHistoryDetailResponse>
+
+    @GET("api/delivery/invoice/{id}")
+    suspend fun invoiceDeliveryDetail(
+        @Path ("id") id: Int,
+    ): Response<InvoiceDetailResponse>
+
+    @GET("api/delivery/invoice")
+    suspend fun invoiceDelivery(): Response<InvoiceResponse>
+
 
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL

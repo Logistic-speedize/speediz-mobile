@@ -1,13 +1,16 @@
 package com.example.speediz.ui.feature.authorized.delivery.express.detail
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speediz.core.data.model.CompletedStatusRequest
-import com.example.speediz.core.data.model.ExpressDetailResponse
-import com.example.speediz.core.data.model.PickUpStatusRequest
-import com.example.speediz.core.data.model.StatusRequest
+import com.example.speediz.core.data.delivery.CompletedStatusRequest
+import com.example.speediz.core.data.delivery.ExpressDetailResponse
+import com.example.speediz.core.data.delivery.PickUpStatusRequest
+import com.example.speediz.core.data.delivery.StatusRequest
+import com.example.speediz.core.data.delivery.TrackingLocationRequest
 import com.example.speediz.core.repository.ExpressRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -33,6 +36,8 @@ class ExpressDetailViewModel @Inject constructor(
     private val _expressDetail = MutableStateFlow<ExpressDetailResponse?>(null)
     val expressDetail = _expressDetail.asStateFlow()
 
+    private val _trackingLocation = MutableStateFlow<TrackingUiState>(TrackingUiState.Loading)
+    val trackingLocation = _trackingLocation.asStateFlow()
     fun getExpressDetail(id: Int) {
        viewModelScope.launch {
            _uiState.value = ExpressDetailUiState.Loading
@@ -96,6 +101,19 @@ class ExpressDetailViewModel @Inject constructor(
             } catch (e: Exception) {
                 _pickUpStatus.value = StatusUiState.Error(e.message ?: "Unknown Error")
             }
+        }
+    }
+
+    fun getTrackingDeliveryLocation(request : TrackingLocationRequest) {
+        viewModelScope.launch {
+            try {
+                val response = repository.trackingDeliveryLocation(request)
+                _trackingLocation.value = TrackingUiState.Success(response.message.toString())
+                Log.d("ExpressViewModel" , "Tracking location response: $response" )
+            } catch (e: Exception) {
+                Log.d("ExpressViewModel" , "Error tracking location: ${e.message}" )
+            }
+            delay(5000)
         }
     }
 }

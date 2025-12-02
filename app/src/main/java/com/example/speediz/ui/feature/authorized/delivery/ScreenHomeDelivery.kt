@@ -177,6 +177,9 @@ fun ScreenHomeDelivery(
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .padding(16.dp)
+                            .clickable{
+                                onNavigateTo(AuthorizedRoute.DeliveryRoute.History.route)
+                            }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -207,12 +210,12 @@ fun ScreenHomeDelivery(
                             )
                             .padding(16.dp)
                             .clickable{
-                                onNavigateTo(AuthorizedRoute.DeliveryRoute.Map.route)
+                                onNavigateTo(AuthorizedRoute.DeliveryRoute.Invoice.route)
                             }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Map",
+                        text = "Invoice",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium

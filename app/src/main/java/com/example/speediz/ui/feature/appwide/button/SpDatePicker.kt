@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +23,7 @@ import java.util.*
 fun SpDatePickerInput(
     placeholderText: String = "",
     formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
-    onValueChange: (String) -> Unit = {}
+    onValueChange: (String) -> Unit = {},
 ) {
     var dateText by remember { mutableStateOf("") }
     var showSheet by remember { mutableStateOf(false) }
@@ -48,7 +49,13 @@ fun SpDatePickerInput(
             disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-        )
+        ),
+        leadingIcon = {
+            Icon(
+                imageVector = androidx.compose.material.icons.Icons.Default.DateRange ,
+                contentDescription = "Select Date"
+            )
+        }
     )
 
     // Only show the bottom sheet if showSheet == true

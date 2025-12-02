@@ -1,6 +1,6 @@
 package com.example.speediz.core.network
 
-import com.example.speediz.core.data.model.ResponseErrorModel
+import com.example.speediz.core.data.ResponseErrorModel
 import com.example.speediz.ui.utils.MyException
 import com.google.gson.GsonBuilder
 import org.json.JSONObject
