@@ -118,6 +118,9 @@ interface ApiService {
     @GET("api/delivery/invoice")
     suspend fun invoiceDelivery(): Response<InvoiceResponse>
 
+    @GET("api/vendor/invoice")
+    suspend fun invoiceVendor(): Response<com.example.speediz.core.data.vendor.InvoiceResponse>
+
 
     companion object {
         val baseUrl = BuildConfig.API_BASE_URL
