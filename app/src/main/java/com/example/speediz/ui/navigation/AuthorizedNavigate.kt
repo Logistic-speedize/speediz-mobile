@@ -14,6 +14,8 @@ import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoic
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.packageList.screenPackage
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPackageTracking
 import com.example.speediz.ui.feature.authorized.vendor.home.screenHomeVendor
+import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail.navigationInvoiceDetail
+import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail.screenInvoiceDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.navigationPackageDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.screenPackageDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.navigationTrackingDetail
@@ -98,8 +100,14 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
         }
     )
     screenInvoice(
-        onNavigateTo = {route ->
-            navController.navigate(route)
+        onNavigateTo = { id ->
+            navController.navigationInvoiceDetail(id)
+        },
+        onBack = {
+            navController.popBackStack()
         }
+    )
+    screenInvoiceDetail(
+        onBack = { navController.popBackStack() }
     )
 }
