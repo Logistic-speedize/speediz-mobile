@@ -19,7 +19,8 @@ fun CompactTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
-    height: Int = 40
+    height: Int = 60,
+    enable: Boolean = true,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Label above the field
@@ -56,7 +57,8 @@ fun CompactTextField(
                         fontSize = 13.sp,
                         color = Color.Black
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enable
                 )
 
                 if (innerText.isEmpty()) {

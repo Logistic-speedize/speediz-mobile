@@ -2,6 +2,7 @@ package com.example.speediz.ui.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import com.example.speediz.ui.feature.authorized.delivery.account.screenAccount
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.navigationExpressDetail
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.screenExpressDetail
 import com.example.speediz.ui.feature.authorized.delivery.express.screenExpress
@@ -66,6 +67,16 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
         },
         onBackPress = {
             navController.popBackStack()
+        }
+    )
+    screenAccount(
+        onLogOut = {
+        },
+        onBack = {
+            navController.popBackStack()
+        },
+        onEdit = {
+            // Handle edit profile navigation here
         }
     )
     //        screenAccount()
