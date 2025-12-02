@@ -18,16 +18,18 @@ import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.navigation.deliveryAuthorizedNavigate
 import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
+import com.example.speediz.ui.utils.hasFirebasePermission
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+    navController : NavHostController ,
+    modifier : Modifier = Modifier ,
+    role : Int? ,
 ) {
     val signInViewModel = hiltViewModel<SignInViewModel>()
     val isLoggedIn = signInViewModel.isLoggedIn.collectAsState().value
-    val userRole = signInViewModel.role.collectAsState().value
+    val userRole = role
     val startDestination = if (!isLoggedIn) {
         UnauthorizedRoute.SignIn.route
     }else {
@@ -49,12 +51,14 @@ fun AppNavigation(
                 unauthorizedNavigate(
                     navController = navController
                 )
-                vendorAuthorizedNavigate(
-                    navController = navController
-                )
-                deliveryAuthorizedNavigate(
-                    navController = navController
-                )
+                if (hasFirebasePermission()){
+                    vendorAuthorizedNavigate(
+                        navController = navController
+                    )
+                    deliveryAuthorizedNavigate(
+                        navController = navController
+                    )
+                }
 
             }
         }

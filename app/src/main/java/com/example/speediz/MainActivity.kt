@@ -1,12 +1,10 @@
 package com.example.speediz
 
 import android.os.Bundle
-import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -30,11 +28,25 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val sharePreferences: MySharePreferences = hiltViewModel<SignInViewModel>().sharePreferences
             val isLoggedIn = remember { mutableStateOf(sharePreferences.getToken() != null) }
+            val role = remember { mutableStateOf(sharePreferences.getUserRole()) }
             val showSplashScreen = remember { mutableStateOf(true) }
-            LaunchedEffect( navController) {
+
+            val requestPermissionNotification = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                // Handle permission result if needed
+            }
+
+            LaunchedEffect(Unit) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionNotification.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            LaunchedEffect( navController, role) {
                 navController.addOnDestinationChangedListener {
                     _, destination, _ ->
                     isLoggedIn.value = sharePreferences.getToken() != null
+                    role.value = sharePreferences.getUserRole()
                 }
             }
             LaunchedEffect(Unit) {
@@ -48,7 +60,8 @@ class MainActivity : ComponentActivity() {
 
                } else {
                    AppNavigation(
-                       navController = navController
+                       navController = navController ,
+                       role = role.value?.toInt() ,
                    )
                }
            }

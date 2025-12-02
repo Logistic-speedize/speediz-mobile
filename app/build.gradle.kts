@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.android.hilt)
     alias (libs.plugins.secrets.gradle)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)  //  plugin for Firebase
 }
 
 android {
@@ -22,7 +24,6 @@ android {
         buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${project.findProperty("MAPBOX_ACCESS_TOKEN") ?: ""}\"")
         buildConfigField ("String", "API_BASE_URL", "\"${project.findProperty("API_BASE_URL") ?: "https://default.url/"}\"")
     }
-
     packaging {
         jniLibs {
             useLegacyPackaging = false
@@ -64,6 +65,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.serialization.json)
     implementation(libs.androidx.tv.material)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.play.services.location)
+    implementation(libs.firebase.inappmessaging.display)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.androidx.compose.material3)
     ksp(libs.bundles.dagger.ksp)
     //hilt
     implementation(libs.hilt.dagger)
@@ -85,9 +92,18 @@ dependencies {
     //work manager
     implementation(libs.work.runtime.ktx)
     //mapbox
-    implementation(libs.mapbox)
+//    implementation(libs.mapbox.sdk)
+//    implementation(libs.mapbox.compose)
+//   // implementation(libs.mapbox.directions)
+//    implementation(libs.mapbox.navigation)
+//    implementation(libs.mapbox.navigation.core)
+    implementation(libs.mapbox.maps)
+//    implementation(libs.mapbox.navigation)
     implementation(libs.compose.ui)
     //navigation animation
+    //firebase
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.analytics.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
