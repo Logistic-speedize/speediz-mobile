@@ -20,10 +20,17 @@ data class InvoiceDetailResponse(
         @SerializedName("delivery_fee")
         val deliveryFee: Double,
         @SerializedName("package_status_counts")
-        val packageStatusCounts: Map<String, Int>,
+        val packageStatusCounts: PackageStatusCounts,
         @SerializedName("packages")
         val packages: List<InvoicePackage>,
     ){
+        data class  PackageStatusCounts(
+            val cancelled: Int,
+            val pending: Int,
+            @SerializedName("in_transit")
+            val inTransit: Int,
+            val completed: Int,
+        )
         data class InvoicePackage(
             val id: Int,
             @SerializedName("package_number")

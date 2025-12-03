@@ -150,7 +150,10 @@ fun ScreenDeliveryInvoice(
             Spacer(Modifier.height(16.dp))
             LazyColumn {
                 items(responseUiState) { item ->
-                    InvoiceCard(item = item)
+                    InvoiceCard(
+                        item = item,
+                        toDetail = onNavigateTo
+                    )
                     Spacer(Modifier.height(14.dp))
                 }
             }
@@ -209,7 +212,8 @@ fun SearchBox(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InvoiceCard(
-    item : InvoiceResponse.Data.InvoiceItems
+    item : InvoiceResponse.Data.InvoiceItems,
+    toDetail: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -218,6 +222,9 @@ fun InvoiceCard(
             .border(2.dp, androidx.compose.material3.MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
             .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
             .padding(16.dp)
+            .clickable{
+                toDetail(item.id.toString())
+            }
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
