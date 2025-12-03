@@ -95,6 +95,15 @@ class SignInViewModel @Inject constructor(
             }
         }
     }
+
+    fun signOut() {
+        viewModelScope.launch {
+            sharePreferences.clearToken()
+            _isLoggedIn.value = false
+            _role.value = 3
+            Log.d("TAG", "User signed out.")
+        }
+    }
     fun resetState() {
         _signInState.value = SignInState.Idle
     }
