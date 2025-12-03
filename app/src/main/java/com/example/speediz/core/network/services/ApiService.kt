@@ -12,6 +12,7 @@ import com.example.speediz.core.data.delivery.PickUpStatusRequest
 import com.example.speediz.core.data.ResponseErrorModel
 import com.example.speediz.core.data.SignInRequest
 import com.example.speediz.core.data.SignInResponse
+import com.example.speediz.core.data.delivery.DeliveryProfileResponse
 import com.example.speediz.core.data.delivery.InvoiceDetailResponse
 import com.example.speediz.core.data.delivery.InvoiceResponse
 import com.example.speediz.core.data.delivery.SignUpDriverResponse
@@ -120,6 +121,9 @@ interface ApiService {
 
     @GET("api/vendor/invoice")
     suspend fun invoiceVendor(): Response<com.example.speediz.core.data.vendor.InvoiceResponse>
+
+    @GET("api/delivery/me")
+    suspend fun getDeliveryProfile(): Response<DeliveryProfileResponse>
 
 
     companion object {

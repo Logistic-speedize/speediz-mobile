@@ -71,13 +71,15 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
     )
     screenAccount(
         onLogOut = {
+            navController.navigate(UnauthorizedRoute.SignIn.route) {
+                popUpTo(AuthorizedRoute.DeliveryRoute.Home.route) {
+                    inclusive = true
+                }
+            }
         },
         onBack = {
             navController.popBackStack()
         },
-        onEdit = {
-            // Handle edit profile navigation here
-        }
     )
     //        screenAccount()
 }

@@ -113,6 +113,87 @@ fun DialogDelivery(
         }
     )
 }
+@Composable
+fun SPDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: (String) -> Unit,
+    title: String = "Enter Reason",
+    description: String = "Please provide a reason before proceeding:",
+    onChangeValue: (String) -> Unit = { },
+    isEnablePassValue: Boolean
+) {
+
+    val reason = remember { mutableStateOf("") }
+    val isEnableInput = remember { mutableStateOf<Boolean?>(isEnablePassValue) }
+    val context = LocalContext.current
+    AlertDialog(
+        modifier = Modifier.fillMaxWidth() ,
+        containerColor = MaterialTheme.colorScheme.surface ,
+        onDismissRequest = { onDismissRequest() } ,
+        title = { Text(text = title) } ,
+        text = {
+            Column {
+                Text(text = description)
+                Spacer(modifier = Modifier.height(8.dp))
+                if ( isEnableInput.value == true){
+                    OutlinedTextField(
+                        value = reason.value,
+                        onValueChange = {
+                            reason.value = it
+                            onChangeValue(it)
+                        },
+                        placeholder = { Text("Enter reason...") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                            .border(
+                                BorderStroke(1.dp, SPColor.primary),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .background(
+                                SPColor.surface, shape = RoundedCornerShape(12.dp)
+                            ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                } else {
+                    ""
+                }
+            }
+        } ,
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (isEnableInput.value == true){
+                        if (reason.value.isNotEmpty()) {
+                            onConfirm(reason.value)
+                            Log.d("DialogDelivery" , "Confirm clicked with reason: ${reason.value}" )
+                            onDismissRequest()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Please enter a reason before confirming." ,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@Button
+                        }
+                    } else {
+                        onConfirm("")
+                        onDismissRequest()
+                    }
+                }
+            ) {
+                Text("Confirm", color = MaterialTheme.colorScheme.surface)
+            }
+        } ,
+        dismissButton = {
+            OutlinedButton(
+                onClick = { onDismissRequest() },
+                border = BorderStroke(1.dp , MaterialTheme.colorScheme.primary)
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 
 @Preview(showBackground = true)
 @Composable

@@ -8,13 +8,11 @@ import com.example.speediz.ui.navigation.AuthorizedRoute
 fun NavGraphBuilder.screenAccount(
     onLogOut: () -> Unit,
     onBack: () -> Unit,
-    onEdit: () -> Unit,
 ) {
     composable(AuthorizedRoute.DeliveryRoute.Account.route) {
         ScreenAccount(
-            onConfirm = onLogOut,
+            onLogOut = onLogOut,
             onBackPress = onBack,
-            onClickToEdit = onEdit,
         )
     }
 }
