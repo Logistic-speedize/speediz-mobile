@@ -1,5 +1,7 @@
 package com.example.speediz.core.repository.di
 
+import com.example.speediz.core.repository.DeliveryProfileRepository
+import com.example.speediz.core.repository.DeliveryProfileRepositoryImpl
 import com.example.speediz.core.repository.ExpressRepository
 import com.example.speediz.core.repository.ExpressRepositoryImpl
 import com.example.speediz.core.repository.InvoiceRepository
@@ -65,4 +67,10 @@ abstract class RepositoryModule {
     abstract fun bindInvoiceRepository(
         impl: InvoiceRepositoryImpl
     ) : InvoiceRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDeliveryProfileRepository(
+        impl: DeliveryProfileRepositoryImpl
+    ) : DeliveryProfileRepository
 }

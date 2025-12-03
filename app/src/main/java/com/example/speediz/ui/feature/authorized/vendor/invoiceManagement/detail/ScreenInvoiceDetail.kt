@@ -92,3 +92,8 @@ fun Header(
         Spacer(modifier = Modifier.size(30.dp))
     }
 }
+@Preview(showBackground = true)
+@Composable
+fun ScreenInvoiceDetailPreview() {
+    ScreenInvoiceDetail(id = "INV-123456") {}
+}
