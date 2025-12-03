@@ -9,6 +9,8 @@ import com.example.speediz.ui.feature.authorized.delivery.express.screenExpress
 import com.example.speediz.ui.feature.authorized.delivery.history.detail.navigateToHistoryDetail
 import com.example.speediz.ui.feature.authorized.delivery.history.detail.screenHistoryDetail
 import com.example.speediz.ui.feature.authorized.delivery.history.screenHistory
+import com.example.speediz.ui.feature.authorized.delivery.invoice.detail.navigateToDeliveryInvoiceDetail
+import com.example.speediz.ui.feature.authorized.delivery.invoice.detail.screenDeliveryInvoiceDetail
 import com.example.speediz.ui.feature.authorized.delivery.invoice.screenDeliveryInvoice
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
 import com.example.speediz.ui.feature.authorized.vendor.map.screenMap
@@ -63,7 +65,7 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
     )
     screenDeliveryInvoice(
         onNavigateTo = {route ->
-            navController.navigate(route)
+            navController.navigateToDeliveryInvoiceDetail(route)
         },
         onBackPress = {
             navController.popBackStack()
@@ -80,6 +82,11 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
         onBack = {
             navController.popBackStack()
         },
+    )
+    screenDeliveryInvoiceDetail (
+        onBackPress = {
+            navController.popBackStack()
+        }
     )
     //        screenAccount()
 }
