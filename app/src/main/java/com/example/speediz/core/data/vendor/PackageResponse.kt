@@ -22,15 +22,15 @@ data class PackageResponse(
             val date: String = "",
             @SerializedName("status")
             val status: String = "",
-            val driver: DriverInfo,
+            val driver: DriverInfo ?= null,
             val customer: CustomerInfo,
         ){
             data class DriverInfo(
                 val id: Int,
                 @SerializedName("first_name")
-                val firstName: String = "",
+                val firstName: String,
                 @SerializedName("last_name")
-                val lastName: String = "",
+                val lastName: String,
                 @SerializedName("contact_number")
                 val contactNumber: String = "",
                 @SerializedName("driver_type")

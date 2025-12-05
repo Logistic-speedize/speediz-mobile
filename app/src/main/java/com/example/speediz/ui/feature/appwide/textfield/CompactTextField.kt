@@ -4,14 +4,27 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.tv.material3.Icon
+import com.example.speediz.ui.theme.SpeedizTheme
 
 @Composable
 fun CompactTextField(
@@ -21,13 +34,14 @@ fun CompactTextField(
     modifier: Modifier = Modifier,
     height: Int = 60,
     enable: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    readOnly: Boolean = false,
+    keyboardAction: KeyboardActions = KeyboardActions.Default,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Label above the field
         Text(
             text = label,
-            fontSize = 13.sp,
-            color = Color.Gray,
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
@@ -35,8 +49,6 @@ fun CompactTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(height.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(6.dp))
-                .padding(horizontal = 8.dp)
         ) {
             var innerText by remember { mutableStateOf(value) }
 
@@ -46,30 +58,37 @@ fun CompactTextField(
                     .fillMaxSize(),
                 contentAlignment = Alignment.CenterStart
             ) {
-                BasicTextField(
+                OutlinedTextField(
                     value = innerText,
                     onValueChange = {
                         innerText = it
                         onValueChange(it)
                     },
                     singleLine = true,
-                    textStyle = TextStyle(
-                        fontSize = 13.sp,
-                        color = Color.Black
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = enable
+                    textStyle = TextStyle(fontSize = 13.sp, color = Color.Black),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    enabled = enable,
+                    placeholder = { Text(text = label, fontSize = 13.sp) },
+                    keyboardOptions = keyboardOptions,
+                    readOnly = readOnly,
+                    keyboardActions = keyboardAction,
                 )
-
-                if (innerText.isEmpty()) {
-                    Text(
-                        text = label,
-                        fontSize = 13.sp,
-                        color = Color.LightGray
-                    )
-                }
             }
         }
+    }
+}
+
+@Preview (showBackground = true)
+@Composable
+fun CompactTextFieldPreview() {
+    SpeedizTheme{
+        CompactTextField(
+            value = "",
+            onValueChange = {},
+            label = "Receiver’s Phone Number",
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
 

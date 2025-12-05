@@ -21,6 +21,7 @@ import com.example.speediz.core.data.delivery.StatusRequest
 import com.example.speediz.core.data.delivery.TrackingLocationRequest
 import com.example.speediz.core.data.delivery.PackageHistoryDetailResponse
 import com.example.speediz.core.data.delivery.PackageHistoryResponse
+import com.example.speediz.core.data.vendor.CreatePackageRequest
 import com.example.speediz.core.data.vendor.SignUpVendorRequest
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
@@ -124,6 +125,11 @@ interface ApiService {
 
     @GET("api/delivery/me")
     suspend fun getDeliveryProfile(): Response<DeliveryProfileResponse>
+
+    @POST("api/vendor/packages")
+    suspend fun createPackage(
+        @Body info: CreatePackageRequest
+    ) : Response<ResponseErrorModel>
 
 
     companion object {

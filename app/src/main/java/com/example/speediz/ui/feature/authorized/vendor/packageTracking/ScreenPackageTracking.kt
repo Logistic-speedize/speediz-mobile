@@ -228,7 +228,7 @@ fun PackageCard(item: PackageResponse.DataPackage.PackageItem, onNavigateTo : ()
         ) {
             Column {
                 Text("Customer Name", fontSize = 13.sp, color = Color.Gray)
-                val vendor = "${item.customer?.firstName} ${item.customer?.lastName}"
+                val vendor = item.customerName
                 Text(vendor, fontWeight = FontWeight.Medium, color = Color.Black)
             }
             Column(
@@ -246,7 +246,7 @@ fun PackageCard(item: PackageResponse.DataPackage.PackageItem, onNavigateTo : ()
             modifier = Modifier.fillMaxWidth()
         ) {
             Column{
-                val deliveryName = "${item.driver.firstName} ${item.driver.lastName}"
+                val deliveryName = "${item.driver?.firstName} ${item.driver?.lastName}".ifEmpty { "N/A" }
                 Text("Delivery's Name", fontSize = 13.sp, color = Color.Gray)
                 Text(deliveryName, fontWeight = FontWeight.Medium, color = Color.Black)
             }
@@ -254,7 +254,7 @@ fun PackageCard(item: PackageResponse.DataPackage.PackageItem, onNavigateTo : ()
                 horizontalAlignment = Alignment.End,
             ) {
                 Text("Phone", fontSize = 13.sp, color = Color.Gray)
-                Text(item.driver.contactNumber, fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(item.driver?.contactNumber ?: "N/A", fontWeight = FontWeight.Medium, color = Color.Black)
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -264,7 +264,7 @@ fun PackageCard(item: PackageResponse.DataPackage.PackageItem, onNavigateTo : ()
         ) {
             Column{
                 Text("Delivery Type", fontSize = 13.sp, color = Color.Gray)
-                Text(item.driver.driverType , fontWeight = FontWeight.Medium, color = Color.Black)
+                Text(item.driver?.driverType ?: "N/A" , fontWeight = FontWeight.Medium, color = Color.Black)
             }
         }
 
@@ -276,7 +276,7 @@ fun PackageCard(item: PackageResponse.DataPackage.PackageItem, onNavigateTo : ()
         ) {
             Text("Location", color = Color.Gray, fontSize = 14.sp)
             Text(
-                text = item.location,
+                text = item.location.ifEmpty { "N/A" },
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,

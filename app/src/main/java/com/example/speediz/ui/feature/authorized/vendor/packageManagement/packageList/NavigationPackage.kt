@@ -7,11 +7,13 @@ import com.example.speediz.ui.navigation.AuthorizedRoute
 
 fun NavGraphBuilder.screenPackage(
     onNavigateTo : (String) -> Unit,
+    onNavigateToCreatePackage: () -> Unit,
     onBack: () -> Unit
 ) {
     composable(AuthorizedRoute.VendorRoute.Package.route) {
         ScreenPackage(
             onNavigateTo = onNavigateTo,
+            onNavigateToCreatePackage = onNavigateToCreatePackage,
             onBack = onBack
         )
     }
