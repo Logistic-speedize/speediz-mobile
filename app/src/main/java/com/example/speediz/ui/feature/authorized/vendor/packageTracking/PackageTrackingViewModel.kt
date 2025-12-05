@@ -66,9 +66,12 @@ class PackageTrackingViewModel @Inject constructor(
         val filteredList = if (id.isEmpty()) {
             packageInMap.value
         } else {
-             packageInMap.value.filter { it.packageNumber.contains(id, ignoreCase = true) }
+            packageInMap.value.filter { it.packageNumber.contains(id, ignoreCase = true) }
         }
         _packageFilterInMap.value = filteredList
+            .sortedByDescending(
+            { it.id }
+        )
     }
     fun searchPackageById(searchId: String) {
         val filteredList = if (searchId.isEmpty()) {
@@ -76,6 +79,6 @@ class PackageTrackingViewModel @Inject constructor(
         } else {
              packageList.value.filter { it.id.toString().contains(searchId, ignoreCase = true) }
         }
-        _packageFilter.value = filteredList
+        _packageFilter.value = filteredList.sortedByDescending { it.id  }
     }
 }

@@ -20,6 +20,8 @@ import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPa
 import com.example.speediz.ui.feature.authorized.vendor.home.screenHomeVendor
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail.navigationInvoiceDetail
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail.screenInvoiceDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.create.navigateToCreatePackage
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.create.screenCreatePackage
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.navigationPackageDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.screenPackageDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.navigationTrackingDetail
@@ -104,10 +106,21 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
         },
         onBack = {
             navController.popBackStack()
+        },
+        onNavigateToCreatePackage = {
+            navController.navigateToCreatePackage()
         }
     )
     screenPackageDetail(
         onBack = {
+            navController.popBackStack()
+        }
+    )
+    screenCreatePackage(
+        onBack = {
+            navController.popBackStack()
+        },
+        onCreate = {
             navController.popBackStack()
         }
     )

@@ -18,7 +18,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +49,7 @@ import com.example.speediz.ui.feature.authorized.vendor.packageTracking.PackageT
 @Composable
 fun ScreenPackage(
     onNavigateTo: (String) -> Unit,
+    onNavigateToCreatePackage: () -> Unit,
     onBack: () -> Unit
 ){
     val viewModel = hiltViewModel<PackageTrackingViewModel>()
@@ -82,6 +86,24 @@ fun ScreenPackage(
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     color = Color.Black
+                )
+            }
+        },
+        floatingActionButton = {
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .shadow(4.dp , RoundedCornerShape(28.dp))
+                    .background(MaterialTheme.colorScheme.primary , RoundedCornerShape(28.dp))
+                    .clickable { onNavigateToCreatePackage() }
+                ,
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Package",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
