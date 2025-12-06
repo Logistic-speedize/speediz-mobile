@@ -14,6 +14,8 @@ import com.example.speediz.core.repository.SignInRepository
 import com.example.speediz.core.repository.SignInRepositoryImpl
 import com.example.speediz.core.repository.SignUpRepository
 import com.example.speediz.core.repository.SignUpRepositoryImpl
+import com.example.speediz.core.repository.VendorProfileRepository
+import com.example.speediz.core.repository.VendorProfileRepositoryImpl
 import com.example.speediz.core.repository.VendorRepository
 import com.example.speediz.core.repository.VendorRepositoryImpl
 import com.google.android.gms.common.SignInButton
@@ -73,4 +75,10 @@ abstract class RepositoryModule {
     abstract fun bindDeliveryProfileRepository(
         impl: DeliveryProfileRepositoryImpl
     ) : DeliveryProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVendorProfileRepository(
+        impl: VendorProfileRepositoryImpl
+    ) : VendorProfileRepository
 }

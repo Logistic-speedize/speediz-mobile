@@ -23,6 +23,7 @@ import com.example.speediz.core.data.delivery.PackageHistoryDetailResponse
 import com.example.speediz.core.data.delivery.PackageHistoryResponse
 import com.example.speediz.core.data.vendor.CreatePackageRequest
 import com.example.speediz.core.data.vendor.SignUpVendorRequest
+import com.example.speediz.core.data.vendor.VendorProfileResponse
 import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.core.network.interceptor.TokenInterceptor
 import okhttp3.MultipartBody
@@ -125,6 +126,8 @@ interface ApiService {
 
     @GET("api/delivery/me")
     suspend fun getDeliveryProfile(): Response<DeliveryProfileResponse>
+    @GET("api/vendor/me")
+    suspend fun getVendorProfile(): Response<VendorProfileResponse>
 
     @POST("api/vendor/packages")
     suspend fun createPackage(

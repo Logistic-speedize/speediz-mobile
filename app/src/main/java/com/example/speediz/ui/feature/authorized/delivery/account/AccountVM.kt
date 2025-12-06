@@ -21,9 +21,7 @@ class AccountVM @Inject constructor(
             try {
                 val response = repository.getDeliveryProfile().data
                 _profileUIState.value = DeliveryProfileState.Success(response)
-                Log.d( "AccountVM" , "Fetched profile data: ${response}" )
             } catch (e: Exception) {
-                Log.d( "AccountVM" , "Error fetching profile data: ${e.message}" )
                 _profileUIState.value = DeliveryProfileState.Error(e.message ?: "Unknown Error")
             }
         }
