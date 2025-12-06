@@ -1,7 +1,5 @@
 package com.example.speediz.ui.feature.authorized.delivery.invoice.detail
 
-import android.graphics.drawable.Icon
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,20 +9,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,13 +37,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.tv.material3.Icon
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import coil.decode.ImageSource
 import com.example.speediz.R
 import com.example.speediz.core.data.delivery.InvoiceDetailResponse
+import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.utils.dateFormat
+import com.mapbox.maps.extension.style.expressions.dsl.generated.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,66 +52,107 @@ fun ScreenDeliveryInvoiceDetail(
     id: String,
     onBackPress: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
+    val viewModel = hiltViewModel<DeliveryInvoiceDetailViewModel>()
+    val invoiceDetailState = viewModel.uiState.collectAsState()
+    LaunchedEffect(key1 = id){
+        viewModel.getInvoiceDetailById(id = id)
+    }
+    when (val state = invoiceDetailState.value){
+        is InvoiceDetailUIState.Success -> {
+            val invoiceDetail = state.invoiceDetailData
+            val completedPackage = invoiceDetail.packageStatusCounts.completed
+            val remainPackage = invoiceDetail.packageStatusCounts.pending +
+                    invoiceDetail.packageStatusCounts.inTransit +
+                    invoiceDetail.packageStatusCounts.cancelled
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Invoice Detail",
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.Black,
+                                    textAlign = TextAlign.Center
+                                )
+                            )
+                        },
+                        navigationIcon = {
+                            androidx.tv.material3.Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable { onBackPress() }
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent
+                        )
+                    )
+                },
+                containerColor = Color.Transparent,
+                modifier = Modifier.padding(16.dp).statusBarsPadding()
+            ) {
+                    innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding),
+                ) {
+                    PackageStatusSection(
+                        id= invoiceDetail.invoiceNumber,
+                        packageStatusInfo = invoiceDetail.packageStatusCounts,
+                        date = invoiceDetail.invoiceDate
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
                     Text(
-                        text = "Invoice Detail",
+                        text = "Package Information",
                         style = TextStyle(
                             fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Bold,
                             color = Color.Black,
                             textAlign = TextAlign.Center
                         )
                     )
-                },
-                navigationIcon = {
-                    androidx.tv.material3.Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable { onBackPress() }
-                    )
-                },
-                modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    invoiceDetail.packages.forEach { item ->
+                        PackageCard(packageInfo = item)
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    androidx.compose.material3.Text(text = "Total packages completed: ${completedPackage}pcs", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    androidx.compose.material3.Text(text = "Total packages remained: ${remainPackage}pcs", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    androidx.compose.material3.Text(text = "Total package price: ${invoiceDetail.totalPackagePrice}$", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    androidx.compose.material3.Text(text = "Total delivery fee: ${invoiceDetail.deliveryFee}$", fontSize = 16.sp)
+                }
+
+            }
         }
-    ) {
-        innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(innerPadding),
-        ) {
-            PackageStatusSection(id= "1")
-            androidx.compose.material3.Text(text = "Total packages: 3pcs", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            Spacer(modifier = Modifier.height(8.dp))
-            androidx.compose.material3.Text(text = "Total package price: 70$", fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            androidx.compose.material3.Text(text = "Total delivery fee: 6$", fontSize = 16.sp)
+        is InvoiceDetailUIState.Loading -> {
+            SPLoading()
         }
+        else -> {}
     }
 }
 
 @Composable
 fun PackageStatusSection(
     id: String,
-    packageStatusInfo: Map<String, Int> = mapOf(
-        "Pending" to 2,
-        "Completed" to 5,
-        "Cancelled" to 1
-    )
+    packageStatusInfo: InvoiceDetailResponse.Data.PackageStatusCounts,
+    date: String = "2025-12-01"
 ){
-    val cancelledCounts = "CANCELLED"
-    val pendingCounts = "PENDING"
-    val completedCounts = "COMPLETED"
-    val date = "2025-12-01"
+    val cancelledCounts = packageStatusInfo.cancelled
+    val pendingCounts = packageStatusInfo.pending + packageStatusInfo.inTransit
+    val completedCounts = packageStatusInfo.completed
+    val total = cancelledCounts + pendingCounts + completedCounts + cancelledCounts
+    val date = dateFormat(date).format(
+        java.util.Locale.getDefault(), "dd-MM-yyyy"
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,6 +162,8 @@ fun PackageStatusSection(
         androidx.compose.material3.Text(text = "Invoice No: $id", fontSize = 16.sp, fontWeight = FontWeight.Medium)
         Spacer(modifier = Modifier.height(8.dp))
         androidx.compose.material3.Text(text = "Date: ${date}", fontSize = 16.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        androidx.compose.material3.Text(text = "Total Packages: ${total}", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(8.dp))
         androidx.compose.material3.Text(text = "Pending Packages: ${pendingCounts}", fontSize = 16.sp)
         Spacer(modifier = Modifier.height(8.dp))
@@ -142,15 +187,11 @@ fun PackageCard(
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_box),
-                contentDescription = "Package Icon",
-                modifier = Modifier.size(24.dp).border(
-                    width = 1.dp,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(12.dp)
-                )
-
+            Icon(
+                imageVector = Icons.Rounded.Info,
+                contentDescription = "Package",
+                modifier = Modifier.padding(4.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.width(10.dp))
             Text(
@@ -166,7 +207,7 @@ fun PackageCard(
             Text(text = "Invoice ID" , color = Color.Gray , fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             Text(
-                text = packageInfo.id.toString(),
+                text = "#${packageInfo.id}",
                 color = Color.Black ,
                 fontSize = 14.sp ,
                 fontWeight = FontWeight.Medium
@@ -176,7 +217,9 @@ fun PackageCard(
             Text(text = "Date" , color = Color.Gray , fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             Text(
-                text = dateFormat(packageInfo.shipment.date),
+                text = dateFormat(packageInfo.shipment.date).format(
+                    packageInfo.shipment.date, "dd-MM-yyyy"
+                ),
                 color = Color.Black ,
                 fontSize = 14.sp ,
                 fontWeight = FontWeight.Medium
@@ -186,7 +229,7 @@ fun PackageCard(
             Text(text = "Package Price" , color = Color.Gray , fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             Text(
-                text = dateFormat(packageInfo.shipment.price.toString()),
+                text = "$${packageInfo.shipment.price}",
                 color = Color.Black ,
                 fontSize = 14.sp ,
                 fontWeight = FontWeight.Medium
@@ -196,7 +239,7 @@ fun PackageCard(
             Text(text = "Delivery Fee" , color = Color.Gray , fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             Text(
-                text = dateFormat(packageInfo.shipment.deliveryFee),
+                text = "$${packageInfo.shipment.deliveryFee}",
                 color = Color.Black ,
                 fontSize = 14.sp ,
                 fontWeight = FontWeight.Medium

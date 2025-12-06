@@ -1,6 +1,8 @@
 package com.example.speediz.ui.graphs
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
@@ -20,6 +22,7 @@ import com.example.speediz.ui.navigation.unauthorizedNavigate
 import com.example.speediz.ui.navigation.vendorAuthorizedNavigate
 import com.example.speediz.ui.utils.hasFirebasePermission
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(

@@ -12,6 +12,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import androidx.core.graphics.scale
+import java.time.LocalDate
 
 fun Context.toastHelper(message: String){
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -47,17 +48,23 @@ fun dateFormat(date: String): String{
     }
 }
 @RequiresApi(Build.VERSION_CODES.O)
-fun convertDateCalendar(date: String, inputPattern: String, outputPattern: String): String {
+fun convertDateCalendar(
+    date: String?,
+    inputPattern: String,
+    outputPattern: String
+): String {
     return try {
+        if (date.isNullOrEmpty()) return ""  // handle null/empty
         val inputFormatter = DateTimeFormatter.ofPattern(inputPattern, Locale.getDefault())
         val outputFormatter = DateTimeFormatter.ofPattern(outputPattern, Locale.getDefault())
-        val dateTime = ZonedDateTime.parse(date, inputFormatter.withZone(ZoneId.systemDefault()))
-        dateTime.format(outputFormatter)
+        val localDate = LocalDate.parse(date, inputFormatter)
+        localDate.format(outputFormatter)
     } catch (e: Exception) {
         e.printStackTrace()
-        date
+        date ?: ""
     }
 }
+
 fun resizeImage(context: Context, uri: Uri, maxWidth: Int, maxHeight: Int): Bitmap? {
     val inputStream =  context.contentResolver.openInputStream(uri) ?: return null
     val originalBitmap = BitmapFactory.decodeStream(inputStream)

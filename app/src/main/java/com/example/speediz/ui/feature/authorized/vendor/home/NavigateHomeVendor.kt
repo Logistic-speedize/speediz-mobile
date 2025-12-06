@@ -6,11 +6,13 @@ import androidx.navigation.compose.composable
 import com.example.speediz.ui.navigation.AuthorizedRoute
 
 fun NavGraphBuilder.screenHomeVendor(
-    onNavigateTo : (String) -> Unit
+    onNavigateTo : (String) -> Unit,
+    onNavigateToProfile: () -> Unit,
 ){
     composable(AuthorizedRoute.VendorRoute.Home.route) {
         ScreenHomeVendor(
-            onNavigateTo = onNavigateTo
+            onNavigateTo = onNavigateTo,
+            onNavigateToProfile = onNavigateToProfile
         )
     }
 }

@@ -1,5 +1,8 @@
 package com.example.speediz.ui.navigation
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.example.speediz.ui.feature.authorized.delivery.account.screenAccount
@@ -13,6 +16,8 @@ import com.example.speediz.ui.feature.authorized.delivery.invoice.detail.navigat
 import com.example.speediz.ui.feature.authorized.delivery.invoice.detail.screenDeliveryInvoiceDetail
 import com.example.speediz.ui.feature.authorized.delivery.invoice.screenDeliveryInvoice
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
+import com.example.speediz.ui.feature.authorized.vendor.account.navigationVendorAccount
+import com.example.speediz.ui.feature.authorized.vendor.account.screenVendorAccount
 import com.example.speediz.ui.feature.authorized.vendor.map.screenMap
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoiceList.screenInvoice
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.packageList.screenPackage
@@ -20,11 +25,14 @@ import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPa
 import com.example.speediz.ui.feature.authorized.vendor.home.screenHomeVendor
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail.navigationInvoiceDetail
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail.screenInvoiceDetail
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.create.navigateToCreatePackage
+import com.example.speediz.ui.feature.authorized.vendor.packageManagement.create.screenCreatePackage
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.navigationPackageDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.detail.screenPackageDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.navigationTrackingDetail
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.detail.screenTrackingDetail
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.deliveryAuthorizedNavigate(
     navController: NavController
 ) {
@@ -74,9 +82,8 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
     screenAccount(
         onLogOut = {
             navController.navigate(UnauthorizedRoute.SignIn.route) {
-                popUpTo(AuthorizedRoute.DeliveryRoute.Home.route) {
-                    inclusive = true
-                }
+                popUpTo(0) { inclusive = true }   // clears the entire backstack
+                launchSingleTop = true
             }
         },
         onBack = {
@@ -90,24 +97,40 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
     )
     //        screenAccount()
 }
+@RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.vendorAuthorizedNavigate(
     navController: NavController
 ) {
-            screenHomeVendor(
-                onNavigateTo = {route ->
-                    navController.navigate(route)
-                }
-            )
+    screenHomeVendor(
+        onNavigateTo = {route ->
+            navController.navigate(route)
+        },
+        onNavigateToProfile = {
+            navController.navigationVendorAccount()
+            Log.d( "NavigationVendorAccount", "${ navController.currentDestination?.route }" )
+        }
+    )
     screenPackage(
         onNavigateTo = {id ->
             navController.navigationPackageDetail(id)
         },
         onBack = {
             navController.popBackStack()
+        },
+        onNavigateToCreatePackage = {
+            navController.navigateToCreatePackage()
         }
     )
     screenPackageDetail(
         onBack = {
+            navController.popBackStack()
+        }
+    )
+    screenCreatePackage(
+        onBack = {
+            navController.popBackStack()
+        },
+        onCreate = {
             navController.popBackStack()
         }
     )
@@ -137,5 +160,16 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
     )
     screenInvoiceDetail(
         onBack = { navController.popBackStack() }
+    )
+    screenVendorAccount(
+        onLogOut = {
+            navController.navigate(UnauthorizedRoute.SignIn.route) {
+                popUpTo(0) { inclusive = true }   // clears the entire backstack
+                launchSingleTop = true
+            }
+        },
+        onBack = {
+            navController.popBackStack()
+        },
     )
 }
