@@ -1,13 +1,33 @@
 package com.example.speediz.ui.feature.authorized.vendor.home
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,10 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
+import com.example.speediz.ui.navigation.AuthorizedRoute
+
 
 @Composable
 fun ScreenHomeVendor(
     onNavigateTo: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {}
 ) {
     val viewModel = hiltViewModel<HomeVendorViewModel>()
     val uiState by viewModel.uiState.collectAsState()
@@ -43,7 +66,8 @@ fun ScreenHomeVendor(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = 16.dp)
+                ,
                 contentAlignment = Alignment.Center
             ) {
                 WelcomeUser(
@@ -51,7 +75,8 @@ fun ScreenHomeVendor(
                         uiState.email.isBlank() -> "Unknown User"
                         else -> uiState.email
                     },
-                    profile = R.drawable.img_default_profile
+                    profile = R.drawable.img_default_profile,
+                    onToProfile = onNavigateToProfile
                 )
             }
 
@@ -125,7 +150,8 @@ fun NavigateButton(
 fun WelcomeUser(
     email: String,
     profile: Int,
-    onNotificationsClick: () -> Unit = {}
+    onNotificationsClick: () -> Unit = {},
+    onToProfile: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -136,7 +162,11 @@ fun WelcomeUser(
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray),
+                .background(Color.LightGray)
+                .clickable {
+                    onToProfile()
+                }
+            ,
             contentAlignment = Alignment.Center
         ) {
             Image(
