@@ -121,8 +121,13 @@ interface ApiService {
     @GET("api/delivery/invoice")
     suspend fun invoiceDelivery(): Response<InvoiceResponse>
 
-    @GET("api/vendor/invoice")
+    @GET("api/vendor/vendor-invoice")
     suspend fun invoiceVendor(): Response<com.example.speediz.core.data.vendor.InvoiceResponse>
+
+    @GET("api/vendor/vendor-invoice/{id}")
+    suspend fun invoiceVendorDetail(
+        @Path ("id") id: Int
+    ): Response<com.example.speediz.core.data.vendor.InvoiceDetailResponse>
 
     @GET("api/delivery/me")
     suspend fun getDeliveryProfile(): Response<DeliveryProfileResponse>

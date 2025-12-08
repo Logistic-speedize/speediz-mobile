@@ -14,6 +14,8 @@ import com.example.speediz.core.repository.SignInRepository
 import com.example.speediz.core.repository.SignInRepositoryImpl
 import com.example.speediz.core.repository.SignUpRepository
 import com.example.speediz.core.repository.SignUpRepositoryImpl
+import com.example.speediz.core.repository.VendorInvoiceRepository
+import com.example.speediz.core.repository.VendorInvoiceRepositoryImpl
 import com.example.speediz.core.repository.VendorProfileRepository
 import com.example.speediz.core.repository.VendorProfileRepositoryImpl
 import com.example.speediz.core.repository.VendorRepository
@@ -81,4 +83,10 @@ abstract class RepositoryModule {
     abstract fun bindVendorProfileRepository(
         impl: VendorProfileRepositoryImpl
     ) : VendorProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVendorInvoiceRepository(
+        impl: VendorInvoiceRepositoryImpl
+    ) : VendorInvoiceRepository
 }

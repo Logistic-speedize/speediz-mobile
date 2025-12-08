@@ -1,3 +1,4 @@
+// Kotlin
 package com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoiceList
 
 import androidx.compose.foundation.background
@@ -17,13 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,71 +45,105 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
-import com.example.speediz.ui.feature.authorized.delivery.invoice.DeliveryInvoiceViewModel
+import com.example.speediz.ui.feature.authorized.delivery.invoice.SearchBox
+import com.example.speediz.ui.utils.SpeedizPaidStatus
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenInvoice(
     onNavigateTo: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val viewModel = hiltViewModel<InvoiceListViewModel>()
-    val invoices by viewModel.responseUIState.collectAsState()
-    val isLoading by viewModel.loading.collectAsState()
+    val invoiceList by viewModel.isInvoiceList.collectAsState()
 
-    var selectedFilter by remember { mutableStateOf("All") }
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    var selectedFilter by remember { mutableStateOf(PaymentFilter.ALL) }
+    var searchText by remember { mutableStateOf("") }
 
-    // Fetch data when the screen appears
-    LaunchedEffect(viewModel) {
-        viewModel.fetchInvoiceData()
+    // Fetch on first enter
+    LaunchedEffect(Unit) {
+        viewModel.fetchInvoiceList()
+    }
+    LaunchedEffect(searchText) {
+        viewModel.searchInvoiceById(searchText, selectedFilter)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Header { onBack() }
+    // Filter based on current tab + search text
+    val filteredInvoices = remember(invoiceList, selectedFilter, viewModel.isQueryAllInvoice.value, viewModel.isQueryPaidInvoice.value, viewModel.isQueryUnpaidInvoice.value) {
+        viewModel.getFilteredInvoices(selectedFilter)
+    }
 
-        Spacer(modifier = Modifier.height(16.dp))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Invoice Management", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                navigationIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_back),
+                        contentDescription = "Back",
+                        modifier = Modifier.size(30.dp).clickable { onBack() }
+                    )
+                }
+            )
+        },
+        containerColor = Color.Transparent
+    ) {
+        Column(modifier = Modifier.fillMaxSize().padding(it)) {
 
-        SearchBar(
-            query = searchQuery,
-            onQueryChange = { /* TO DO */}
-        )
+            // Search box
+            SearchBox(
+                value = searchText,
+                onChange = { newText ->
+                    searchText = newText
+                }
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        FilterRow(
-            options = listOf("All", "Unpaid", "Paid"),
-            selectedOption = selectedFilter,
-            onOptionSelected = { option ->
-                selectedFilter = option
-                // You can also call a ViewModel function to filter data
-                // viewModel.filterByStatus(option)
-            }
-        )
+            // Tab Filter
+            FilterRow(
+                options = listOf("All", "Unpaid", "Paid"),
+                selectedOption = when (selectedFilter) {
+                    PaymentFilter.ALL -> "All"
+                    PaymentFilter.UNPAID -> "Unpaid"
+                    PaymentFilter.PAID -> "Paid"
+                },
+                onOptionSelected = { option ->
+                    selectedFilter = when(option) {
+                        "Paid" -> PaymentFilter.PAID
+                        "Unpaid" -> PaymentFilter.UNPAID
+                        else -> PaymentFilter.ALL
+                    }
 
-        Spacer(modifier = Modifier.height(16.dp))
+                    // Trigger filter with existing search text
+                    viewModel.searchInvoiceById(searchText, selectedFilter)
+                }
+            )
 
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Invoices Listing
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(invoices) { invoice ->
+                items(filteredInvoices) { invoice ->
+                    val statusColor = when (invoice.status.lowercase()) {
+                        SpeedizPaidStatus.Paid.status.lowercase() -> Color(0xFF4CAF50)
+                        SpeedizPaidStatus.Unpaid.status.lowercase() -> Color(0xFFF44336)
+                        else -> Color.Gray
+                    }
+
                     InvoiceItem(
-                        invoiceId = invoice.id.toString(),
+                        invoiceId = invoice.invoiceNumber.toString(),
                         status = invoice.status,
-                        statusColor = when (invoice.status.lowercase()) {
-                            "paid" -> Color(0xFF4CAF50)
-                            "unpaid" -> Color(0xFFFFC107)
-                            else -> Color.Gray
-                        },
-                        onClick = { onNavigateTo(invoice.id.toString()) }
+                        statusColor = statusColor,
+                        onClick = {
+                            onNavigateTo(invoice.id.toString())
+                        }
                     )
                 }
             }
@@ -115,106 +152,11 @@ fun ScreenInvoice(
 }
 
 
-@Composable
-fun Header(
-    onBackClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Back Icon
-        Icon(
-            painter = painterResource(id = R.drawable.ic_arrow_back),
-            contentDescription = "Back",
-            modifier = Modifier
-                .size(30.dp)
-                .clickable { onBackClick() }
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // Title
-        Box(
-            modifier = Modifier
-                .weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Invoice Management",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        // Placeholder Spacer
-        Spacer(modifier = Modifier.size(30.dp))
-    }
-}
-
-
-@Composable
-fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .padding(horizontal = 16.dp)
-            .shadow(4.dp, shape = RoundedCornerShape(12.dp))
-            .background(Color.White, RoundedCornerShape(12.dp))
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "Search Icon",
-                tint = Color.Gray,
-                modifier = Modifier.size(20.dp)
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp), // ensure textfield stays same height
-                contentAlignment = Alignment.CenterStart
-            ) {
-                BasicTextField(
-                    value = query,
-                    onValueChange = onQueryChange,
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterStart),
-                    decorationBox = { innerTextField ->
-                        if (query.isEmpty()) {
-                            Text(
-                                text = "Search invoice id",
-                                color = Color.Gray,
-                                fontSize = 16.sp
-                            )
-                        }
-                        innerTextField()
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun FilterRowPreview() {
     var selectedOption by remember { mutableStateOf("All") }
-
     FilterRow(
         selectedOption = selectedOption,
         onOptionSelected = { selectedOption = it }
@@ -228,9 +170,7 @@ fun FilterRow(
     onOptionSelected: (String) -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         options.forEach { option ->
@@ -247,7 +187,7 @@ fun FilterRow(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = option, // make text capital
+                    text = option,
                     color = if (isSelected) Color.White else Color.Gray,
                     fontWeight = FontWeight.Medium
                 )
@@ -279,19 +219,14 @@ fun InvoiceItem(
             .padding(20.dp)
     ) {
         Column {
-            // Top Row: Icon + Invoice ID + Arrow
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .shadow(
-                            elevation = 2.dp,
-                            shape = RoundedCornerShape(4.dp)
-                        )
+                        .shadow(elevation = 2.dp, shape = RoundedCornerShape(4.dp))
                         .background(Color.White, shape = RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -306,7 +241,7 @@ fun InvoiceItem(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Text(
-                    text = "Invoice - ${invoiceId}",
+                    text = invoiceId,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -326,10 +261,8 @@ fun InvoiceItem(
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
-            // Bottom Row: Status
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -342,10 +275,7 @@ fun InvoiceItem(
                 Box(
                     modifier = Modifier
                         .size(width = 80.dp, height = 24.dp)
-                        .background(
-                            color = statusColor,
-                            shape = RoundedCornerShape(4.dp)
-                        ),
+                        .background(color = statusColor, shape = RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
