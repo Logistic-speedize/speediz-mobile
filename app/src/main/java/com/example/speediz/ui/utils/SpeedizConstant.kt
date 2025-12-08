@@ -11,3 +11,8 @@ enum class SpeedizPackageType(val type: String) {
     Supplies("Supplies"),
     Other("Other")
 }
+
+enum class SpeedizPaidStatus(val status: String) {
+    Paid("Paid"),
+    Unpaid("Unpaid"),
+}

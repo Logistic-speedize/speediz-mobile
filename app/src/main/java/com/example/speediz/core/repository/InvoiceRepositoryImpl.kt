@@ -20,10 +20,4 @@ class InvoiceRepositoryImpl @Inject constructor(
             api.invoiceDeliveryDetail(id)
         }
     }
-
-    override suspend fun invoiceVendor(): com.example.speediz.core.data.vendor.InvoiceResponse {
-        return apiRequest {
-            api.invoiceVendor()
-        }
-    }
 }
