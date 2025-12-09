@@ -52,114 +52,12 @@ import okhttp3.Request
 import org.json.JSONObject
 import kotlin.math.hypot
 
-//@Composable
-//fun MapboxUserRoute(
-//    destinationLat: Double,
-//    destinationLon: Double,
-//    minDistanceMeters: Double = 50.0
-//) {
-//    val context = LocalContext.current
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    Log.d("MapboxUserRoute" , "Destination: ($destinationLat, $destinationLon)" )
-//    // Set access token once
-//    MapboxOptions.accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
-//
-//    AndroidView(factory = { ctx ->
-//        val mapView = MapView(ctx)
-//        val mapboxMap = mapView.mapboxMap
-//        var lastUserPosition: Point? = null
-//        val destinationPoint = Point.fromLngLat(destinationLon, destinationLat)
-//
-//        mapboxMap.loadStyleUri(Style.MAPBOX_STREETS) { style ->
-//
-//            // Destination marker
-//            context.getDrawable(R.drawable.ic_location_on_map)?.toBitmap()?.let {
-//                style.addImage("destination_marker", it)
-//            }
-//            style.addSource(geoJsonSource("destination-source") { geometry(destinationPoint) })
-//            style.addLayer(symbolLayer("destination-layer", "destination-source") {
-//                iconImage("destination_marker")
-//                iconAllowOverlap(true)
-//                iconIgnorePlacement(true)
-//            })
-//
-//            // Origin marker
-//            context.getDrawable(R.drawable.ic_radio_button_checked)?.toBitmap()?.let {
-//                style.addImage("origin_marker", it)
-//            }
-//            style.addSource(geoJsonSource("origin-source") { geometry(Point.fromLngLat( 0.0, 0.0)) })
-//            style.addLayer(symbolLayer("origin-layer", "origin-source") {
-//                iconImage("origin_marker")
-//                iconAllowOverlap(true)
-//                iconIgnorePlacement(true)
-//            })
-//
-//            // Route line
-//            style.addSource(geoJsonSource("route-source") {
-//                geometry(LineString.fromLngLats(listOf(destinationPoint, destinationPoint)))
-//            })
-//            style.addLayer(
-//                lineLayer("route-layer", "route-source") {
-//                    lineColor("#1E90FF") // blue color for navigation route
-//                    lineWidth(8.0)        // thicker line
-//                    lineCap(LineCap.ROUND) // rounded ends
-//                    lineJoin(LineJoin.ROUND) // smooth corners
-//                }
-//            )
-//
-//            // Enable location plugin
-//            val locationPlugin = mapView.location
-//            locationPlugin.updateSettings {
-//                enabled = true
-//                pulsingEnabled = true
-//                locationPuck = LocationPuck2D()
-//            }
-//
-//            // Listen for user movement
-//            locationPlugin.addOnIndicatorPositionChangedListener { userPoint ->
-//                if (userPoint.latitude() == 0.0 && userPoint.longitude() == 0.0) return@addOnIndicatorPositionChangedListener
-//
-//                style.getSourceAs<com.mapbox.maps.extension.style.sources.generated.GeoJsonSource>("origin-source")
-//                    ?.geometry(userPoint)
-//
-//                if (lastUserPosition == null || distanceBetween(lastUserPosition!!, userPoint) >= minDistanceMeters) {
-//                    lastUserPosition = userPoint
-//
-//                    coroutineScope.launch(Dispatchers.IO) {
-//                        val routeLine = fetchRoute(userPoint, destinationPoint)
-//                        routeLine?.let { line ->
-//                            coroutineScope.launch(Dispatchers.Main) {
-//                                style.getSourceAs<com.mapbox.maps.extension.style.sources.generated.GeoJsonSource>("route-source")
-//                                    ?.geometry(line)
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                val centerLng = (userPoint.longitude() + destinationPoint.longitude()) / 2
-//                val centerLat = (userPoint.latitude() + destinationPoint.latitude()) / 2
-//                val cameraOptions = CameraOptions.Builder()
-//                    .center(Point.fromLngLat(centerLng, centerLat))
-//                    .zoom(14.0) // target zoom level
-//                    .build()
-//
-//                CoroutineScope(Dispatchers.Main).launch {
-//                    delay(500) // delay before moving camera
-//                    mapboxMap.easeTo(
-//                        cameraOptions,
-//                        MapAnimationOptions.Builder().duration(1500).build()
-//                    )
-//                }
-//            }
-//        }
-//        mapView
-//    }, modifier = Modifier.fillMaxSize())
-//}
 @Composable
 fun MapboxUserRoute(
     destinationLat: Double,
     destinationLon: Double,
+    originLat: Double = 0.0,
+    originLon: Double = 0.0,
     updateIntervalMs: Long = 3_000L // update every 10 seconds
 ){
     val context = LocalContext.current
@@ -189,7 +87,7 @@ fun MapboxUserRoute(
             context.getDrawable(R.drawable.ic_radio_button_checked)?.toBitmap()?.let {
                 style.addImage("origin_marker", it)
             }
-            style.addSource(geoJsonSource("origin-source") { geometry(Point.fromLngLat(0.0, 0.0)) })
+            style.addSource(geoJsonSource("origin-source") { geometry(Point.fromLngLat(originLat, originLon)) })
             style.addLayer(symbolLayer("origin-layer", "origin-source") {
                 iconImage("origin_marker")
                 iconAllowOverlap(true)

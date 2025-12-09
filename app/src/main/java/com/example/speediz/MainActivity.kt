@@ -14,9 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.speediz.core.application.MySharePreferences
-import com.example.speediz.ui.feature.authorized.vendor.map.ScreenMap
 import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
 import com.example.speediz.ui.graphs.AppNavigation
+import com.example.speediz.ui.theme.LightStatusBar
 import com.example.speediz.ui.theme.SpeedizTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
             }
                 // A surface container using the 'background' color from the theme
            SpeedizTheme {
+               LightStatusBar()
                if (showSplashScreen.value) {
                    ScreenSplashScreen()
 
@@ -67,12 +68,5 @@ class MainActivity : ComponentActivity() {
            }
 
         }
-    }
-}
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SpeedizTheme {
-        ScreenMap(modifier = Modifier)
     }
 }
