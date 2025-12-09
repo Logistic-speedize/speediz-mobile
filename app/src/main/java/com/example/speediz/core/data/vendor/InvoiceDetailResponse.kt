@@ -53,7 +53,9 @@ data class InvoiceDetailResponse(
             @SerializedName("status")
             val status: String,
             @SerializedName("delivered_at")
-            val deliveredAt: String?
+            val deliveredAt: String?,
+            @SerializedName("delivery_fee")
+            val deliveryFee: String
         )
     }
 }
