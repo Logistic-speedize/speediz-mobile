@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,10 +46,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.speediz.core.data.vendor.CreatePackageRequest
 import com.example.speediz.ui.feature.appwide.textfield.CompactTextField
+import com.example.speediz.ui.theme.LightStatusBar
 import com.example.speediz.ui.theme.SpeedizTheme
 import com.example.speediz.ui.utils.SpeedizPackageType
 import com.example.speediz.ui.utils.geocodeAddress
@@ -83,12 +85,23 @@ fun ScreenCreatePackage(
     )
     var selectedPackageType by remember { mutableStateOf(packageTypeList.first()) }
     var isGetLocation by remember { mutableStateOf(false) }
+    var isEnableSubmit by remember { mutableStateOf(false) }
     LaunchedEffect(location) {
         val result = geocodeAddress(currentLocal, location)
         if (result != null) {
             latitude = result.first.toString()
             longitude = result.second.toString()
-            Log.d( "Geocode", "Latitude: ${result.first}, Longitude: ${result.second}" )
+            viewModel.setReceiverLat(latitude.toDouble())
+            viewModel.setReceiverLng(longitude.toDouble())
+            isEnableSubmit = viewModel.onValidation(
+                phone = phone,
+                name = name,
+                type = selectedPackageType.type,
+                price = price.toDoubleOrNull() ?: 0.0,
+                location = location,
+                lat = latitude.toDoubleOrNull() ?: 0.0,
+                lng = longitude.toDoubleOrNull() ?: 0.0
+            )
         }
     }
 
@@ -107,7 +120,7 @@ fun ScreenCreatePackage(
         }
     }
 
-
+    LightStatusBar()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -154,7 +167,8 @@ fun ScreenCreatePackage(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions =  KeyboardOptions(
                     keyboardType = KeyboardType.Number
-                )
+                ),
+                errorMessage =  viewModel.setReceiverPhone(phone)
             )
 
             Spacer(Modifier.height(12.dp))
@@ -169,7 +183,8 @@ fun ScreenCreatePackage(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions =  KeyboardOptions(
                     keyboardType = KeyboardType.Ascii
-                )
+                ),
+                errorMessage =  viewModel.setReceiverName(name)
             )
 
             Spacer(Modifier.height(12.dp))
@@ -181,7 +196,9 @@ fun ScreenCreatePackage(
             Box {
                 OutlinedTextField(
                     value = selectedPackageType.type,
-                    onValueChange = { },
+                    onValueChange = {
+                        viewModel.setPackageType(it)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
                     trailingIcon = {
@@ -219,6 +236,9 @@ fun ScreenCreatePackage(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
+                ),
+                errorMessage = viewModel.setPackagePrice(
+                    if (price.isBlank()) 0.0 else price.toDouble()
                 )
             )
 
@@ -235,40 +255,9 @@ fun ScreenCreatePackage(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                    imeAction = ImeAction.Done
-                )
+                ),
+                errorMessage = viewModel.setCustomerLocation(location)
             )
-
-            Spacer(Modifier.height(16.dp))
-//            Text(text = "Generate Location", fontWeight = FontWeight.SemiBold)
-//            Spacer(Modifier.height(12.dp))
-//
-//            // Latitude
-//            CompactTextField(
-//                label = "Receiver's Latitude",
-//                value = latitude,
-//                onValueChange = {
-//                    latitude = it
-//                },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions =  KeyboardOptions(
-//                    keyboardType = KeyboardType.Number
-//                )
-//            )
-
-//            Spacer(Modifier.height(12.dp))
-//
-//            // Longitude
-//            CompactTextField(
-//                label = "Receiver's Longitude",
-//                value = longitude,
-//                onValueChange = {
-//                    longitude = it
-//                },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions =  KeyboardOptions(
-//                    keyboardType = KeyboardType.Number
-//                )
-//            )
 
             Spacer(Modifier.height(32.dp))
 
@@ -288,11 +277,12 @@ fun ScreenCreatePackage(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(55.dp),
+                    .height(60.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF3B82F6)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
+                enabled = isEnableSubmit
             ) {
                 Text("Create", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }

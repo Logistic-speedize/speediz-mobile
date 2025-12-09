@@ -18,7 +18,6 @@ import com.example.speediz.ui.feature.authorized.delivery.invoice.screenDelivery
 import com.example.speediz.ui.feature.authorized.delivery.screenDeliveryHome
 import com.example.speediz.ui.feature.authorized.vendor.account.navigationVendorAccount
 import com.example.speediz.ui.feature.authorized.vendor.account.screenVendorAccount
-import com.example.speediz.ui.feature.authorized.vendor.map.screenMap
 import com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.invoiceList.screenInvoice
 import com.example.speediz.ui.feature.authorized.vendor.packageManagement.packageList.screenPackage
 import com.example.speediz.ui.feature.authorized.vendor.packageTracking.screenPackageTracking
@@ -41,7 +40,6 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
             navController.navigate(route)
         }
     )
-    screenMap()
     screenExpress(
         navigateTo = { expressId ->
             navController.navigationExpressDetail(expressId)

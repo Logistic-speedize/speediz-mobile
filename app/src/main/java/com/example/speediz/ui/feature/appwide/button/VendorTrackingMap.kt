@@ -17,15 +17,11 @@ import androidx.core.graphics.drawable.toBitmap
 import com.example.speediz.BuildConfig
 import com.example.speediz.R
 import com.mapbox.common.MapboxOptions
-import com.mapbox.common.location.AccuracyLevel
-import com.mapbox.common.location.IntervalSettings
-import com.mapbox.common.location.LocationProviderRequest
 import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.expressions.dsl.generated.lineProgress
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.symbolLayer
@@ -34,15 +30,6 @@ import com.mapbox.maps.extension.style.layers.properties.generated.LineJoin
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.getSourceAs
-import com.mapbox.maps.plugin.LocationPuck2D
-import com.mapbox.maps.plugin.locationcomponent.location
-import com.mapbox.maps.plugin.animation.easeTo
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.json.JSONObject
-import kotlin.text.toDouble
 
 
 @Composable
@@ -54,11 +41,11 @@ fun VendorDriverRouteMap(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
     var routeLine by remember { mutableStateOf<LineString?>(null) }
     var routeProgress by remember { mutableStateOf(0f) }
 
-    // Create Points
-    val driverPoint = remember(driverLat, driverLon) { Point.fromLngLat(driverLon, driverLat) }
+    val vendorPoint = remember(driverLat, driverLon) { Point.fromLngLat(driverLon, driverLat) }
     val customerPoint = remember(customerLat, customerLon) { Point.fromLngLat(customerLon, customerLat) }
 
     // Animate route progress
@@ -67,86 +54,80 @@ fun VendorDriverRouteMap(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3000, easing = LinearEasing),
+            animation = tween(3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         )
     )
     routeProgress = animatedProgress
+    MapboxOptions.accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
 
-    // Fetch route whenever driverPoint or customerPoint changes
-    LaunchedEffect(driverPoint, customerPoint) {
-        val line = fetchRoute(driverPoint, customerPoint)
+    // Fetch route once
+    LaunchedEffect(vendorPoint, customerPoint) {
+        val line = fetchRoute(vendorPoint, customerPoint)
         routeLine = line
-        Log.d("VendorDriverRouteMap", "Fetched route line: $routeLine")
     }
 
-    AndroidView(
-        factory = { ctx ->
-            MapboxOptions.accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
-            val mapView = MapView(ctx)
-            val mapboxMap = mapView.mapboxMap
+    AndroidView(factory = { ctx ->
+        val mapView = MapView(ctx)
+        val mapboxMap = mapView.mapboxMap
 
-            mapboxMap.loadStyleUri(Style.MAPBOX_STREETS) { style ->
+        mapboxMap.loadStyleUri(Style.MAPBOX_STREETS) { style ->
 
-                // ----- DRIVER MARKER -----
-                context.getDrawable(R.drawable.ic_radio_button_checked)?.toBitmap()?.let {
-                    style.addImage("driver_marker", it)
-                }
-                style.addSource(geoJsonSource("driver-source") { geometry(driverPoint) })
-                style.addLayer(symbolLayer("driver-layer", "driver-source") {
-                    iconImage("driver_marker")
-                    iconAllowOverlap(true)
-                    iconIgnorePlacement(true)
-                })
-
-                // ----- CUSTOMER MARKER -----
-                context.getDrawable(R.drawable.ic_location_on_map)?.toBitmap()?.let {
-                    style.addImage("customer_marker", it)
-                }
-                style.addSource(geoJsonSource("customer-source") { geometry(customerPoint) })
-                style.addLayer(symbolLayer("customer-layer", "customer-source") {
-                    iconImage("customer_marker")
-                    iconAllowOverlap(true)
-                    iconIgnorePlacement(true)
-                })
-
-                // ----- ROUTE SOURCE & LAYER -----
-                style.addSource(geoJsonSource("route-source"))
-                style.addLayer(lineLayer("route-layer", "route-source") {
-                    lineWidth(7.0)
-                    lineColor("#1E90FF")
-                    lineCap(LineCap.ROUND)
-                    lineJoin(LineJoin.ROUND)
-                    lineTrimOffset(listOf(0.0, routeProgress.toDouble()))
-                })
-
-                // ----- Camera -----
-                val centerLat = (driverLat + customerLat) / 2
-                val centerLon = (driverLon + customerLon) / 2
-                mapboxMap.setCamera(
-                    CameraOptions.Builder()
-                        .center(Point.fromLngLat(centerLon, centerLat))
-                        .zoom(12.0)
-                        .build()
-                )
-
-                // Update route source whenever routeLine changes
-                    routeLine?.let { line ->
-                        style.getSourceAs<com.mapbox.maps.extension.style.sources.generated.GeoJsonSource>("route-source")
-                            ?.geometry(line)
-                    }
+            // Vendor marker
+            context.getDrawable(R.drawable.ic_radio_button_checked)?.toBitmap()?.let {
+                style.addImage("vendor_marker", it)
             }
+            style.addSource(geoJsonSource("vendor-source") { geometry(vendorPoint) })
+            style.addLayer(symbolLayer("vendor-layer", "vendor-source") {
+                iconImage("vendor_marker")
+                iconAllowOverlap(true)
+                iconIgnorePlacement(true)
+            })
 
-            mapView
-        },
-        modifier = Modifier.fillMaxSize(),
+            // Customer marker
+            context.getDrawable(R.drawable.ic_location_on_map)?.toBitmap()?.let {
+                style.addImage("customer_marker", it)
+            }
+            style.addSource(geoJsonSource("customer-source") { geometry(customerPoint) })
+            style.addLayer(symbolLayer("customer-layer", "customer-source") {
+                iconImage("customer_marker")
+                iconAllowOverlap(true)
+                iconIgnorePlacement(true)
+            })
+
+            // Route layer
+            style.addSource(geoJsonSource("route-source"))
+            style.addLayer(lineLayer("route-layer", "route-source") {
+                lineColor("#1E90FF")
+                lineWidth(7.0)
+                lineCap(LineCap.ROUND)
+                lineJoin(LineJoin.ROUND)
+                lineTrimOffset(listOf(0.0, routeProgress.toDouble()))
+            })
+
+            // Camera
+            val centerLat = (driverLat + customerLat) / 2
+            val centerLon = (driverLon + customerLon) / 2
+            mapboxMap.setCamera(
+                CameraOptions.Builder()
+                    .center(Point.fromLngLat(centerLon, centerLat))
+                    .zoom(12.0)
+                    .build()
+            )
+        }
+
+        mapView
+    }, modifier = Modifier.fillMaxSize(),
         update = { view ->
+            val style = view.mapboxMap.getStyle() ?: return@AndroidView
+
+            // Update route
             routeLine?.let { line ->
-                view.mapboxMap.getStyle()
-                    ?.getSourceAs<com.mapbox.maps.extension.style.sources.generated.GeoJsonSource>("route-source")
+                style.getSourceAs<com.mapbox.maps.extension.style.sources.generated.GeoJsonSource>("route-source")
                     ?.geometry(line)
             }
         }
     )
 }
+
 

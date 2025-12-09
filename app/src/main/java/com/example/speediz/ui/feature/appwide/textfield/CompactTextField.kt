@@ -32,11 +32,12 @@ fun CompactTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
-    height: Int = 60,
+    height: Int = 80,
     enable: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     readOnly: Boolean = false,
     keyboardAction: KeyboardActions = KeyboardActions.Default,
+    errorMessage: String = "",
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Label above the field
@@ -73,6 +74,16 @@ fun CompactTextField(
                     keyboardOptions = keyboardOptions,
                     readOnly = readOnly,
                     keyboardActions = keyboardAction,
+                    supportingText = {
+                        if (errorMessage.isNotEmpty()) {
+                            Text(
+                                text = errorMessage,
+                                color = Color.Red,
+                                fontSize = 12.sp
+                            )
+                        }
+                    },
+                    isError = errorMessage.isNotEmpty()
                 )
             }
         }

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
 import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
+import com.example.speediz.ui.feature.appwide.button.MapboxUserRoute
 import com.example.speediz.ui.feature.appwide.button.VendorDriverRouteMap
 import com.example.speediz.ui.feature.authorized.delivery.express.detail.StatusItem
 import com.example.speediz.ui.theme.SPColor
@@ -58,9 +59,7 @@ fun ScreenTrackingDetail(
     val driverLon = packageDetail?.data?.destinationInfo?.longitude ?: 0.0
     val customerLat = packageDetail?.data?.driverLocation?.lat ?: 0.0
     val customerLon = packageDetail?.data?.driverLocation?.lng ?: 0.0
-//    LaunchedEffect(id, packageDetail, uiState) {
-//        viewModel.getPackageDetail(id)
-//    }
+
     LaunchedEffect(Unit) {
         viewModel.getPackageDetail(id)
         delay(2000L)
@@ -101,8 +100,7 @@ fun ScreenTrackingDetail(
                 )
             }
         }
-    ) {
-            padding ->
+    ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             Box(
                 modifier = Modifier
@@ -116,14 +114,13 @@ fun ScreenTrackingDetail(
                     val context = LocalContext.current
                     Toast.makeText(context, "Location data is not available", Toast.LENGTH_SHORT).show()
                 } else {
-                    VendorDriverRouteMap(
-                        driverLon = driverLon,
-                        driverLat = driverLat,
-                        customerLon = customerLon,
-                        customerLat = customerLat,
+                    MapboxUserRoute(
+                        originLat = driverLat,
+                        originLon = driverLon,
+                        destinationLat = customerLat,
+                        destinationLon = customerLon,
                     )
                 }
-               // Log.d("ExpressDetail" , "Lat: ${packageDetail.data.} , Lon: ${expressDetail?.data?.location?.lng}" )
             }
             BottomSheetShowPackageDetail(
                 packageDetail = packageDetail,
