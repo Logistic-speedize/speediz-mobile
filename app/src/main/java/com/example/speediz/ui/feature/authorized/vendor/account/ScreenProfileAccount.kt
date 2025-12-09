@@ -49,6 +49,7 @@ import com.example.speediz.ui.feature.appwide.button.SPDialog
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.textfield.CompactTextField
 import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
+import com.example.speediz.ui.theme.LightStatusBar
 import com.example.speediz.ui.theme.SPColor
 import com.example.speediz.ui.utils.convertDateCalendar
 import com.example.speediz.ui.utils.dateFormat
@@ -73,6 +74,7 @@ fun ScreenProfileScreen(
     var clickToEdit by remember { mutableStateOf(false) }
     val enableToEdit = clickToEdit
 
+    LightStatusBar()
     when (profileDataState){
         is VendorProfileState.Loading -> {
             SPLoading()

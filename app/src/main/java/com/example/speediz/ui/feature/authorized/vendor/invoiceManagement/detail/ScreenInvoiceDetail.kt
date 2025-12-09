@@ -1,6 +1,8 @@
 package com.example.speediz.ui.feature.authorized.vendor.invoiceManagement.detail
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,8 +50,10 @@ import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.authorized.delivery.invoice.detail.DeliveryInvoiceDetailViewModel
 import com.example.speediz.ui.feature.authorized.delivery.invoice.detail.InvoiceDetailUIState
 import com.example.speediz.ui.theme.SPColor
+import com.example.speediz.ui.utils.convertDateCalendar
 import com.example.speediz.ui.utils.dateFormat
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenInvoiceDetail(
@@ -145,6 +149,7 @@ fun ScreenInvoiceDetail(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PackageStatusSection(
     id: String,
@@ -178,6 +183,7 @@ fun PackageStatusSection(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PackageCard(
     packageInfo: com.example.speediz.core.data.vendor.InvoiceDetailResponse.InvoiceDetail.PackageItem
@@ -222,9 +228,11 @@ fun PackageCard(
             androidx.tv.material3.Text(text = "Date", color = Color.Gray, fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             androidx.tv.material3.Text(
-                text = dateFormat(packageInfo.deliveredAt.toString()).format(
-                    packageInfo.deliveredAt, "dd-MM-yyyy"
-                ),
+                text = convertDateCalendar(
+                    dateFormat(packageInfo.deliveredAt.toString()),
+                    inputPattern = "yyyy-MM-dd HH:mm:ss",
+                    outputPattern = "dd-MM-yyyy")
+                ,
                 color = Color.Black,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
@@ -244,7 +252,7 @@ fun PackageCard(
             androidx.tv.material3.Text(text = "Delivery Fee", color = Color.Gray, fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             androidx.tv.material3.Text(
-                text = "$${packageInfo.deliveredAt}",
+                text = "$${packageInfo.deliveryFee}",
                 color = Color.Black,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
@@ -254,7 +262,7 @@ fun PackageCard(
             androidx.tv.material3.Text(text = "Status", color = Color.Gray, fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
             androidx.tv.material3.Text(
-                text = "$${packageInfo.status}",
+                text = packageInfo.status,
                 color = when(packageInfo.status){
                     "completed" -> SPColor.greenSuccess
                     "pending" -> SPColor.blueInfo
