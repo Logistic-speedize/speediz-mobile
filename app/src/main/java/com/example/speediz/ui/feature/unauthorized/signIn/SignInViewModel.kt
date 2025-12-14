@@ -29,15 +29,21 @@ class SignInViewModel @Inject constructor(
     val signInState : StateFlow<SignInState> = _signInState
     var email by mutableStateOf("")
     var password by mutableStateOf("")
-    fun onEmailChanged(newEmail: String) {
-        email = newEmail
-       validateInput()
+    fun onEmailChanged(email: String): String {
+        this.email = email
+        var message = ""
+        if (email.isEmpty()) message = "Email is required"
+        else if (! Patterns.EMAIL_ADDRESS.matcher(email).matches()) message = "Invalid email format"
+        return message
     }
     private var _role = MutableStateFlow(3)
     val role = _role
-    fun onPasswordChanged(newPassword: String) {
+    fun onPasswordChanged(newPassword: String): String {
         password = newPassword
-      validateInput()
+        var message = ""
+        if (password.isEmpty()) message = "Password is required"
+        else if (password.length < 6) message = "Password must be at least 6 characters long"
+        return message
     }
     private fun validateInput(){
         val emailError = if(email.isEmpty()) "Email is required"

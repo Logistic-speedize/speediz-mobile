@@ -57,7 +57,7 @@ fun ScreenSignIn(
                 }
             }
             is SignInState.Error -> {
-                Toast.makeText(context, signInState.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Your sign in form is incorrect, Please try again", Toast.LENGTH_SHORT).show()
             }
             else -> Unit
         }
@@ -88,11 +88,15 @@ fun ScreenSignIn(
                 OutlinedTextField(
                     value = viewModel.email ,
                     onValueChange = {
-                        viewModel.onEmailChanged( it)
+                        viewModel.onEmailChanged(it)
                     } ,
                     label = { Text("Email", color = Color.DarkGray) } ,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    supportingText = {
+                       val message =  viewModel.onEmailChanged(email = viewModel.email)
+                        Text( text = message , color = Color.Red )
+                    }
                 )
                 Spacer( modifier = Modifier.padding(8.dp))
                 OutlinedTextField(
@@ -102,7 +106,11 @@ fun ScreenSignIn(
                     } ,
                     label = { Text("Password", color = Color.DarkGray) } ,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    supportingText = {
+                        val message =  viewModel.onPasswordChanged(newPassword = viewModel.password)
+                        Text( text = message , color = Color.Red )
+                    }
                 )
                 Spacer( modifier = Modifier.padding(8.dp))
                 Text(

@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +38,9 @@ fun CompactTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     readOnly: Boolean = false,
     keyboardAction: KeyboardActions = KeyboardActions.Default,
-    errorMessage: String = "",
+    supportingText: @Composable (() -> Unit)? = null,
+    visualTransformation: VisualTransformation = VisualTransformation.None
+
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Label above the field
@@ -74,16 +77,8 @@ fun CompactTextField(
                     keyboardOptions = keyboardOptions,
                     readOnly = readOnly,
                     keyboardActions = keyboardAction,
-                    supportingText = {
-                        if (errorMessage.isNotEmpty()) {
-                            Text(
-                                text = errorMessage,
-                                color = Color.Red,
-                                fontSize = 12.sp
-                            )
-                        }
-                    },
-                    isError = errorMessage.isNotEmpty()
+                    supportingText = supportingText,
+                    visualTransformation = visualTransformation
                 )
             }
         }

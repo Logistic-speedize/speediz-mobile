@@ -116,13 +116,14 @@ class CreatePackageViewModel @Inject constructor(
         lat: Double,
         lng: Double
     ): Boolean {
+
+        val nameRegex = Regex("^[A-Za-z\\s]+$")
+
         return when {
-            phone.isBlank() || phone.length <= 5 || phone.length >= 15 -> false
-            name.isBlank() || name.contains(
-                Regex(".*[0-9].*")
-            ) -> false
+            phone.isBlank() || phone.length !in 6..14 -> false
+            name.isBlank() || !nameRegex.matches(name) -> false
             type.isBlank() -> false
-            price <= 0.0 || price >= 1000000 -> false
+            price !in 0.0..<1000000.0 -> false
             location.isBlank() -> false
             lat == 0.0 || lng == 0.0 -> false
             else -> true
@@ -131,19 +132,25 @@ class CreatePackageViewModel @Inject constructor(
 
     fun createPackage(request: CreatePackageRequest) {
         _createPackageUIState.value = CreatePackageUIState.Loading
+
         viewModelScope.launch {
             try {
-                Log.d( "CreatePackageViewModel", "Creating package with request: $request" )
+                Log.d("CreatePackageVM", "Request: $request")
+
                 val response = repository.createPackage(request)
+
                 if (response.errors != null) {
-                    _createPackageUIState.value = CreatePackageUIState.Error(response.message.orEmpty())
+                    _createPackageUIState.value =
+                        CreatePackageUIState.Error(response.message ?: "Create package failed")
                 } else {
                     _createPackageUIState.value = CreatePackageUIState.Success
                 }
-                Log.d( "CreatePackageViewModel", "Create package response: $response" )
+
+                Log.d("CreatePackageVM", "Response: $response")
+
             } catch (e: Exception) {
-                _createPackageUIState.value = CreatePackageUIState.Error(e.message ?: "An unexpected error occurred")
-                Log.d( "CreatePackageViewModel", "Error creating package", e )
+                _createPackageUIState.value =
+                    CreatePackageUIState.Error(e.message ?: "Unexpected error")
             }
         }
     }
