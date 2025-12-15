@@ -6,7 +6,7 @@ import com.example.speediz.core.data.vendor.PackageResponse
 import com.example.speediz.core.data.vendor.PackageTrackingDetailResponse
 
 interface PackageRepository {
-    suspend fun packageList(): PackageResponse
+    suspend fun packageList(page: Int): PackageResponse
     suspend fun packageTrackingDetails(id: Int): PackageTrackingDetailResponse
     suspend fun createPackage(request: CreatePackageRequest): ResponseErrorModel
 }

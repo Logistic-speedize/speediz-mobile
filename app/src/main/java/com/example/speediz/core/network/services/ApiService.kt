@@ -36,6 +36,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("api/mobile/login")
@@ -98,7 +99,9 @@ interface ApiService {
     ): Response<ResponseErrorModel>
 
     @GET("api/vendor/packages")
-    suspend fun packageList(): Response<PackageResponse>
+    suspend fun packageList(
+        @Query("page") page: Int
+    ): Response<PackageResponse>
 
     @GET("api/vendor/packages/map/{id}")
     suspend fun packageTrackingDetail(

@@ -35,14 +35,42 @@ class PackageTrackingViewModel @Inject constructor(
 
     }
 
+//    fun fetchPackageList() {
+//        _isLoading.value = true
+//        viewModelScope.launch {
+//            try {
+//                val response = repository.packageList()
+//                Log.d("PackageTrackingViewModel" , "Fetched packages: ${response.data.packages}")
+//                _packageList.value = response.data.packages
+//                _packageFilter.value = response.data.packages
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            } finally {
+//                _isLoading.value = false
+//            }
+//        }
+//    }
+
     fun fetchPackageList() {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val response = repository.packageList()
-                Log.d("PackageTrackingViewModel" , "Fetched packages: ${response.data.packages}")
-                _packageList.value = response.data.packages
-                _packageFilter.value = response.data.packages
+                val allPackages = mutableListOf<PackageResponse.DataPackage.PackageItem>()
+                var page = 1
+                var hasMore = true
+
+                while (hasMore) {
+                    val response = repository.packageList(page)
+                    val packages = response.data.packages
+                    allPackages += packages
+                    hasMore = page <= response.data.lastPage
+                    page++
+                }
+
+                Log.d("PackageTrackingViewModel", "Fetched packages: $allPackages")
+                _packageList.value = allPackages.sortedByDescending(PackageResponse.DataPackage.PackageItem::id)
+                _packageFilter.value = allPackages.sortedByDescending(PackageResponse.DataPackage.PackageItem::id)
+
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -51,16 +79,50 @@ class PackageTrackingViewModel @Inject constructor(
         }
     }
 
-    fun fetchPackageListInMap(){
-        _isLoading.value = true
-        viewModelScope.launch {
-            val response = repository.packageList()
-            val packageList = response.data.packages.filter { it.status == "in_transit" }
-            _packageInMap.value = packageList
-            _packageFilterInMap.value = packageList
+//    fun fetchPackageListInMap(){
+//        _isLoading.value = true
+//        viewModelScope.launch {
+//
+//            val response = repository.packageList()
+//            val packageList = response.data.packages.filter { it.status == "in_transit" }
+//            _packageInMap.value = packageList
+//            _packageFilterInMap.value = packageList
+//        }
+//        _isLoading.value = false
+//    }
+fun fetchPackageListInMap() {
+    _isLoading.value = true
+    viewModelScope.launch {
+        try {
+            val allPackages = mutableListOf<PackageResponse.DataPackage.PackageItem>()
+            var page = 1
+            val pageSize = 50
+            var hasMore = true
+
+            while (hasMore) {
+                val response = repository.packageList(page) // make sure this calls API with ?page=page
+                val packages = response.data.packages
+                allPackages += packages
+                hasMore = packages.size == pageSize
+                page++
+            }
+
+            // Filter packages that are in transit
+            val inTransitPackages = allPackages.filter { it.status == "in_transit" }
+
+            _packageInMap.value = inTransitPackages
+            _packageFilterInMap.value = inTransitPackages
+
+            Log.d("PackageTrackingViewModel", "Fetched in-transit packages: $inTransitPackages")
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            _isLoading.value = false
         }
-        _isLoading.value = false
     }
+}
+
 
     fun searchPackageInMapByNId(id: String) {
         val filteredList = if (id.isEmpty()) {
