@@ -1,5 +1,6 @@
 package com.example.speediz.ui.feature.authorized.delivery.invoice.detail
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,16 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -30,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,11 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.example.speediz.R
 import com.example.speediz.core.data.delivery.InvoiceDetailResponse
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.utils.dateFormat
-import com.mapbox.maps.extension.style.expressions.dsl.generated.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -150,9 +145,13 @@ fun PackageStatusSection(
     val pendingCounts = packageStatusInfo.pending + packageStatusInfo.inTransit
     val completedCounts = packageStatusInfo.completed
     val total = cancelledCounts + pendingCounts + completedCounts + cancelledCounts
-    val date = dateFormat(date).format(
-        java.util.Locale.getDefault(), "dd-MM-yyyy"
-    )
+    val date = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        dateFormat(date).format(
+            java.util.Locale.getDefault(), "dd-MM-yyyy"
+        )
+    } else {
+        TODO("VERSION.SDK_INT < O")
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -216,14 +215,16 @@ fun PackageCard(
         Row {
             Text(text = "Date" , color = Color.Gray , fontSize = 14.sp)
             Spacer(Modifier.weight(1f))
-            Text(
-                text = dateFormat(packageInfo.shipment.date).format(
-                    packageInfo.shipment.date, "dd-MM-yyyy"
-                ),
-                color = Color.Black ,
-                fontSize = 14.sp ,
-                fontWeight = FontWeight.Medium
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Text(
+                    text = dateFormat(packageInfo.shipment.date).format(
+                        packageInfo.shipment.date, "dd-MM-yyyy"
+                    ),
+                    color = Color.Black ,
+                    fontSize = 14.sp ,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
         Row {
             Text(text = "Package Price" , color = Color.Gray , fontSize = 14.sp)

@@ -118,7 +118,6 @@ fun ScreenExpressDetail(
             BottomSheetShowExpressDetail(
                expressDetail = expressDetail?.data,
                 currentStatus = currentStatus,
-                navigateTo = navigateTo,
                viewModel = viewModel
            )
         }
@@ -131,7 +130,6 @@ fun ScreenExpressDetail(
 fun BottomSheetShowExpressDetail(
     expressDetail: ExpressDetailResponse.ExpressDetailData ?= null,
     currentStatus: String,
-    navigateTo: (String) -> Unit,
     viewModel : ExpressDetailViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(
@@ -403,9 +401,9 @@ fun ExpressDetail(
 
         // Price Info
         Column {
-            Text("Package price(\$):  ${packageInDollar}", fontWeight = FontWeight.Bold)
-            Text("Package price(riel):  ${packageInRiel}", fontWeight = FontWeight.Bold)
-            Text("Delivery Fee:  \$2.00", fontWeight = FontWeight.Bold)
+            Text("Package price($):  $packageInDollar", fontWeight = FontWeight.Bold)
+            Text("Package price(riel):  $packageInRiel", fontWeight = FontWeight.Bold)
+            Text("Delivery Fee:  $2.00", fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(28.dp))
