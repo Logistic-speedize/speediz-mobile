@@ -109,15 +109,18 @@ fun HistoryDetail(
         else -> "Pending"
     }
 
-    val pickUpAt = convertDateCalendar(
-        dateFormat(expressDetail?.pickedUpAt.toString()),
+    val pickUpAt =
+        //expressDetail?.pickedUpAt.toString()
+        convertDateCalendar(
+        expressDetail?.pickedUpAt,
         "yyyy-MM-dd HH:mm:ss",
-        "dd-mm-yyyy"
+        "dd-MM-yyyy"
     )
-    val deliveredAt = convertDateCalendar(
+    val deliveredAt =
+        convertDateCalendar(
         dateFormat(expressDetail?.deliveredAt.toString()),
         "yyyy-MM-dd HH:mm:ss",
-        "dd-mm-yyyy"
+        "dd-MM-yyyy"
     )
 
     Column(

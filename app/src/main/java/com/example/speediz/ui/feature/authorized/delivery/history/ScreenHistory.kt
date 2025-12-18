@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.core.data.delivery.PackageHistoryResponse
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
+import com.example.speediz.ui.utils.convertDateCalendar
 
 @Composable
 fun ScreenHistory(
@@ -194,7 +195,7 @@ fun HistoryCard(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = historyDetail.shipmentInfo.date,
+                        text = convertDateCalendar(historyDetail.shipmentInfo.date, "yyyy-MM-dd", "dd-MM-yyyy"),
                         fontSize = 14.sp,
                         color = Color.LightGray
                     )

@@ -29,6 +29,7 @@ import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.getCurrentLocation
 import com.example.speediz.ui.theme.SPColor
+import com.example.speediz.ui.utils.dateFormat
 
 @Composable
 fun ScreenExpressDetail(
@@ -329,9 +330,12 @@ fun ExpressDetail(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text( "#SP${expressDetail?.id}" , fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Text(expressDetail?.location?.location.toString(), fontSize = 15.sp, color = Color.Gray)
+                Text(dateFormat(expressDetail?.createdAt.toString()),fontSize = 15.sp, color = Color.Gray)
             }
             Box(
                 modifier = Modifier

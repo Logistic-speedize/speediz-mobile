@@ -1,5 +1,10 @@
 package com.example.speediz
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.speediz.core.application.MySharePreferences
+import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
 import com.example.speediz.ui.graphs.AppNavigation
 import com.example.speediz.ui.theme.LightStatusBar
@@ -31,6 +37,7 @@ class MainActivity : ComponentActivity() {
             val role = remember { mutableStateOf(sharePreferences.getUserRole()) }
             val showSplashScreen = remember { mutableStateOf(true) }
 
+            val isInternet = NetworkConnectionInterceptor(applicationContext)
             val requestPermissionNotification = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
@@ -53,17 +60,20 @@ class MainActivity : ComponentActivity() {
                 kotlinx.coroutines.delay(1500)
                 showSplashScreen.value = false
             }
-                // A surface container using the 'background' color from the theme
+
            SpeedizTheme {
                LightStatusBar()
                if (showSplashScreen.value) {
                    ScreenSplashScreen()
-
                } else {
-                   AppNavigation(
-                       navController = navController ,
-                       role = role.value?.toInt() ,
-                   )
+                  if(!isInternet.isConnected()){
+                      ScreenNoInternet()
+                  } else {
+                      AppNavigation(
+                          navController = navController ,
+                          role = role.value?.toInt() ,
+                      )
+                  }
                }
            }
 
