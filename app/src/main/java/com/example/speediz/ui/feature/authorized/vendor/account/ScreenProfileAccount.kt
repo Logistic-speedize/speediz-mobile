@@ -173,7 +173,8 @@ fun ScreenProfileScreen(
                             value = profileData.driver.lastName,
                             onValueChange = {},
                             label = "Last Name",
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            enable = enableToEdit
                         )
                     }
 

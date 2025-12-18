@@ -5,7 +5,7 @@ import com.example.speediz.ui.navigation.AuthorizedRoute
 
 data class HomeVendorState(
     val email: String = "",
-    val profile: Int = R.drawable.img_default_profile,
+    val profile: String = "",
     val unreadCount: Int = 0,
     val actions: List<VendorAction> = listOf(
         VendorAction(

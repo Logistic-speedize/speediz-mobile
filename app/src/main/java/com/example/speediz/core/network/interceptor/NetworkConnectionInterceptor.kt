@@ -16,7 +16,7 @@ class NetworkConnectionInterceptor (
             return chain.proceed(chain.request())
         }
     }
-    private fun isConnected(): Boolean {
+    fun isConnected(): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false

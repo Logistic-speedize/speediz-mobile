@@ -29,6 +29,14 @@ class HistoryVM @Inject constructor(
     private val _statusList = MutableStateFlow<List<String>>(emptyList())
     val statusList = _statusList.asStateFlow()
 
+    private val _dateQuery = MutableStateFlow("")
+    val dateQuery = _dateQuery.asStateFlow()
+
+    init {
+        fetchPackageHistoryByStatus()
+        historyFilterList
+        historyList
+    }
 
 //    fun fetchPackageHistory() {
 //        _uiState.value = HistoryState.Loading
@@ -66,6 +74,16 @@ class HistoryVM @Inject constructor(
                     }
                    }
 
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun fetchPackageHistoryByDate(date: String) {
+        viewModelScope.launch {
+            try {
+                val response = historyRepository.packageHistory()
+                val list = response.data.historyItems
+                _historyFilterList.value =  list.filter { it.shipmentInfo.date.contains(date) }
             } catch (_: Exception) {}
         }
     }

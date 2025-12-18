@@ -31,13 +31,13 @@ class HomeVendorViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = true , error = null) }
                 runCatching { repository.getCurrentVendor() }
                     .onSuccess { vendor ->
-                        _uiState.update {
-                            it.copy(
-                                email = vendor.email,
-                                profile = vendor.profile,
-                                isLoading = false
-                            )
-                        }
+//                        _uiState.update {
+//                            it.copy(
+//                                email = vendor.email,
+//                                profile = vendor.profile,
+//                                isLoading = false
+//                            )
+//                        }
                     }
                     .onFailure { e ->
                         _uiState.update { it.copy(isLoading = false, error = e.message ?: "Unknown error") }

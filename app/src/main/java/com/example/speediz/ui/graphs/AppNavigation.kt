@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.speediz.ScreenNoInternet
+import com.example.speediz.core.network.interceptor.NetworkConnectionInterceptor
 import com.example.speediz.ui.feature.unauthorized.signIn.SignInViewModel
 import com.example.speediz.ui.navigation.AuthorizedRoute
 import com.example.speediz.ui.navigation.UnauthorizedRoute
@@ -33,6 +35,7 @@ fun AppNavigation(
     val signInViewModel = hiltViewModel<SignInViewModel>()
     val isLoggedIn = signInViewModel.isLoggedIn.collectAsState().value
     val userRole = role
+    val isConnected = NetworkConnectionInterceptor(navController.context)
     val startDestination = if (!isLoggedIn) {
         UnauthorizedRoute.SignIn.route
     }else {
@@ -44,25 +47,27 @@ fun AppNavigation(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
         )
         {
-            NavHost(
-                navController = navController,
-                startDestination = startDestination,
-                modifier = modifier,
-            ) {
-                Log.d("AppNavigation", "isLogedIn: $isLoggedIn")
-                Log.d("AppNavigation", "User role: $userRole")
-                unauthorizedNavigate(
-                    navController = navController
-                )
-                if (hasFirebasePermission()){
-                    vendorAuthorizedNavigate(
+            if ( !isConnected.isConnected() ) {
+                ScreenNoInternet()
+            } else {
+                NavHost(
+                    navController = navController,
+                    startDestination = startDestination,
+                    modifier = modifier,
+                ) {
+                    unauthorizedNavigate(
                         navController = navController
                     )
-                    deliveryAuthorizedNavigate(
-                        navController = navController
-                    )
-                }
+                    if (hasFirebasePermission()){
+                        vendorAuthorizedNavigate(
+                            navController = navController
+                        )
+                        deliveryAuthorizedNavigate(
+                            navController = navController
+                        )
+                    }
 
+                }
             }
         }
     }

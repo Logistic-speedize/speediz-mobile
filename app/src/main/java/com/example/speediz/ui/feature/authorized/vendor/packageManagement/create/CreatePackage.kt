@@ -54,8 +54,10 @@ import com.example.speediz.core.data.vendor.CreatePackageRequest
 import com.example.speediz.ui.feature.appwide.textfield.CompactTextField
 import com.example.speediz.ui.theme.LightStatusBar
 import com.example.speediz.ui.theme.SpeedizTheme
+import com.example.speediz.ui.utils.LocationPrefix
 import com.example.speediz.ui.utils.SpeedizPackageType
 import com.example.speediz.ui.utils.geocodeAddress
+import org.w3c.dom.Text
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,13 +112,24 @@ fun ScreenCreatePackage(
             is CreatePackageUIState.Success -> {
                 onCreate()
             }
-            else -> {
+            is CreatePackageUIState.Error -> {
                 Toast.makeText(
                     currentLocal,
-                    (uiState as? CreatePackageUIState.Error)?.message ?: "",
+                    (uiState as? CreatePackageUIState.Error)?.message ?: "Error creating package",
                     Toast.LENGTH_SHORT
-                )
+                ).show()
+                Log.d( "ScreenCreatePackage", "Error creating package: ${(uiState as? CreatePackageUIState.Error)?.message}" )
             }
+            else -> {
+                // No action needed for Loading or other states
+            }
+//            else -> {
+//                Toast.makeText(
+//                    currentLocal,
+//                    (uiState as? CreatePackageUIState.Error)?.message ?: "",
+//                    Toast.LENGTH_SHORT
+//                )
+//            }
         }
     }
 
@@ -168,7 +181,7 @@ fun ScreenCreatePackage(
                 keyboardOptions =  KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
-                errorMessage =  viewModel.setReceiverPhone(phone)
+            //    errorMessage =  viewModel.setReceiverPhone(phone)
             )
 
             Spacer(Modifier.height(12.dp))
@@ -184,7 +197,7 @@ fun ScreenCreatePackage(
                 keyboardOptions =  KeyboardOptions(
                     keyboardType = KeyboardType.Ascii
                 ),
-                errorMessage =  viewModel.setReceiverName(name)
+             //   errorMessage =  viewModel.setReceiverName(name)
             )
 
             Spacer(Modifier.height(12.dp))
@@ -237,26 +250,32 @@ fun ScreenCreatePackage(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
-                errorMessage = viewModel.setPackagePrice(
-                    if (price.isBlank()) 0.0 else price.toDouble()
-                )
+                supportingText = {
+                    Text(text = "Enter 0 if the package is free. Package price must be 1-1000$", fontSize = 12.sp, color = Color.Gray)
+                }
             )
 
             Spacer(Modifier.height(12.dp))
 
+            val locationPrefix = LocationPrefix("Phnom Penh,")
             // Location
             CompactTextField(
                 label = "Customer Location",
                 value = location,
                 onValueChange = {
-                    location = it
+                    location = "Phnom Penh, $it"
+                    Log.d( "CreatePackage", "ScreenCreatePackage: Location $location" )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                    imeAction = ImeAction.Done
                 ),
-                errorMessage = viewModel.setCustomerLocation(location)
+                visualTransformation = locationPrefix,
+                supportingText = {
+                    Text(text = "Location must be in Phnom Penh only", fontSize = 12.sp, color = Color.Gray)
+                }
+             //   errorMessage = viewModel.setCustomerLocation(location)
             )
 
             Spacer(Modifier.height(32.dp))

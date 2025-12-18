@@ -70,7 +70,7 @@ fun ScreenExpress(
             }
         }
     ) {
-        padding ->
+            padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,7 +131,9 @@ fun ScreenExpress(
                             text = "No packages found.",
                             fontWeight = FontWeight.Bold ,
                             fontSize = 18.sp ,
-                            color = Color.Black
+                            color = Color.Black,
+                            modifier = Modifier.fillMaxSize().align(alignment = Alignment.CenterHorizontally),
+                            textAlign = TextAlign.Center
                         )
                     }
                 } else {

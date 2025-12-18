@@ -11,19 +11,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.core.data.delivery.PackageHistoryResponse
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
+import com.example.speediz.ui.utils.convertDateCalendar
 
 @Composable
 fun ScreenHistory(
@@ -56,6 +56,7 @@ fun ScreenHistory(
     val tabs = listOf("ALL", "Completed", "Cancelled")
     var selectedTab by remember { mutableStateOf("ALL") }
     val items = historyFilterList
+    val dateQuery = remember { mutableStateOf("") }
 
     LaunchedEffect(selectedTab) {
         if (selectedTab == "ALL") {
@@ -70,7 +71,8 @@ fun ScreenHistory(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .statusBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
@@ -130,12 +132,15 @@ fun ScreenHistory(
 
             /** ---------------- Select Dates Button ------------------- **/
             Box(
-                modifier = Modifier.width(200.dp)
-                    .align(Alignment.End),
+                modifier = Modifier.width(200.dp),
+                contentAlignment = Alignment.CenterEnd
             ) {
                 SpDatePickerInput(
                     placeholderText = "Select date",
-                    onValueChange = {}
+                    onValueChange = {
+                        dateQuery.value = it
+                        viewModel.fetchPackageHistoryByDate(it)
+                    }
                 )
             }
 
@@ -182,11 +187,19 @@ fun HistoryCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "#SP${historyDetail.id}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Column {
+                    Text(
+                        text = "#SP${historyDetail.id}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = convertDateCalendar(historyDetail.shipmentInfo.date, "yyyy-MM-dd", "dd-MM-yyyy"),
+                        fontSize = 14.sp,
+                        color = Color.LightGray
+                    )
+                }
 
                 Box(
                     modifier = Modifier
@@ -230,8 +243,13 @@ fun HistoryCard(
 
             Spacer(Modifier.height(16.dp))
 
-            Text("Location", fontSize = 12.sp, color = Color.Gray)
-            Text(historyDetail.locationInfo.location)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text("Location", fontSize = 12.sp, color = Color.Gray)
+                Text(historyDetail.locationInfo.location)
+            }
 
             Spacer(Modifier.height(20.dp))
 
@@ -242,7 +260,7 @@ fun HistoryCard(
                     .height(48.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFC727)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text("VIEW DETAILS", fontWeight = FontWeight.Bold, color = Color.Black)

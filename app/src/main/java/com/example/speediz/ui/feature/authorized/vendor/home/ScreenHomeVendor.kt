@@ -26,12 +26,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +41,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.speediz.R
+import com.example.speediz.core.data.vendor.Vendor
+import com.example.speediz.core.data.vendor.VendorProfileResponse
+import com.example.speediz.ui.feature.appwide.button.SPLoading
+import com.example.speediz.ui.feature.authorized.vendor.account.VendorAccountVM
+import com.example.speediz.ui.feature.authorized.vendor.account.VendorProfileState
 import com.example.speediz.ui.navigation.AuthorizedRoute
 
 
@@ -48,8 +56,17 @@ fun ScreenHomeVendor(
     onNavigateTo: (String) -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    val viewModel = hiltViewModel<HomeVendorViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
+//    val viewModel = hiltViewModel<HomeVendorViewModel>()
+//    val uiState by viewModel.uiState.collectAsState()
+    val viewModel = hiltViewModel<VendorAccountVM>()
+    val profileUIState by viewModel.profileUIState.collectAsState()
+
+    val homeViewModel = hiltViewModel<HomeVendorViewModel>()
+    val uiState by homeViewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchProfileData()
+    }
 
     Box(
         modifier = Modifier
@@ -70,14 +87,24 @@ fun ScreenHomeVendor(
                 ,
                 contentAlignment = Alignment.Center
             ) {
-                WelcomeUser(
-                    email = when {
-                        uiState.email.isBlank() -> "Unknown User"
-                        else -> uiState.email
-                    },
-                    profile = R.drawable.img_default_profile,
-                    onToProfile = onNavigateToProfile
-                )
+                when (profileUIState) {
+                    is VendorProfileState.Loading -> {
+                        SPLoading()
+                        Log.d("ScreenHomeVendor", "Loading profile...")
+                    }
+                    is VendorProfileState.Error -> {
+                        val message = (profileUIState as VendorProfileState.Error).message
+                        Log.d("ScreenHomeVendor", "Error loading profile: $message")
+                    }
+                    is VendorProfileState.Success -> {
+                        val profileData = (profileUIState as VendorProfileState.Success).response
+                        Log.d("ScreenHomeVendor", "Profile loaded: $profileData")
+                        WelcomeUser(
+                            userProfile = profileData,
+                            onToProfile = onNavigateToProfile
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -148,8 +175,7 @@ fun NavigateButton(
 
 @Composable
 fun WelcomeUser(
-    email: String,
-    profile: Int,
+    userProfile: VendorProfileResponse.Data ,
     onNotificationsClick: () -> Unit = {},
     onToProfile: () -> Unit = {}
 ) {
@@ -169,10 +195,14 @@ fun WelcomeUser(
             ,
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = profile),
-                contentDescription = "Profile",
-                modifier = Modifier.fillMaxSize()
+            AsyncImage(
+                model = userProfile.driver.imageProfile,
+                contentDescription = "Profile photo",
+                placeholder = painterResource(R.drawable.ic_profile_fallback),
+                error = painterResource(R.drawable.ic_profile_fallback),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(CircleShape)
             )
         }
 
@@ -191,20 +221,11 @@ fun WelcomeUser(
                     lineHeight = 14.sp
                 )
                 Text(
-                    text = email,
+                    text = userProfile.user.email,
                     color = Color.Black,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     lineHeight = 16.sp
-                )
-            }
-
-            IconButton(onClick = onNotificationsClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_notification),
-                    contentDescription = "Notifications",
-                    tint = colorResource(id = R.color.neutral_gray),
-                    modifier = Modifier.size(26.dp)
                 )
             }
         }

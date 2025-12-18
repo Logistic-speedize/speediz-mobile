@@ -21,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +45,8 @@ fun ScreenSignIn(
     val signInState = viewModel.signInState.collectAsState().value
     val role = viewModel.role.collectAsState().value
     val context = LocalContext.current
+    val isEmailInput = remember { mutableStateOf(false) }
+    val isPasswordInput = remember { mutableStateOf(false) }
     LaunchedEffect(signInState, role) {
         when (signInState) {
             is SignInState.Success -> {
@@ -57,7 +61,7 @@ fun ScreenSignIn(
                 }
             }
             is SignInState.Error -> {
-                Toast.makeText(context, signInState.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Your sign in form is incorrect, Please try again", Toast.LENGTH_SHORT).show()
             }
             else -> Unit
         }
@@ -88,21 +92,39 @@ fun ScreenSignIn(
                 OutlinedTextField(
                     value = viewModel.email ,
                     onValueChange = {
-                        viewModel.onEmailChanged( it)
+                        if(!isEmailInput.value) isEmailInput.value = true
+                        viewModel.onEmailChanged(it)
                     } ,
                     label = { Text("Email", color = Color.DarkGray) } ,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    supportingText = {
+                       val message =  viewModel.onEmailChanged(email = viewModel.email)
+                        if(isEmailInput.value){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    },
                 )
                 Spacer( modifier = Modifier.padding(8.dp))
                 OutlinedTextField(
                     value = viewModel.password ,
                     onValueChange = {
+                        if(!isPasswordInput.value) isPasswordInput.value = true
                         viewModel.onPasswordChanged(it)
                     } ,
                     label = { Text("Password", color = Color.DarkGray) } ,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    supportingText = {
+                        val message =  viewModel.onPasswordChanged(newPassword = viewModel.password)
+                        if(isPasswordInput.value){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    }
                 )
                 Spacer( modifier = Modifier.padding(8.dp))
                 Text(

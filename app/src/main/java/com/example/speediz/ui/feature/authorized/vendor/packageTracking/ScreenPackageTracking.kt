@@ -246,7 +246,11 @@ fun PackageCard(item: PackageResponse.DataPackage.PackageItem, onNavigateTo : ()
             modifier = Modifier.fillMaxWidth()
         ) {
             Column{
-                val deliveryName = "${item.driver?.firstName} ${item.driver?.lastName}".ifEmpty { "N/A" }
+                val deliveryName = if(item.driver != null){
+                    "${item.driver.firstName} ${item.driver.lastName}"
+                } else {
+                    "N/A"
+                }
                 Text("Delivery's Name", fontSize = 13.sp, color = Color.Gray)
                 Text(deliveryName, fontWeight = FontWeight.Medium, color = Color.Black)
             }

@@ -84,7 +84,7 @@ fun MapboxUserRoute(
             })
 
             // Origin marker
-            context.getDrawable(R.drawable.ic_radio_button_checked)?.toBitmap()?.let {
+            context.getDrawable(R.drawable.ic_driver)?.toBitmap()?.let {
                 style.addImage("origin_marker", it)
             }
             style.addSource(geoJsonSource("origin-source") { geometry(Point.fromLngLat(originLat, originLon)) })
@@ -98,13 +98,23 @@ fun MapboxUserRoute(
             style.addSource(geoJsonSource("route-source") {
                 geometry(LineString.fromLngLats(listOf(destinationPoint, destinationPoint)))
             })
-            style.addLayer(
+//            style.addLayer(
+//                lineLayer("route-layer", "route-source") {
+//                    lineColor("#1E90FF")
+//                    lineWidth(8.0)
+//                    lineCap(LineCap.ROUND)
+//                    lineJoin(LineJoin.ROUND)
+//                }
+//            )
+            // route line under markers
+            style.addLayerBelow(
                 lineLayer("route-layer", "route-source") {
                     lineColor("#1E90FF")
                     lineWidth(8.0)
                     lineCap(LineCap.ROUND)
                     lineJoin(LineJoin.ROUND)
-                }
+                },
+                "destination-layer" // ensures line is below both markers
             )
 
             // Location plugin

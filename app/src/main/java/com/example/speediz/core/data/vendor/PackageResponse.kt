@@ -6,7 +6,16 @@ data class PackageResponse(
     val data: DataPackage
 ){
     data class DataPackage(
-        val packages: List<PackageItem>
+        val packages: List<PackageItem>,
+        val total: Int,
+        @SerializedName("per_page")
+        val perPage: Int,
+        @SerializedName("current_page")
+        val currentPage: Int,
+        @SerializedName("last_page")
+        val lastPage: Int,
+        val from: Int,
+        val to: Int,
     ){
         data class PackageItem(
             val id: Int,

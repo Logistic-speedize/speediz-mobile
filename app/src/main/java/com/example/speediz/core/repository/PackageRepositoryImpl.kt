@@ -10,8 +10,8 @@ import javax.inject.Inject
 class PackageRepositoryImpl @Inject constructor(
     private val api: ApiService
 ): SafeApiRequest(), PackageRepository {
-    override suspend fun packageList() = apiRequest {
-        api.packageList()
+    override suspend fun packageList(page: Int) = apiRequest {
+        api.packageList(page = page)
     }
 
     override suspend fun packageTrackingDetails(id : Int) : PackageTrackingDetailResponse {

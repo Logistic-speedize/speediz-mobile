@@ -29,6 +29,7 @@ import com.example.speediz.ui.feature.appwide.button.MapboxUserLocationBox
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.getCurrentLocation
 import com.example.speediz.ui.theme.SPColor
+import com.example.speediz.ui.utils.dateFormat
 
 @Composable
 fun ScreenExpressDetail(
@@ -118,7 +119,6 @@ fun ScreenExpressDetail(
             BottomSheetShowExpressDetail(
                expressDetail = expressDetail?.data,
                 currentStatus = currentStatus,
-                navigateTo = navigateTo,
                viewModel = viewModel
            )
         }
@@ -131,7 +131,6 @@ fun ScreenExpressDetail(
 fun BottomSheetShowExpressDetail(
     expressDetail: ExpressDetailResponse.ExpressDetailData ?= null,
     currentStatus: String,
-    navigateTo: (String) -> Unit,
     viewModel : ExpressDetailViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(
@@ -331,9 +330,12 @@ fun ExpressDetail(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text( "#SP${expressDetail?.id}" , fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Text(expressDetail?.location?.location.toString(), fontSize = 15.sp, color = Color.Gray)
+                Text(dateFormat(expressDetail?.createdAt.toString()),fontSize = 15.sp, color = Color.Gray)
             }
             Box(
                 modifier = Modifier
@@ -403,9 +405,9 @@ fun ExpressDetail(
 
         // Price Info
         Column {
-            Text("Package price(\$):  ${packageInDollar}", fontWeight = FontWeight.Bold)
-            Text("Package price(riel):  ${packageInRiel}", fontWeight = FontWeight.Bold)
-            Text("Delivery Fee:  \$2.00", fontWeight = FontWeight.Bold)
+            Text("Package price($):  $packageInDollar", fontWeight = FontWeight.Bold)
+            Text("Package price(riel):  $packageInRiel", fontWeight = FontWeight.Bold)
+            Text("Delivery Fee:  $2.00", fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(28.dp))
