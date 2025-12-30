@@ -14,79 +14,52 @@ import javax.inject.Inject
 class HistoryVM @Inject constructor(
     private val historyRepository: PackageHistoryRepository
 ): ViewModel() {
+
     private val _uiState = MutableStateFlow<HistoryState>(HistoryState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private val _historyList = MutableStateFlow<List<PackageHistoryResponse.PackageHistoryData.PackageHistoryItem>>(emptyList())
-    val historyList = _historyList.asStateFlow()
-
-    private val _historyFilterList = MutableStateFlow<List<PackageHistoryResponse.PackageHistoryData.PackageHistoryItem>>(emptyList())
-    val historyFilterList = _historyFilterList.asStateFlow()
-
-    private val _historyFilterByDate = MutableStateFlow<List<PackageHistoryResponse.PackageHistoryData.PackageHistoryItem>>(emptyList())
-    val historyFilterByDate = _historyFilterByDate.asStateFlow()
-
-    private val _statusList = MutableStateFlow<List<String>>(emptyList())
-    val statusList = _statusList.asStateFlow()
-
-    private val _dateQuery = MutableStateFlow("")
-    val dateQuery = _dateQuery.asStateFlow()
+    private var allHistoryItems: List<PackageHistoryResponse.PackageHistoryData.PackageHistoryItem> = emptyList()
 
     init {
-        fetchPackageHistoryByStatus()
-        historyFilterList
-        historyList
+        fetchHistory()
     }
 
-//    fun fetchPackageHistory() {
-//        _uiState.value = HistoryState.Loading
-//        viewModelScope.launch {
-//            try {
-//                val response = historyRepository.packageHistory()
-//                val list = response.data.historyItems
-//                Log.d( "HistoryVM" , "Fetched package history: ${response} items" )
-//                _historyList.value = list
-//
-//                _statusList.value = list.map { it.status }
-//                    .distinct()
-//                    .map { it.replaceFirstChar { c -> c.uppercase() } }
-//
-//            } catch (_: Exception) {
-//            }
-//        }
-//    }
-
-    fun fetchPackageHistoryByStatus(status: String ?= null, date: String ?= null) {
+    private fun fetchHistory() {
         viewModelScope.launch {
             try {
+                _uiState.value = HistoryState.Loading
                 val response = historyRepository.packageHistory()
-                val list = response.data.historyItems
-                _historyFilterList.value =
-                   when {
-                    !status.isNullOrEmpty() -> {
-                        list.filter { it.status.equals(status, ignoreCase = true) }
-                    }
-                    !date.isNullOrEmpty() -> {
-                        list.filter { it.shipmentInfo.date.contains(date) }
-                    }
-                    else -> {
-                        list
-                    }
-                   }
+                allHistoryItems = response.data.historyItems
 
-            } catch (_: Exception) {}
+                if (allHistoryItems.isEmpty()) {
+                    _uiState.value = HistoryState.Empty
+                } else {
+                    _uiState.value = HistoryState.Success(
+                        allItems = allHistoryItems,
+                        filteredItems = allHistoryItems
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = HistoryState.Error(e.localizedMessage ?: "Something went wrong")
+            }
         }
     }
 
-    fun fetchPackageHistoryByDate(date: String) {
-        viewModelScope.launch {
-            try {
-                val response = historyRepository.packageHistory()
-                val list = response.data.historyItems
-                _historyFilterList.value =  list.filter { it.shipmentInfo.date.contains(date) }
-            } catch (_: Exception) {}
+    // Filter by status and/or date
+    fun filterPackageHistory(status: String? = null, date: String? = null) {
+        val filteredList = allHistoryItems.filter { item ->
+            val matchStatus = status?.let { it.equals(item.status, ignoreCase = true) } ?: true
+            val matchDate = date?.let { item.shipmentInfo.date.startsWith(it.take(10)) } ?: true
+            matchStatus && matchDate
+        }
+
+        _uiState.value = if (filteredList.isEmpty()) {
+            HistoryState.Empty
+        } else {
+            HistoryState.Success(
+                allItems = allHistoryItems,
+                filteredItems = filteredList
+            )
         }
     }
-
-
 }
