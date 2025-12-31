@@ -31,7 +31,9 @@ fun SpDatePickerInput(
     // TextField to open sheet
     OutlinedTextField(
         value = dateText ,
-        onValueChange = {} ,
+        onValueChange = {
+            dateText = it
+        } ,
         label = {
             Text(
                 text = placeholderText

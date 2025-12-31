@@ -93,7 +93,6 @@ fun NavGraphBuilder.deliveryAuthorizedNavigate(
             navController.popBackStack()
         }
     )
-    //        screenAccount()
 }
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.vendorAuthorizedNavigate(
@@ -105,7 +104,6 @@ fun NavGraphBuilder.vendorAuthorizedNavigate(
         },
         onNavigateToProfile = {
             navController.navigationVendorAccount()
-            Log.d( "NavigationVendorAccount", "${ navController.currentDestination?.route }" )
         }
     )
     screenPackage(

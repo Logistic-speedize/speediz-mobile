@@ -1,5 +1,7 @@
 package com.example.speediz.ui.feature.authorized.delivery.history
 
+import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,7 +44,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speediz.core.data.delivery.PackageHistoryResponse
+import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 import com.example.speediz.ui.utils.convertDateCalendar
 
@@ -51,113 +56,133 @@ fun ScreenHistory(
     onNavigateTo: (String) -> Unit = {}
 ) {
     val viewModel = hiltViewModel<HistoryVM>()
-    val historyFilterList by viewModel.historyFilterList.collectAsState()
+    val historyListState by viewModel.uiState.collectAsState()
 
     val tabs = listOf("ALL", "Completed", "Cancelled")
     var selectedTab by remember { mutableStateOf("ALL") }
-    val items = historyFilterList
     val dateQuery = remember { mutableStateOf("") }
 
-    LaunchedEffect(selectedTab) {
-        if (selectedTab == "ALL") {
-            viewModel.fetchPackageHistoryByStatus()
-        } else {
-            viewModel.fetchPackageHistoryByStatus(selectedTab)
-        }
+    LaunchedEffect(selectedTab, dateQuery.value) {
+        val date = dateQuery.value.takeIf { it.isNotBlank() }
+
+        // Always filter by selected tab (unless ALL) and date
+        val status = if (selectedTab == "ALL") null else selectedTab
+        viewModel.filterPackageHistory(status = status, date = date)
     }
-
-    Scaffold(
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .statusBarsPadding(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "back"
-                    )
-                }
-
-                Text(
-                    text = "Report",
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(Modifier.width(48.dp))
-            }
-        },
-        containerColor = Color.Transparent
-    ) { paddingValues ->
-
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-        ) {
-
-            /** ---------------- Tabs ------------------- **/
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(top = 10.dp, bottom = 6.dp)
-            ) {
-                tabs.forEach { tab ->
-                    val selected = tab == selectedTab
-
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(
-                                if (selected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.surface
-                            )
-                            .clickable { selectedTab = tab }
-                            .padding(horizontal = 22.dp, vertical = 10.dp)
-                    ) {
-                        Text(
-                            text = tab,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (selected) Color.White else Color.Gray,
-                            fontSize = 14.sp
+        Scaffold(
+            topBar = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .statusBarsPadding(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "back"
                         )
                     }
-                }
-            }
 
-            /** ---------------- Select Dates Button ------------------- **/
-            Box(
-                modifier = Modifier.width(200.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                SpDatePickerInput(
-                    placeholderText = "Select date",
-                    onValueChange = {
-                        dateQuery.value = it
-                        viewModel.fetchPackageHistoryByDate(it)
-                    }
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            /** ---------------- Cards ------------------- **/
-            LazyColumn {
-                items(items.size) { index ->
-                    HistoryCard(
-                        historyDetail = items[index],
-                        onClick = { id -> onNavigateTo(id) }
+                    Text(
+                        text = "Report",
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                    Spacer(Modifier.height(18.dp))
+
+                    Spacer(Modifier.width(48.dp))
+                }
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
+
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+            ) {
+
+                /** ---------------- Tabs ------------------- **/
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(top = 10.dp, bottom = 6.dp)
+                ) {
+                    tabs.forEach { tab ->
+                        val selected = tab == selectedTab
+
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(
+                                    if (selected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surface
+                                )
+                                .clickable { selectedTab = tab }
+                                .padding(horizontal = 22.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = tab,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (selected) Color.White else Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+
+                /** ---------------- Select Dates Button ------------------- **/
+                Box(
+                    modifier = Modifier.width(200.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    SpDatePickerInput(
+                        placeholderText = "Select date",
+                        onValueChange = {
+                            dateQuery.value = it
+                        }
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+                when (historyListState) {
+                    is HistoryState.Loading -> {
+                        SPLoading()
+                    }
+                    is HistoryState.Success -> {
+                        val items = (historyListState as HistoryState.Success).filteredItems
+                        /** ---------------- Cards ------------------- **/
+                        if(items.isEmpty()){
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                            ){
+                                Text(
+                                    text = "No Items Available",
+                                    modifier = Modifier.align(Alignment.Center),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }else{
+                            LazyColumn {
+                                items(items.size) { index ->
+                                    HistoryCard(
+                                        historyDetail = items[index],
+                                        onClick = { id -> onNavigateTo(id) }
+                                    )
+                                    Spacer(Modifier.height(18.dp))
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+
+                    }
                 }
             }
         }
-    }
 }
 
 
@@ -194,11 +219,13 @@ fun HistoryCard(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = convertDateCalendar(historyDetail.shipmentInfo.date, "yyyy-MM-dd", "dd-MM-yyyy"),
-                        fontSize = 14.sp,
-                        color = Color.LightGray
-                    )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Text(
+                            text = convertDateCalendar(historyDetail.shipmentInfo.date, "yyyy-MM-dd", "dd-MM-yyyy"),
+                            fontSize = 14.sp,
+                            color = Color.LightGray
+                        )
+                    }
                 }
 
                 Box(
