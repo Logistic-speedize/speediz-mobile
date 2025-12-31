@@ -32,8 +32,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,17 +62,17 @@ fun ScreenDeliveryInvoice(
     onBackPress: () -> Unit,
 ) {
     val viewModel = hiltViewModel<DeliveryInvoiceViewModel>()
-    val responseUiState = viewModel.responseUIState.collectAsState().value
-    val dateFilter = viewModel.dateFilter
-    var search = viewModel.searchQuery.collectAsState().value
+    val responseUiState = viewModel.invoiceUIState.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    var dateFilter by remember { mutableStateOf("") }
     LaunchedEffect(viewModel) {
         viewModel.fetchInvoiceData()
     }
-    LaunchedEffect(dateFilter) {
-        viewModel.filterByDate(dateFilter.value)
-    }
-    LaunchedEffect(search) {
-        viewModel.filterByQuery(search)
+    LaunchedEffect(searchQuery, dateFilter) {
+        viewModel.fetchInvoiceData(
+            searchQuery = searchQuery.ifBlank { null },
+            date = dateFilter.ifBlank { null }
+        )
     }
     Scaffold(
         topBar = {
@@ -114,10 +117,9 @@ fun ScreenDeliveryInvoice(
         ) {
             // Search box
             SearchBox(
-                value = search,
+                value = searchQuery,
                 onChange = {
-                    search = it
-                    viewModel.filterByQuery(search)
+                    searchQuery = it
                 }
             )
             Spacer(Modifier.height(16.dp))
@@ -130,19 +132,49 @@ fun ScreenDeliveryInvoice(
                 SpDatePickerInput(
                     placeholderText = "Select date",
                     onValueChange = {
-                        dateFilter.value = it
-                        viewModel.filterByDate(dateFilter.value)
+                        dateFilter = it
                     },
                 )
             }
             Spacer(Modifier.height(16.dp))
-            LazyColumn {
-                items(responseUiState) { item ->
-                    InvoiceCard(
-                        item = item,
-                        toDetail = onNavigateTo
-                    )
-                    Spacer(Modifier.height(14.dp))
+            when (val state = responseUiState.value) {
+                is DeliveryInvoiceUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "Loading...", color = Color.Gray)
+                    }
+                }
+                is DeliveryInvoiceUiState.Success -> {
+                    if (state.invoiceUiState.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "No invoices found.", color = Color.Gray)
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(state.invoiceUiState) { item ->
+                                InvoiceCard(
+                                    item = item,
+                                    toDetail = onNavigateTo
+                                )
+                            }
+                        }
+                    }
+                }
+                is DeliveryInvoiceUiState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = state.message, color = Color.Red)
+                    }
                 }
             }
         }
