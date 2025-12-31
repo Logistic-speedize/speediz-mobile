@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
 import com.example.speediz.core.data.vendor.PackageResponse
+import com.example.speediz.ui.feature.appwide.button.SPLoading
+import com.example.speediz.ui.feature.authorized.delivery.invoice.SearchBox
 import com.example.speediz.ui.theme.SPColor
 
 @Composable
@@ -55,11 +57,15 @@ fun ScreenPackageTracking(
     onBack: () -> Unit
 ) {
     val viewModel = hiltViewModel<PackageTrackingViewModel>()
-    val filteredList= viewModel.packageFilterInMap.collectAsState()
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    val packageUiState = viewModel.packageUiState.collectAsState()
+    var searchText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchPackageListInMap()
+    }
+
+    LaunchedEffect(searchText) {
+        viewModel.fetchPackageListInMap(searchText)
     }
 
     Scaffold(
@@ -102,72 +108,66 @@ fun ScreenPackageTracking(
             Spacer(modifier = Modifier.height(20.dp))
 
             // --- Search Bar with Search Icon ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(4.dp , RoundedCornerShape(12.dp))
-                    .background(Color.White , RoundedCornerShape(12.dp))
-                    .padding(horizontal = 16.dp , vertical = 12.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search) ,
-                        contentDescription = "Search" ,
-                        tint = Color.Gray ,
-                        modifier = Modifier.size(20.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    BasicTextField(
-                        value = searchText ,
-                        onValueChange = {
-                            searchText = it
-                            val idText = searchText.text.filter { char -> char.isDigit() }
-                            viewModel.searchPackageInMapByNId(
-                                id = idText
-                            )
-                        } ,
-                        textStyle = TextStyle(fontSize = 16.sp) ,
-                        decorationBox = { innerTextField ->
-                            if (searchText.text.isEmpty()) {
-                                Text(
-                                    "Search package phone number" ,
-                                    color = Color.Gray ,
-                                    fontSize = 16.sp
-                                )
-                            }
-                            innerTextField()
-                        } ,
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            SearchBox(
+                onChange = {
+                    searchText = it
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             // --- Packages List ---
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-                if ( filteredList.value.isEmpty()){
-                    item {
+            when (val uiState = packageUiState.value) {
+                is PackageUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SPLoading()
+                    }
+                }
+                is PackageUiState.Success -> {
+                    val filteredList = uiState.data
+                    if (filteredList.isEmpty()) {
                         Text(
                             text = "No packages found.",
-                            fontWeight = FontWeight.Bold ,
-                            fontSize = 18.sp ,
-                            color = Color.Black
+                            fontSize = 16.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
-                    }
-                } else {
-                    items(filteredList.value) { item ->
-                        PackageCard(
-                            item = item,
-                            onNavigateTo = {
-                                onNavigateTo(item.id.toString())
+                    } else {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                            if ( filteredList.isEmpty()){
+                                item {
+                                    Text(
+                                        text = "No packages found.",
+                                        fontWeight = FontWeight.Bold ,
+                                        fontSize = 18.sp ,
+                                        color = Color.Black
+                                    )
+                                }
+                            } else {
+                                items(filteredList) { item ->
+                                    PackageCard(
+                                        item = item,
+                                        onNavigateTo = {
+                                            onNavigateTo(item.id.toString())
+                                        }
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
                             }
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
+                }
+                is PackageUiState.Error -> {
+                    Text(
+                        text = uiState.message,
+                        fontSize = 16.sp,
+                        color = Color.Red,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
             }
         }

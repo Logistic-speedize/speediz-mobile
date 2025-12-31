@@ -15,6 +15,8 @@ import javax.inject.Inject
 class PackageTrackingViewModel @Inject constructor(
     val repository : PackageRepository
 ): ViewModel() {
+    private val _packageUiState = MutableStateFlow<PackageUiState>(PackageUiState.Loading)
+    val packageUiState = _packageUiState.asStateFlow()
     private val _packageList = MutableStateFlow<List<PackageResponse.DataPackage.PackageItem>>(emptyList())
     private val packageList = _packageList.asStateFlow()
 
@@ -25,34 +27,13 @@ class PackageTrackingViewModel @Inject constructor(
 
     private val _packageFilter = MutableStateFlow<List<PackageResponse.DataPackage.PackageItem>>(emptyList())
     val packageFilter = _packageFilter.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading
     init {
 
         fetchPackageList()
         packageFilter
 
     }
-
-//    fun fetchPackageList() {
-//        _isLoading.value = true
-//        viewModelScope.launch {
-//            try {
-//                val response = repository.packageList()
-//                Log.d("PackageTrackingViewModel" , "Fetched packages: ${response.data.packages}")
-//                _packageList.value = response.data.packages
-//                _packageFilter.value = response.data.packages
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            } finally {
-//                _isLoading.value = false
-//            }
-//        }
-//    }
-
-    fun fetchPackageList() {
-        _isLoading.value = true
+    fun fetchPackageList(searchQuery: String? = null) {
         viewModelScope.launch {
             try {
                 val allPackages = mutableListOf<PackageResponse.DataPackage.PackageItem>()
@@ -66,32 +47,29 @@ class PackageTrackingViewModel @Inject constructor(
                     hasMore = page <= response.data.lastPage
                     page++
                 }
-
-                Log.d("PackageTrackingViewModel", "Fetched packages: $allPackages")
-                _packageList.value = allPackages.sortedByDescending(PackageResponse.DataPackage.PackageItem::id)
-                _packageFilter.value = allPackages.sortedByDescending(PackageResponse.DataPackage.PackageItem::id)
-
+                val sortedList = allPackages.sortedByDescending(PackageResponse.DataPackage.PackageItem::id)
+                Log.d( "PackageTrackingVM" , "Fetched Packages: $sortedList" )
+                _packageList.value = sortedList
+                _packageFilter.value = sortedList
+                val filteredList = sortedList.filter { item ->
+                    val matchQuery = searchQuery?.let {
+                        item.id.toString().contains(it, ignoreCase = true) ||
+                        item.packageNumber.contains(it, ignoreCase = true)
+                    } ?: true
+                    matchQuery
+                }
+                _packageFilter.value = filteredList
+                if (filteredList.isEmpty()){
+                    _packageUiState.value = PackageUiState.Success(emptyList())
+                } else {
+                    _packageUiState.value = PackageUiState.Success(filteredList)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-            } finally {
-                _isLoading.value = false
             }
         }
     }
-
-//    fun fetchPackageListInMap(){
-//        _isLoading.value = true
-//        viewModelScope.launch {
-//
-//            val response = repository.packageList()
-//            val packageList = response.data.packages.filter { it.status == "in_transit" }
-//            _packageInMap.value = packageList
-//            _packageFilterInMap.value = packageList
-//        }
-//        _isLoading.value = false
-//    }
-fun fetchPackageListInMap() {
-    _isLoading.value = true
+fun fetchPackageListInMap(searchQuery: String ?= null) {
     viewModelScope.launch {
         try {
             val allPackages = mutableListOf<PackageResponse.DataPackage.PackageItem>()
@@ -109,38 +87,47 @@ fun fetchPackageListInMap() {
 
             // Filter packages that are in transit
             val inTransitPackages = allPackages.filter { it.status == "in_transit" }
+            if (searchQuery != null && searchQuery.isNotEmpty()) {
+                val filteredList = inTransitPackages.filter {
+                    it.id.toString().contains(searchQuery, ignoreCase = true)
+                }
+                _packageInMap.value = filteredList
+                _packageFilterInMap.value = filteredList
+                if (filteredList.isEmpty()) {
+                    _packageUiState.value = PackageUiState.Success(emptyList())
+                } else {
+                    _packageUiState.value = PackageUiState.Success(filteredList)
+                }
+                return@launch
+            }
 
             _packageInMap.value = inTransitPackages
             _packageFilterInMap.value = inTransitPackages
 
-            Log.d("PackageTrackingViewModel", "Fetched in-transit packages: $inTransitPackages")
-
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            _isLoading.value = false
         }
     }
 }
 
 
-    fun searchPackageInMapByNId(id: String) {
-        val filteredList = if (id.isEmpty()) {
-            packageInMap.value
-        } else {
-            packageInMap.value.filter { it.packageNumber.contains(id, ignoreCase = true) }
-        }
-        _packageFilterInMap.value = filteredList
-            .sortedByDescending(
-            { it.id }
-        )
-    }
-    fun searchPackageById(searchId: String) {
-        val filteredList = if (searchId.isEmpty()) {
-            packageList.value
-        } else {
-             packageList.value.filter { it.id.toString().contains(searchId, ignoreCase = true) }
-        }
-        _packageFilter.value = filteredList.sortedByDescending { it.id  }
-    }
+//    fun searchPackageInMapByNId(id: String) {
+//        val filteredList = if (id.isEmpty()) {
+//            packageInMap.value
+//        } else {
+//            packageInMap.value.filter { it.packageNumber.contains(id, ignoreCase = true) }
+//        }
+//        _packageFilterInMap.value = filteredList
+//            .sortedByDescending(
+//            { it.id }
+//        )
+//    }
+//    fun searchPackageById(searchId: String) {
+//        val filteredList = if (searchId.isEmpty()) {
+//            packageList.value
+//        } else {
+//             packageList.value.filter { it.id.toString().contains(searchId, ignoreCase = true) }
+//        }
+//        _packageFilter.value = filteredList.sortedByDescending { it.id  }
+//    }
 }

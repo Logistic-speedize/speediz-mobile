@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.speediz.R
 import com.example.speediz.core.data.delivery.ExpressResponse
+import com.example.speediz.ui.feature.authorized.delivery.invoice.SearchBox
 import com.example.speediz.ui.theme.SPColor
 
 @Composable
@@ -34,7 +35,7 @@ fun ScreenExpress(
 ) {
     val viewModel = hiltViewModel<ExpressViewModel>()
     val filteredList= viewModel.expressFilter.collectAsState()
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    var searchText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchExpressData()
@@ -80,46 +81,13 @@ fun ScreenExpress(
             Spacer(modifier = Modifier.height(20.dp))
 
             // --- Search Bar with Search Icon ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(4.dp , RoundedCornerShape(12.dp))
-                    .background(Color.White , RoundedCornerShape(12.dp))
-                    .padding(horizontal = 16.dp , vertical = 12.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search) ,
-                        contentDescription = "Search" ,
-                        tint = Color.Gray ,
-                        modifier = Modifier.size(20.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    BasicTextField(
-                        value = searchText ,
-                        onValueChange = {
-                            searchText = it
-                            val idText = searchText.text.filter { char -> char.isDigit() }
-                            viewModel.searchExpressById(idText)
-                        } ,
-                        textStyle = TextStyle(fontSize = 16.sp) ,
-                        decorationBox = { innerTextField ->
-                            if (searchText.text.isEmpty()) {
-                                Text(
-                                    "Search package phone number" ,
-                                    color = Color.Gray ,
-                                    fontSize = 16.sp
-                                )
-                            }
-                            innerTextField()
-                        } ,
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            SearchBox(
+                onChange = {
+                    searchText = it
+                    val idText = searchText.filter { char -> char.isDigit() }
+                    viewModel.searchExpressById(idText)
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(28.dp))
 
