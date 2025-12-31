@@ -34,11 +34,14 @@ fun ScreenExpress(
     onBack: () -> Unit
 ) {
     val viewModel = hiltViewModel<ExpressViewModel>()
-    val filteredList= viewModel.expressFilter.collectAsState()
+    val expressUiState by viewModel.uiState.collectAsState()
     var searchText by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.fetchExpressData()
+    }
+    LaunchedEffect(searchText) {
+        viewModel.fetchExpressData(searchText.filter { it.isDigit() })
     }
 
     Scaffold(
@@ -85,41 +88,67 @@ fun ScreenExpress(
                 onChange = {
                     searchText = it
                     val idText = searchText.filter { char -> char.isDigit() }
-                    viewModel.searchExpressById(idText)
                 }
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // --- Packages List ---
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-                if ( filteredList.value.isEmpty()){
-                    item {
-                        Text(
-                            text = "No packages found.",
-                            fontWeight = FontWeight.Bold ,
-                            fontSize = 18.sp ,
-                            color = Color.Black,
-                            modifier = Modifier.fillMaxSize().align(alignment = Alignment.CenterHorizontally),
-                            textAlign = TextAlign.Center
+            when ( val state = expressUiState ) {
+                is ExpressUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = SPColor.primary
                         )
                     }
-                } else {
-                    filteredList.value.forEach { ( date, items) ->
-                        item {
-                            Text(
-                                text = date,
-                                fontWeight = FontWeight.Bold ,
-                                fontSize = 18.sp ,
-                                color = Color.Black
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
+                }
+                is ExpressUiState.Success -> {
+                    val filteredList = state.data
+                    // --- Packages List ---
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                        if ( filteredList.isEmpty()){
+                            item {
+                                Text(
+                                    text = "No packages found.",
+                                    fontWeight = FontWeight.Bold ,
+                                    fontSize = 18.sp ,
+                                    color = Color.Black,
+                                    modifier = Modifier.fillMaxSize().align(alignment = Alignment.CenterHorizontally),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else {
+                            filteredList.forEach { ( date, items) ->
+                                item {
+                                    Text(
+                                        text = date,
+                                        fontWeight = FontWeight.Bold ,
+                                        fontSize = 18.sp ,
+                                        color = Color.Black
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
+                                items(items) { item ->
+                                    ExpressCard(item = item, onNavigateTo = {
+                                        onNavigateTo(item.id.toString())
+                                    })
+                                }
+                            }
                         }
-                        items(items) { item ->
-                            ExpressCard(item = item, onNavigateTo = {
-                                onNavigateTo(item.id.toString())
-                            })
-                        }
+                    }
+                }
+                is ExpressUiState.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = state.message,
+                            fontSize = 16.sp,
+                            color = Color.Red
+                        )
                     }
                 }
             }
