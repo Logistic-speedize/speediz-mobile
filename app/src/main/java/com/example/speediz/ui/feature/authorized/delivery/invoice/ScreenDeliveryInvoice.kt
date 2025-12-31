@@ -51,6 +51,7 @@ import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.speediz.core.data.delivery.InvoiceResponse
+import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 import com.example.speediz.ui.utils.dateFormat
 
@@ -139,12 +140,7 @@ fun ScreenDeliveryInvoice(
             Spacer(Modifier.height(16.dp))
             when (val state = responseUiState.value) {
                 is DeliveryInvoiceUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "Loading...", color = Color.Gray)
-                    }
+                    SPLoading()
                 }
                 is DeliveryInvoiceUiState.Success -> {
                     if (state.invoiceUiState.isEmpty()) {
