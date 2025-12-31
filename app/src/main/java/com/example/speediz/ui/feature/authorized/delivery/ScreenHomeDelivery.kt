@@ -1,7 +1,5 @@
 package com.example.speediz.ui.feature.authorized.delivery
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,9 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,10 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,17 +31,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.speediz.R
 import com.example.speediz.core.data.delivery.ExpressResponse
-import com.example.speediz.core.data.vendor.PackageResponse
 import com.example.speediz.ui.feature.appwide.button.SPLoading
 import com.example.speediz.ui.feature.authorized.delivery.account.AccountVM
 import com.example.speediz.ui.feature.authorized.delivery.account.DeliveryProfileState
+import com.example.speediz.ui.feature.authorized.delivery.express.ExpressUiState
 import com.example.speediz.ui.feature.authorized.delivery.express.ExpressViewModel
-import com.example.speediz.ui.feature.authorized.vendor.packageTracking.PackageTrackingViewModel
 import com.example.speediz.ui.navigation.AuthorizedRoute
 import com.example.speediz.ui.theme.SPColor
 import com.example.speediz.ui.theme.SpeedizTheme
 import com.example.speediz.ui.theme.spacing
-import com.example.speediz.ui.utils.dateFormat
 
 @Composable
 fun ScreenHomeDelivery(
@@ -60,7 +50,7 @@ fun ScreenHomeDelivery(
     val profileState = profileVM.profileUIState.collectAsState()
 
     val packageVM = hiltViewModel<ExpressViewModel>()
-    val packageState = packageVM.expressFilter.collectAsState()
+    val packageState = packageVM.uiState.collectAsState()
 
     LaunchedEffect(profileState) {
         profileVM.fetchProfileData()
@@ -254,113 +244,53 @@ fun ScreenHomeDelivery(
                 }
             }
 
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Search Bar (with border)
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .clip(RoundedCornerShape(12.dp))
-//                    .border(
-//                        width = 2.dp,
-//                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-//                        shape = RoundedCornerShape(12.dp)
-//                    )
-//                    .background(MaterialTheme.colorScheme.surface)
-//                    .padding(horizontal = 16.dp, vertical = 12.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Image(
-//                    painter = painterResource(id = R.drawable.ic_search),
-//                    contentDescription = "Search",
-//                    modifier = Modifier.size(20.dp)
-//                )
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text(
-//                    text = "Enter company name",
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                    fontSize = 14.sp
-//                )
-//            }
-
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Package list header
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(
-//                    text = "Package list",
-//                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Image(
-//                        painter = painterResource(id = R.drawable.ic_instant_mix),
-//                        contentDescription = "Filter",
-//                        modifier = Modifier.size(20.dp)
-//                    )
-//                    Spacer(modifier = Modifier.width(4.dp))
-//                    Text(
-//                        text = "filters",
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        fontSize = 14.sp
-//                    )
-//                }
-//            }
-
- //           Spacer(modifier = Modifier.height(16.dp))
-            // Package list
-//            Column(
-//                verticalArrangement = Arrangement.spacedBy(16.dp)
-//            ) {
-//                packageState.value.take(4).forEach { packageInfo ->
-//                    val statusColor = when (packageInfo.status.lowercase()) {
-//                        "delivered" -> Color(0xFF4CAF50) // Green
-//                        "in transit" -> Color(0xFFFFC107) // Amber
-//                        "pending" -> Color(0xFFFF5722) // Deep Orange
-//                        else -> Color.Gray
-//                    }
-//                    PackageCardHome(
-//                        packageInfo = packageInfo,
-//                        statusColor = statusColor
-//                    )
-//                }
-//            }
-//
-//            Spacer(modifier = Modifier.height(32.dp))
-            when {
-                packageState.value.isEmpty() -> {
-                    Text(
-                        text = "No packages available.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            when (val state = packageState.value) {
+                is ExpressUiState.Loading -> {
+                    SPLoading()
                 }
-                else -> {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        packageState.value.values.take(4).forEach { packageInfo ->
-                            packageInfo.forEach { item ->
-                                val statusColor = when (item.status.lowercase()) {
-                                    "completed" -> SPColor.greenSuccess // Green
-                                    "in_transit" -> SPColor.blueInfo // Amber
-                                    "pending" -> SPColor.error // Deep Orange
-                                    else -> Color.Gray
+                is ExpressUiState.Success -> {
+                    val expressData = state.data
+                    when {
+                        expressData.isEmpty() -> {
+                            Text(
+                                text = "No packages available.",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        else -> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                expressData.values.take(4).forEach { packageInfo ->
+                                    packageInfo.forEach { item ->
+                                        val statusColor = when (item.status.lowercase()) {
+                                            "completed" -> SPColor.greenSuccess // Green
+                                            "in_transit" -> SPColor.blueInfo // Amber
+                                            "pending" -> SPColor.error // Deep Orange
+                                            else -> Color.Gray
+                                        }
+                                        PackageCardHome(
+                                            packageInfo = item,
+                                            statusColor = statusColor
+                                        )
+                                    }
                                 }
-                                PackageCardHome(
-                                    packageInfo = item,
-                                    statusColor = statusColor
-                                )
                             }
                         }
                     }
+                }
+                is ExpressUiState.Error -> {
+                    Text(
+                        text = "Error loading packages.",
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

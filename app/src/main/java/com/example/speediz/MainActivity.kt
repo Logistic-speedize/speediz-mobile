@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +39,13 @@ class MainActivity : ComponentActivity() {
             val showSplashScreen = remember { mutableStateOf(true) }
 
             val isInternet = NetworkConnectionInterceptor(applicationContext)
+            val isConnected = remember { mutableStateOf(isInternet.isConnected()) }
             val requestPermissionNotification = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                // Handle permission result if needed
+            }
+            val requestPermissionLocation = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 // Handle permission result if needed
@@ -47,6 +54,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     requestPermissionNotification.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    requestPermissionLocation.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 }
             }
             LaunchedEffect( navController, role) {
@@ -60,13 +68,26 @@ class MainActivity : ComponentActivity() {
                 kotlinx.coroutines.delay(1500)
                 showSplashScreen.value = false
             }
+            DisposableEffect(Unit) {
+                val connectivityReceiver = object : BroadcastReceiver() {
+                    override fun onReceive(context: Context?, intent: Intent?) {
+                        isConnected.value = isInternet.isConnected()
+                    }
+                }
+                val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+                registerReceiver(connectivityReceiver, filter)
 
-           SpeedizTheme {
+                onDispose {
+                    unregisterReceiver(connectivityReceiver)
+                }
+            }
+
+            SpeedizTheme {
                LightStatusBar()
                if (showSplashScreen.value) {
                    ScreenSplashScreen()
                } else {
-                  if(!isInternet.isConnected()){
+                  if(!isConnected.value){
                       ScreenNoInternet()
                   } else {
                       AppNavigation(
