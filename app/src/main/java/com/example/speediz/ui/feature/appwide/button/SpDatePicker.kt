@@ -1,6 +1,7 @@
 // Kotlin
 package com.example.speediz.ui.feature.appwide.button
 
+import android.widget.DatePicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ fun SpDatePickerInput(
     placeholderText: String = "",
     formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
     onValueChange: (String) -> Unit = {},
+    supportingText: @Composable (() -> Unit)? = null,
 ) {
     var dateText by remember { mutableStateOf("") }
     var showSheet by remember { mutableStateOf(false) }
@@ -57,7 +59,8 @@ fun SpDatePickerInput(
                 imageVector = androidx.compose.material.icons.Icons.Default.DateRange ,
                 contentDescription = "Select Date"
             )
-        }
+        },
+        supportingText = supportingText
     )
 
     // Only show the bottom sheet if showSheet == true

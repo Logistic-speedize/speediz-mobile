@@ -50,7 +50,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -58,10 +57,9 @@ import com.example.speediz.R
 import com.example.speediz.core.data.vendor.SignUpVendorRequest
 import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
-import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.utils.dateFormat
-import java.util.Locale.getDefault
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenVendorSignUp(
@@ -74,42 +72,21 @@ fun ScreenVendorSignUp(
     var expandedGender by remember { mutableStateOf(false) }
     val signUpViewModel = hiltViewModel<VendorSignUpVM>()
     val signUpState = signUpViewModel.signUpUiState.collectAsState().value
-    val firstName = remember {
-        mutableStateOf("")
-    }
-    val lastName = remember {
-        mutableStateOf("")
-    }
-    val gender = remember {
-        mutableStateOf("")
-    }
-    val dob = remember {
-        mutableStateOf("")
-    }
-    val phone = remember {
-        mutableStateOf("")
-    }
-    val location= remember {
-        mutableStateOf("")
-    }
-    val email = remember {
-        mutableStateOf("")
-    }
-    val password= remember {
-        mutableStateOf("")
-    }
-    val confirmPassword =remember {
-        mutableStateOf("")
-    }
-    val businessName =remember {
-        mutableStateOf("")
-    }
+
+    var isFirstName by remember { mutableStateOf(false) }
+    var isLastName by remember { mutableStateOf(false) }
+    var isGender by remember { mutableStateOf(false) }
+    var isDob by remember { mutableStateOf(false) }
+    var isPhone by remember { mutableStateOf(false) }
+    var isLocation by remember { mutableStateOf(false) }
+    var isEmail by remember { mutableStateOf(false) }
+    var isPassword by remember { mutableStateOf(false) }
+    var isConfirmPassword by remember { mutableStateOf(false) }
+    var isBusinessName by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     LaunchedEffect(signUpState) {
         when (signUpState) {
-            is SignUPState.Loading -> {
-                // Show loading indicator if needed
-            }
             is SignUPState.Success -> {
                 Toast.makeText(
                     context,
@@ -117,7 +94,6 @@ fun ScreenVendorSignUp(
                     Toast.LENGTH_LONG
                 ).show()
                 onNavigateTo()
-                Log.d("Navigation", "Navigating to: ${UnauthorizedRoute.SignIn.route}")
             }
             is SignUPState.Error -> {
                 Toast.makeText(
@@ -132,22 +108,8 @@ fun ScreenVendorSignUp(
         }
     }
 
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun onSubmit (){
-        val request = SignUpVendorRequest(
-            firstName = firstName.value ,
-            lastName = lastName.value ,
-            gender =  gender.value.lowercase(getDefault()) ,
-            dob = dateFormat(dob.value) ,
-            contactNumber = phone.value ,
-            address = location.value ,
-            email = email.value ,
-            password = password.value ,
-            passwordConfirm = confirmPassword.value ,
-            businessName = businessName.value ,
-        )
-        signUpViewModel.signUpVendor(request)
+    fun validate(): Boolean {
+        return signUpViewModel.onValidateInput()
     }
 
     Scaffold(
@@ -184,18 +146,40 @@ fun ScreenVendorSignUp(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = firstName.value,
-                    onValueChange = { firstName.value = it },
+                    value = signUpViewModel.firstname,
+                    onValueChange = {
+                        if (!isFirstName) isFirstName = true
+                        signUpViewModel.onFirstnameChanged(it)
+                    },
                     label = { Text("First Name") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
+                    supportingText = {
+                        val message =  signUpViewModel.onFirstnameChanged(newFirstName = signUpViewModel.firstname)
+                        if(isFirstName){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    }
                 )
                 OutlinedTextField(
-                    value = lastName.value,
-                    onValueChange = { lastName.value = it },
+                    value = signUpViewModel.lastname,
+                    onValueChange = {
+                        if (!isLastName) isLastName = true
+                        signUpViewModel.onLastNameChanged(it)
+                    },
                     label = { Text("Last Name") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
+                    supportingText = {
+                        val message =  signUpViewModel.onLastNameChanged(newLastName = signUpViewModel.lastname)
+                        if(isLastName){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    }
                 )
             }
 
@@ -206,9 +190,10 @@ fun ScreenVendorSignUp(
                 // Gender Dropdown
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
-                        value = gender.value,
+                        value = signUpViewModel.gender,
                         onValueChange = {
-                            gender.value = it
+                           if (!isGender) isGender = true
+                            signUpViewModel.onGenderChanged(it)
                         },
                         label = { Text("Gender") },
                         trailingIcon = {
@@ -224,7 +209,13 @@ fun ScreenVendorSignUp(
                         readOnly = true,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { expandedGender = !expandedGender }
+                            .clickable { expandedGender = !expandedGender },
+                        supportingText = {
+                            val message =  signUpViewModel.onGenderChanged(newGender = signUpViewModel.gender)
+                            if(isGender){
+                                Text( text = message , color = Color.Red )
+                            }
+                        }
                     )
                     DropdownMenu(
                         expanded = expandedGender,
@@ -237,7 +228,7 @@ fun ScreenVendorSignUp(
                             DropdownMenuItem(
                                 text = { Text(option, color = Color.Black) },
                                 onClick = {
-                                    gender.value = option
+                                    signUpViewModel.gender = option
                                     expandedGender = false
                                 },
                                 modifier = Modifier.fillMaxWidth().background( color = Color.White),
@@ -250,48 +241,68 @@ fun ScreenVendorSignUp(
                 ) {
                     SpDatePickerInput(
                         onValueChange = {
-                            dob.value = it
+                            if (!isDob) isDob = true
+                            signUpViewModel.onDOBChanged(newDOB = dateFormat(it))
                         },
-                        placeholderText = "DOB"
+                        placeholderText = "DOB",
+                        supportingText = {
+                            val message =  signUpViewModel.onDOBChanged(newDOB = signUpViewModel.dob)
+                            if(isDob){
+                                Text( text = message , color = Color.Red )
+                            } else {
+                                ""
+                            }
+                        }
                     )
                 }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = businessName.value,
-                    onValueChange = { businessName.value = it },
+                    value = signUpViewModel.businessName,
+                    onValueChange = {
+                        if (!isBusinessName) isBusinessName = true
+                        signUpViewModel.onBusinessNameChanged(it)
+                    },
                     label = { Text("Business name") },
                     placeholder = { Text("Business name") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     supportingText = {
-                        Text(
-                            if ( businessName.value.isEmpty()){
-                                "Enter your business name"
-                            } else {
-                                ""
-                            },
-                            color = if ( businessName.value.isEmpty()){
-                                Color.Red
-                            } else {
-                                Color.Transparent
-                            }
-                        )
+                        val message =  signUpViewModel.onBusinessNameChanged(newBusinessName = signUpViewModel.businessName)
+                        if(isBusinessName){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
                     }
                 )
                 OutlinedTextField(
-                    value = phone.value,
-                    onValueChange = { phone.value = it },
+                    value = signUpViewModel.phoneNumber,
+                    onValueChange = {
+                        if (!isPhone) isPhone = true
+                        signUpViewModel.onContactNumberChanged(it)
+                    },
                     label = { Text("Contact") },
                     placeholder = { Text("phone number") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
+                    supportingText = {
+                        val message =  signUpViewModel.onContactNumberChanged(newContactNumber = signUpViewModel.phoneNumber)
+                        if(isPhone){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    }
                 )
             }
             OutlinedTextField(
-                value = location.value,
-                onValueChange = { location.value = it },
+                value = signUpViewModel.address,
+                onValueChange = {
+                    if (!isLocation) isLocation = true
+                    signUpViewModel.address = it
+                },
                 label = { Text("Location") },
                 placeholder = { Text("Select Location") },
                 trailingIcon = {
@@ -302,33 +313,75 @@ fun ScreenVendorSignUp(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                supportingText = {
+                    val message =  signUpViewModel.onLocationChanged(newLocation = signUpViewModel.address)
+                    if(isLocation){
+                        Text( text = message , color = Color.Red )
+                    } else {
+                        ""
+                    }
+                }
             )
             OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
+                value = signUpViewModel.email,
+                onValueChange = {
+                    if (!isEmail) isEmail = true
+                    signUpViewModel.onEmailChanged(it)
+                },
                 label = { Text("Email Address") },
                 placeholder = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                supportingText = {
+                    val message =  signUpViewModel.onEmailChanged(newEmail = signUpViewModel.email)
+                    if(isEmail){
+                        Text( text = message , color = Color.Red )
+                    } else {
+                        ""
+                    }
+                }
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = password.value,
-                    onValueChange = { password.value = it },
+                    value = signUpViewModel.password,
+                    onValueChange = {
+                        if (!isPassword) isPassword = true
+                        signUpViewModel.onPasswordChanged(it)
+                    },
                     label = { Text("Password") },
                     placeholder = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    supportingText = {
+                        val message =  signUpViewModel.onPasswordChanged(newPassword = signUpViewModel.password)
+                        if(isPassword){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    }
                 )
 
                 OutlinedTextField(
-                    value = confirmPassword.value,
-                    onValueChange = { confirmPassword.value = it },
+                    value = signUpViewModel.confirmPassword,
+                    onValueChange = {
+                        if (!isConfirmPassword) isConfirmPassword = true
+                        signUpViewModel.onConfirmPasswordChanged(it)
+                    },
                     label = { Text("Password") },
                     placeholder = { Text("Confirm Password") },
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.weight(1f),
                     singleLine = true,
+                    supportingText = {
+                        val message =  signUpViewModel.onConfirmPasswordChanged(newConfirmPassword = signUpViewModel.confirmPassword)
+                        if(isConfirmPassword){
+                            Text( text = message , color = Color.Red )
+                        } else {
+                            ""
+                        }
+                    }
                 )
             }
 
@@ -336,7 +389,20 @@ fun ScreenVendorSignUp(
 
             Button(
                 onClick ={
-                    onSubmit()
+                    val request = SignUpVendorRequest(
+                        firstName = signUpViewModel.firstname ,
+                        lastName = signUpViewModel.lastname ,
+                        dob = signUpViewModel.dob,
+                        businessName = signUpViewModel.businessName,
+                        gender = signUpViewModel.gender.lowercase(),
+                        contactNumber = signUpViewModel.phoneNumber ,
+                        address = signUpViewModel.address ,
+                        email = signUpViewModel.email ,
+                        password = signUpViewModel.password ,
+                        passwordConfirm = signUpViewModel.confirmPassword ,
+                    )
+                    Log.d("VendorSignUp", "Request: $request")
+                    signUpViewModel.signUpVendor(request)
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -344,19 +410,11 @@ fun ScreenVendorSignUp(
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(60.dp),
+                enabled = validate()
             ) {
                 Text("Continue", color = Color.White, fontSize = 18.sp)
             }
         }
     }
-}
-
-@Preview ( showBackground = true )
-@Composable
-fun ScreenVendorSignUpPreview() {
-    ScreenVendorSignUp(
-        onNavigateTo = {},
-        onBackPress = {}
-    )
 }
