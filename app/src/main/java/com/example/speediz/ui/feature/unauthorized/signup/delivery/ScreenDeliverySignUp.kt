@@ -1,10 +1,12 @@
 package com.example.speediz.ui.feature.unauthorized.signup.delivery
 
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,34 +71,35 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Locale.getDefault
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScreenDeliverySignUp(
     onNavigateTo: () -> Unit,
     onBackPress: () -> Unit,
 ) {
+    val viewModel = hiltViewModel<DeliveryVM>()
+    val signUpState = viewModel.signUpUiState.collectAsState().value
+    val context = LocalContext.current
+
     val genderOptions = listOf("Male", "Female", "Other")
     val deliveryOptions = listOf("Motorcycle", "Car", "Van", "Truck")
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var cvPath by remember { mutableStateOf<Uri?>(null) }
-    var deliveryType by remember { mutableStateOf("") }
-    var zone by remember { mutableStateOf("") }
-
+    var isFirstName by remember { mutableStateOf(false) }
+    var isLastName by remember { mutableStateOf(false) }
+    var isGender by remember { mutableStateOf(false) }
+    var isDob by remember { mutableStateOf(false) }
+    var isPhone by remember { mutableStateOf(false) }
+    var isEmail by remember { mutableStateOf(false) }
+    var isPassword by remember { mutableStateOf(false) }
+    var isConfirmPassword by remember { mutableStateOf(false) }
+    var isCvPath by remember { mutableStateOf(false) }
+    var isDeliveryType by remember { mutableStateOf(false) }
+    var isZone by remember { mutableStateOf(false) }
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var expandedGender by remember { mutableStateOf(false) }
     var expandedDelivery by remember { mutableStateOf(false) }
 
-    val viewModel = hiltViewModel<DeliveryVM>()
-    val signUpState = viewModel.signUpUiState.collectAsState().value
-    val context = LocalContext.current
     LaunchedEffect(
         signUpState
     ) {
@@ -127,20 +130,6 @@ fun ScreenDeliverySignUp(
         }
     }
 
-    fun onSubmit(){
-        viewModel.firstName.value = firstName
-        viewModel.lastName.value = lastName
-        viewModel.dob.value = dob
-        viewModel.gender.value = gender.lowercase(getDefault())
-        viewModel.contactNumber.value = phone
-        viewModel.email.value = email
-        viewModel.password.value = password
-        viewModel.passwordConfirm.value = confirmPassword
-        viewModel.zone.value = zone
-        viewModel.nidUri.value = cvPath
-        viewModel.driverType.value = deliveryType
-        viewModel.deliverySignUp()
-    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.White,
@@ -174,24 +163,46 @@ fun ScreenDeliverySignUp(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
+                    value = viewModel.firstname,
+                    onValueChange = {
+                        if (!isFirstName) isFirstName = true
+                        viewModel.onFirstnameChanged(it)
+                    },
                     label = { Text("First Name") },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Ascii
                     ),
-                    singleLine = true
+                    singleLine = true,
+                    supportingText = {
+                        val message = viewModel.onFirstnameChanged(viewModel.firstname)
+                        if (isFirstName) {
+                            Text(text = message, color = Color.Red)
+                        } else {
+                            ""
+                        }
+                    }
                 )
                 OutlinedTextField(
-                    value = lastName,
-                    onValueChange = { lastName = it },
+                    value = viewModel.lastname,
+                    onValueChange = {
+                        if (!isLastName) isLastName = true
+                        viewModel.onLastNameChanged(it)
+                    },
                     label = { Text("Last Name") },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Ascii
                     ),
-                    singleLine = true
+                    singleLine = true,
+                    supportingText = {
+                        val message = viewModel.onLastNameChanged(viewModel.lastname)
+                        if (isLastName) {
+                            Text(text = message, color = Color.Red)
+                        } else {
+                            ""
+                        }
+                    }
                 )
             }
 
@@ -200,9 +211,10 @@ fun ScreenDeliverySignUp(
             ) {
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
-                        value = gender,
+                        value = viewModel.gender,
                         onValueChange = {
-                            gender = it
+                            if (!isGender) isGender = true
+                            viewModel.onGenderChanged(it)
                         },
                         label = { Text("Gender") },
                         trailingIcon = {
@@ -218,7 +230,15 @@ fun ScreenDeliverySignUp(
                         readOnly = true,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { expandedGender = !expandedGender }
+                            .clickable { expandedGender = !expandedGender },
+                        supportingText = {
+                            if (isGender) {
+                                val message = viewModel.onGenderChanged(viewModel.gender)
+                                Text(text = message, color = Color.Red)
+                            } else {
+                                ""
+                            }
+                        }
                     )
                     DropdownMenu(
                         expanded = expandedGender,
@@ -231,7 +251,7 @@ fun ScreenDeliverySignUp(
                             DropdownMenuItem(
                                 text = { Text(option, color = Color.Black) },
                                 onClick = {
-                                    gender = option
+                                    viewModel.gender = option
                                     expandedGender = false
                                 },
                                 modifier = Modifier.fillMaxWidth().background( color = Color.White),
@@ -241,8 +261,11 @@ fun ScreenDeliverySignUp(
                 }
                 Box(modifier = Modifier.weight(1f)) {
                     CVUploadField(
-                        selectedCV = cvPath,
-                        onCVSelected = { cvPath = it }
+                        selectedCV = viewModel.nidUri,
+                        onCVSelected = {
+                            if (!isCvPath) isCvPath = true
+                            viewModel.onNidImageChanged(it)
+                        }
                     )
                 }
             }
@@ -252,28 +275,50 @@ fun ScreenDeliverySignUp(
                 ) {
                     SpDatePickerInput(
                         onValueChange = {
-                            dob = it
+                            if (!isDob) isDob = true
+                            viewModel.onDOBChanged(dateFormat(it))
                         },
                         placeholderText = "DOB",
-                        formatter = SimpleDateFormat("MM/dd/yyyy", getDefault())
+                        supportingText = {
+                            val message = viewModel.onDOBChanged(viewModel.dob)
+                            if (isDob) {
+                                Text(text = message, color = Color.Red)
+                            } else {
+                                ""
+                            }
+                        }
                     )
                 }
                 OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
+                    value = viewModel.contactNumber,
+                    onValueChange = {
+                        if (!isPhone) isPhone = true
+                        viewModel.onContactNumberChanged(it)
+                    },
                     label = { Text("Contact") },
                     placeholder = { Text("phone number") },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
                     ),
-                    singleLine = true
+                    singleLine = true,
+                    supportingText = {
+                        val message = viewModel.onContactNumberChanged(viewModel.contactNumber)
+                        if (isPhone) {
+                            Text(text = message, color = Color.Red)
+                        } else {
+                            ""
+                        }
+                    }
                 )
             }
 
             OutlinedTextField(
-                value = zone,
-                onValueChange = { zone = it },
+                value = viewModel.zone,
+                onValueChange = {
+                    if (!isZone) isZone = true
+                    viewModel.onLocationChanged(it)
+                },
                 label = { Text("Location") },
                 placeholder = { Text("Select Location") },
                 trailingIcon = {
@@ -287,9 +332,10 @@ fun ScreenDeliverySignUp(
             )
             Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
-                    value = deliveryType,
+                    value = viewModel.driverType,
                     onValueChange = {
-                        deliveryType = it
+                        if (!isDeliveryType) isDeliveryType = true
+                        viewModel.onDriverTypeChanged(it)
                     },
                     label = { Text("Driver Type") },
                     trailingIcon = {
@@ -305,7 +351,15 @@ fun ScreenDeliverySignUp(
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { expandedDelivery = !expandedDelivery }
+                        .clickable { expandedDelivery = !expandedDelivery },
+                    supportingText = {
+                        if (isDeliveryType) {
+                            val message = viewModel.onDriverTypeChanged(viewModel.driverType)
+                            Text(text = message, color = Color.Red)
+                        } else {
+                            ""
+                        }
+                    }
                 )
                 DropdownMenu(
                     expanded = expandedDelivery,
@@ -318,7 +372,7 @@ fun ScreenDeliverySignUp(
                         DropdownMenuItem(
                             text = { Text(option, color = Color.Black) },
                             onClick = {
-                                deliveryType = option
+                                viewModel.driverType = option
                                 expandedDelivery = false
                             },
                             modifier = Modifier.fillMaxWidth().background( color = Color.White),
@@ -327,39 +381,72 @@ fun ScreenDeliverySignUp(
                 }
             }
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = viewModel.email,
+                onValueChange = {
+                    if (!isEmail) isEmail = true
+                    viewModel.onEmailChanged(it)
+                },
                 label = { Text("Email Address") },
                 placeholder = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                supportingText = {
+                    val message = viewModel.onEmailChanged(viewModel.email)
+                    if (isEmail) {
+                        Text(text = message, color = Color.Red)
+                    } else {
+                        ""
+                    }
+                }
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = viewModel.password,
+                    onValueChange = {
+                        if (!isPassword) isPassword = true
+                        viewModel.onPasswordChanged(it)
+                    },
                     label = { Text("Password") },
                     placeholder = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    supportingText = {
+                        val message = viewModel.onPasswordChanged(viewModel.password)
+                        if (isPassword) {
+                            Text(text = message, color = Color.Red)
+                        } else {
+                            ""
+                        }
+                    }
                 )
 
                 OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    value = viewModel.passwordConfirm,
+                    onValueChange = {
+                        if (!isConfirmPassword) isConfirmPassword = true
+                        viewModel.onConfirmPasswordChanged(it)
+                    },
                     label = { Text("Password") },
                     placeholder = { Text("Password") },
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    supportingText = {
+                        val message = viewModel.onConfirmPasswordChanged(viewModel.passwordConfirm)
+                        if (isConfirmPassword) {
+                            Text(text = message, color = Color.Red)
+                        } else {
+                            ""
+                        }
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
-                    onSubmit()
+                    viewModel.deliverySignUp()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
@@ -367,22 +454,12 @@ fun ScreenDeliverySignUp(
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(60.dp),
+                enabled = viewModel.onValidate()
             ) {
                 Text("Continue", color = Color.White, fontSize = 18.sp)
             }
         }
-    }
-}
-
-@Preview ( showBackground = true)
-@Composable
-fun PreviewScreenDeliverySignUp() {
-    SpeedizTheme {
-        ScreenDeliverySignUp(
-            onNavigateTo = {},
-            onBackPress = {}
-        )
     }
 }
 
@@ -391,7 +468,8 @@ fun PreviewScreenDeliverySignUp() {
 @Composable
 fun CVUploadField(
     selectedCV: Uri?,
-    onCVSelected: (Uri) -> Unit
+    onCVSelected: (Uri) -> Unit,
+    supportText: @Composable (() -> Unit)? = null,
 ) {
     var showSheet by remember { mutableStateOf(false) }
 
@@ -440,7 +518,8 @@ fun CVUploadField(
             disabledLabelColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
             disabledLeadingIconColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
             disabledTrailingIconColor = androidx.tv.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) ,
-        )
+        ),
+        supportingText = supportText
     )
 
     if (showSheet) {

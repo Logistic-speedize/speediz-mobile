@@ -29,9 +29,9 @@ import com.example.speediz.ui.theme.SpeedizTheme
 
 @Composable
 fun CompactTextField(
-    value: String,
+    value: String = "",
     onValueChange: (String) -> Unit,
-    label: String,
+    label: String = "",
     modifier: Modifier = Modifier,
     height: Int = 80,
     enable: Boolean = true,

@@ -199,7 +199,7 @@ fun ScreenAccount(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     CompactTextField(
-                        value = profileData.driver.address,
+                        value = profileData.driver.address ?: "",
                         onValueChange = {},
                         label = "Address",
                         enable = enableToEdit
