@@ -62,7 +62,9 @@ interface ApiService {
         @Part("contact_number") contactNumber: RequestBody ,
         @Part("driver_type") driverType: RequestBody ,
         @Part("zone") zone: RequestBody ,
-        @Part image: MultipartBody.Part? = null
+        @Part image: MultipartBody.Part? = null,
+        @Part nid: MultipartBody.Part? = null,
+        @Part("address") address: RequestBody ,
 
     ): Response<SignUpDriverResponse>
     @GET("api/delivery/express")

@@ -42,6 +42,7 @@ class DeliveryVM @Inject constructor(
     var zone by mutableStateOf("")
     var address by mutableStateOf("")
     var nidUri by mutableStateOf<Uri?>(null) // NID image URI
+    var imageUri by mutableStateOf<Uri?>(null) // Profile image URI
 
     fun onFirstnameChanged(newFirstName: String): String {
         this.firstname = newFirstName
@@ -97,11 +98,17 @@ class DeliveryVM @Inject constructor(
         else if (!Patterns.PHONE.matcher( contactNumber).matches()) message = "Invalid contact number format"
         return message
     }
-    fun onLocationChanged(newLocation: String): String {
+    fun onZoneChanged(newLocation: String): String {
         this.zone = newLocation
-        this.address = newLocation
         var message = ""
         if (zone.isEmpty()) message = "Address is required"
+        return message
+    }
+
+    fun onAddressChanged(newAddress: String): String {
+        this.address = newAddress
+        var message = ""
+        if (address.isEmpty()) message = "Address is required"
         return message
     }
 
@@ -134,16 +141,24 @@ class DeliveryVM @Inject constructor(
         else if (passwordConfirm != password) message = "Passwords do not match"
         return message
     }
-    fun onNidImageChanged(newNidUri: Uri?): String {
-        nidUri = newNidUri
+    fun onImageChanged(newImageUri: Uri?): String {
+        this.imageUri = newImageUri
         var message = ""
-        if (nidUri == null) {
-           message = "NID image is required"
-            Log.d("DeliveryVM", "NID image URI is null")
+        if (imageUri == null) {
+           message = "Image is required"
         }
         return message
     }
 
+    fun onNidImageChanged(newNidUri: Uri?): String {
+        this.nidUri = newNidUri
+        var message = ""
+        if (nidUri == null) {
+            message = "NID image is required"
+            Log.d("DeliveryVM", "NID image URI is null")
+        }
+        return message
+    }
     fun onValidate(): Boolean {
         val firstNameError = onFirstnameChanged(firstname)
         val lastNameError = onLastNameChanged(lastname)
@@ -151,11 +166,13 @@ class DeliveryVM @Inject constructor(
         val genderError = onGenderChanged(gender )
         val contactNumberError = onContactNumberChanged(contactNumber)
         val driverTypeError = onDriverTypeChanged(driverType)
-        val locationError = onLocationChanged(zone)
+        val zoneError = onZoneChanged(zone)
         val emailError = onEmailChanged(email)
         val passwordError = onPasswordChanged(password)
         val confirmPasswordError = onConfirmPasswordChanged(passwordConfirm)
         val nidImageError = onNidImageChanged(nidUri)
+        val imageProfileError = onImageChanged(imageUri)
+        val addressError = onAddressChanged(address)
         return listOf(
             firstNameError,
             lastNameError,
@@ -163,11 +180,13 @@ class DeliveryVM @Inject constructor(
             genderError,
             contactNumberError,
             driverTypeError,
-            locationError,
+            zoneError,
             emailError,
             passwordError,
             confirmPasswordError,
-            nidImageError
+            nidImageError,
+            imageProfileError,
+            addressError
         ).all { it.isEmpty() }
     }
 
@@ -186,8 +205,9 @@ class DeliveryVM @Inject constructor(
             contactNumber = this.contactNumber,
             driverType = this.driverType,
             zone = this.zone,
-            image = this.nidUri,
-            address = this.address
+            image = this.imageUri,
+            address = this.address,
+            nid = this.nidUri
         )
         viewModelScope.launch {
             try {

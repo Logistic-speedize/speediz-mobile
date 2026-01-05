@@ -1,5 +1,6 @@
 package com.example.speediz.ui.feature.unauthorized.signup.delivery
 
+import android.R.attr.spacing
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -66,6 +67,7 @@ import com.example.speediz.ui.feature.appwide.button.SpDatePickerInput
 import com.example.speediz.ui.feature.unauthorized.signup.SignUPState
 import com.example.speediz.ui.navigation.UnauthorizedRoute
 import com.example.speediz.ui.theme.SpeedizTheme
+import com.example.speediz.ui.theme.spacing
 import com.example.speediz.ui.utils.dateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -91,9 +93,11 @@ fun ScreenDeliverySignUp(
     var isEmail by remember { mutableStateOf(false) }
     var isPassword by remember { mutableStateOf(false) }
     var isConfirmPassword by remember { mutableStateOf(false) }
-    var isCvPath by remember { mutableStateOf(false) }
+    var isNidPath by remember { mutableStateOf(false) }
     var isDeliveryType by remember { mutableStateOf(false) }
     var isZone by remember { mutableStateOf(false) }
+    var isAddress by remember { mutableStateOf(false) }
+    var isImagePath by remember { mutableStateOf(false) }
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
@@ -140,7 +144,7 @@ fun ScreenDeliverySignUp(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
@@ -207,7 +211,7 @@ fun ScreenDeliverySignUp(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+              //  verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
@@ -259,17 +263,7 @@ fun ScreenDeliverySignUp(
                         }
                     }
                 }
-                Box(modifier = Modifier.weight(1f)) {
-                    CVUploadField(
-                        selectedCV = viewModel.nidUri,
-                        onCVSelected = {
-                            if (!isCvPath) isCvPath = true
-                            viewModel.onNidImageChanged(it)
-                        }
-                    )
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -289,6 +283,48 @@ fun ScreenDeliverySignUp(
                         }
                     )
                 }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    ImageUploadField(
+                        selectedCV = viewModel.nidUri,
+                        onImageSelected = {
+                            if (!isNidPath) isNidPath = true
+                            viewModel.onNidImageChanged(it)
+                        },
+                        label = "Upload NID" ,
+                        labelAfterUpload = "Uploaded",
+                        supportText = {
+                            val message = viewModel.onNidImageChanged(viewModel.nidUri)
+                            if (isNidPath) {
+                                Text(text = message, color = Color.Red)
+                            } else {
+                                ""
+                            }
+                        }
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    ImageUploadField(
+                        selectedCV = viewModel.imageUri,
+                        onImageSelected = {
+                            if (!isImagePath) isImagePath = true
+                            viewModel.onImageChanged(it)
+                        },
+                        label = "Profile",
+                        labelAfterUpload = "Uploaded",
+                        supportText = {
+                            val message = viewModel.onImageChanged(viewModel.imageUri)
+                            if (isImagePath) {
+                                Text(text = message, color = Color.Red)
+                            } else {
+                                ""
+                            }
+                        }
+                    )
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = viewModel.contactNumber,
                     onValueChange = {
@@ -311,75 +347,89 @@ fun ScreenDeliverySignUp(
                         }
                     }
                 )
-            }
-
-            OutlinedTextField(
-                value = viewModel.zone,
-                onValueChange = {
-                    if (!isZone) isZone = true
-                    viewModel.onLocationChanged(it)
-                },
-                label = { Text("Location") },
-                placeholder = { Text("Select Location") },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            Box(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = viewModel.driverType,
-                    onValueChange = {
-                        if (!isDeliveryType) isDeliveryType = true
-                        viewModel.onDriverTypeChanged(it)
-                    },
-                    label = { Text("Driver Type") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = if (expandedDelivery)
-                                Icons.Default.KeyboardArrowUp
-                            else
-                                Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            modifier = Modifier.clickable { expandedDelivery = !expandedDelivery }
-                        )
-                    },
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expandedDelivery = !expandedDelivery },
-                    supportingText = {
-                        if (isDeliveryType) {
-                            val message = viewModel.onDriverTypeChanged(viewModel.driverType)
-                            Text(text = message, color = Color.Red)
-                        } else {
-                            ""
+                Box(modifier = Modifier.weight(1f)) {
+                    OutlinedTextField(
+                        value = viewModel.driverType,
+                        onValueChange = {
+                            if (!isDeliveryType) isDeliveryType = true
+                            viewModel.onDriverTypeChanged(it)
+                        },
+                        label = { Text("Driver Type") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = if (expandedDelivery)
+                                    Icons.Default.KeyboardArrowUp
+                                else
+                                    Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                modifier = Modifier.clickable { expandedDelivery = !expandedDelivery }
+                            )
+                        },
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedDelivery = !expandedDelivery },
+                        supportingText = {
+                            if (isDeliveryType) {
+                                val message = viewModel.onDriverTypeChanged(viewModel.driverType)
+                                Text(text = message, color = Color.Red)
+                            } else {
+                                ""
+                            }
                         }
-                    }
-                )
-                DropdownMenu(
-                    expanded = expandedDelivery,
-                    onDismissRequest = { expandedDelivery = false },
-                    modifier = Modifier
-                        .focusable()
-                        .background( color = Color.White)
-                ) {
-                    deliveryOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, color = Color.Black) },
-                            onClick = {
-                                viewModel.driverType = option
-                                expandedDelivery = false
-                            },
-                            modifier = Modifier.fillMaxWidth().background( color = Color.White),
-                        )
+                    )
+                    DropdownMenu(
+                        expanded = expandedDelivery,
+                        onDismissRequest = { expandedDelivery = false },
+                        modifier = Modifier
+                            .focusable()
+                            .background( color = Color.White)
+                    ) {
+                        deliveryOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option, color = Color.Black) },
+                                onClick = {
+                                    viewModel.driverType = option
+                                    expandedDelivery = false
+                                },
+                                modifier = Modifier.fillMaxWidth().background( color = Color.White),
+                            )
+                        }
                     }
                 }
             }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = viewModel.zone,
+                    onValueChange = {
+                        if (!isZone) isZone = true
+                        viewModel.onZoneChanged(it)
+                    },
+                    label = { Text("Zone") },
+                    placeholder = { Text("Bouerng Salang") },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = viewModel.address,
+                    onValueChange = {
+                        if (!isAddress) isAddress = true
+                        viewModel.onAddressChanged(it)
+                    },
+                    label = { Text("Address") },
+                    placeholder = { Text("Bouerng Salang, Phnom Penh") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true
+                )
+            }
+
             OutlinedTextField(
                 value = viewModel.email,
                 onValueChange = {
@@ -387,7 +437,7 @@ fun ScreenDeliverySignUp(
                     viewModel.onEmailChanged(it)
                 },
                 label = { Text("Email Address") },
-                placeholder = { Text("Email") },
+                placeholder = { Text("example@gmail.com") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 supportingText = {
@@ -428,8 +478,8 @@ fun ScreenDeliverySignUp(
                         if (!isConfirmPassword) isConfirmPassword = true
                         viewModel.onConfirmPasswordChanged(it)
                     },
-                    label = { Text("Password") },
-                    placeholder = { Text("Password") },
+                    label = { Text("Confirm Password") },
+                    placeholder = { Text("Confirm Password") },
                     visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.weight(1f),
                     singleLine = true,
@@ -466,10 +516,12 @@ fun ScreenDeliverySignUp(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CVUploadField(
+fun ImageUploadField(
     selectedCV: Uri?,
-    onCVSelected: (Uri) -> Unit,
+    onImageSelected: (Uri) -> Unit,
     supportText: @Composable (() -> Unit)? = null,
+    label: String = "Upload CV",
+    labelAfterUpload: String = "Uploaded CV",
 ) {
     var showSheet by remember { mutableStateOf(false) }
 
@@ -478,8 +530,7 @@ fun CVUploadField(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
-            onCVSelected(it) // store URI as String
-            Log.d("CVUploadField" , "Selected CV URI: ${uri}")
+            onImageSelected(it) // store URI as String
             showSheet = false
         }
     }
@@ -488,9 +539,13 @@ fun CVUploadField(
         onValueChange = {} ,
         label = {
            if ( selectedCV == null ) {
-               Text("Upload NID")
+               Text(
+                     text = label
+               )
            } else {
-               Text("Uploaded CV")
+               Text(
+                     text = labelAfterUpload
+               )
            }
        } ,
         trailingIcon = {

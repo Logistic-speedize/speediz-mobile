@@ -38,7 +38,9 @@ class SignUpRepositoryImpl @Inject constructor(
                 signUpDeliveryRequest.contactNumber.toRequestBody(MultipartBody.FORM),
                 signUpDeliveryRequest.driverType.toRequestBody(MultipartBody.FORM),
                 signUpDeliveryRequest.zone.toRequestBody(MultipartBody.FORM),
-                createMultipartFromUri("image" , signUpDeliveryRequest.image)
+                createMultipartFromUri("image" , signUpDeliveryRequest.image),
+                createMultipartFromUri("nid" , signUpDeliveryRequest.nid),
+                signUpDeliveryRequest.address.toRequestBody(MultipartBody.FORM),
             )
         }
     }

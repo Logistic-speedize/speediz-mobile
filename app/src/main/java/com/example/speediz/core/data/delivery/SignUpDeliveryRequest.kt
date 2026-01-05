@@ -28,8 +28,8 @@ data class SignUpDeliveryRequest(
     val zone: String,
     @SerialName("image")
     val image: Uri?= null,
-    @SerialName("cv")
-    val cv: Uri?= null,
+    @SerialName("nid")
+    val nid: Uri?= null,
     @SerialName("address")
     val address: String,
 )
