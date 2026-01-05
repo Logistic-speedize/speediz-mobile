@@ -47,19 +47,21 @@ class HistoryVM @Inject constructor(
 
     // Filter by status and/or date
     fun filterPackageHistory(status: String? = null, date: String? = null) {
-        val filteredList = allHistoryItems.filter { item ->
-            val matchStatus = status?.let { it.equals(item.status, ignoreCase = true) } ?: true
-            val matchDate = date?.let { item.shipmentInfo.date.startsWith(it.take(10)) } ?: true
-            matchStatus && matchDate
-        }
+       viewModelScope.launch {
+           val filteredList = allHistoryItems.filter { item ->
+               val matchStatus = status?.let { it.equals(item.status, ignoreCase = true) } ?: true
+               val matchDate = date?.let { item.shipmentInfo.date.startsWith(it.take(10)) } ?: true
+               matchStatus && matchDate
+           }
 
-        _uiState.value = if (filteredList.isEmpty()) {
-            HistoryState.Empty
-        } else {
-            HistoryState.Success(
-                allItems = allHistoryItems,
-                filteredItems = filteredList
-            )
-        }
+           _uiState.value = if (filteredList.isEmpty()) {
+               HistoryState.Empty
+           } else {
+               HistoryState.Success(
+                   allItems = allHistoryItems,
+                   filteredItems = filteredList
+               )
+           }
+       }
     }
 }

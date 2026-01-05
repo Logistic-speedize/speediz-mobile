@@ -110,24 +110,4 @@ fun fetchPackageListInMap(searchQuery: String ?= null) {
     }
 }
 
-
-//    fun searchPackageInMapByNId(id: String) {
-//        val filteredList = if (id.isEmpty()) {
-//            packageInMap.value
-//        } else {
-//            packageInMap.value.filter { it.packageNumber.contains(id, ignoreCase = true) }
-//        }
-//        _packageFilterInMap.value = filteredList
-//            .sortedByDescending(
-//            { it.id }
-//        )
-//    }
-//    fun searchPackageById(searchId: String) {
-//        val filteredList = if (searchId.isEmpty()) {
-//            packageList.value
-//        } else {
-//             packageList.value.filter { it.id.toString().contains(searchId, ignoreCase = true) }
-//        }
-//        _packageFilter.value = filteredList.sortedByDescending { it.id  }
-//    }
 }

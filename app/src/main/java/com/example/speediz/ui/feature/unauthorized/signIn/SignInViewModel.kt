@@ -55,7 +55,6 @@ class SignInViewModel @Inject constructor(
         else null
         if(emailError != null || passwordError != null) {
             _signInState.value = SignInState.ValidationError(emailError, passwordError)
-            Log.e("TAG", "valideteInput: ${_signInState.value}")
         }else{
             _signInState.value = SignInState.Idle
         }
@@ -69,6 +68,7 @@ class SignInViewModel @Inject constructor(
             null
         }
     }
+
     fun signIn( signInRequest : SignInRequest ) {
         validateInput()
         if ( _signInState.value is SignInState.ValidationError) return
@@ -81,22 +81,17 @@ class SignInViewModel @Inject constructor(
                     password = password,
                     deviceToken = fcmToken ?: ""
                )
-                Log.d( "TAG", "signIn: Login ${request}" )
                 val response = repository.userSignIn(request)
-
                 val success = response.data?.accessToken?:""
-                Log.d("TAG", "Sign in successful. Token: ${response.data?.accessToken}")
                 if (success.isNotEmpty()) {
                     _signInState.value = SignInState.Success(response.data?.accessToken.toString())
                     _isLoggedIn.value = true
                     sharePreferences.saveToken(response.data?.accessToken.toString(), response.data?.user?.role.toString())
                     _role.value = response.data?.user?.role ?: 3
-                    Log.d( "TAG", "signIn: role ${response.data?.user?.role}" )
                 } else {
                     _signInState.value = SignInState.Error("Invalid response from server")
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "Sign in failed: ${e.message}")
                 _signInState.value = SignInState.Error(e.message ?: "An unknown error occurred")
             }
         }

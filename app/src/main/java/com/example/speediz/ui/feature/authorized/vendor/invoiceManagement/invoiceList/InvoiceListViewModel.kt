@@ -21,9 +21,8 @@ enum class PaymentFilter { ALL, PAID, UNPAID }
 class InvoiceListViewModel @Inject constructor(
     private val api: VendorInvoiceRepository
 ): ViewModel() {
-    private val _isInvoiceList = MutableStateFlow<List<InvoiceResponse.Data.VendorInvoices.InvoiceItems>>(emptyList())
-    val isInvoiceList : StateFlow<List<InvoiceResponse.Data.VendorInvoices.InvoiceItems>> = _isInvoiceList.asStateFlow()
-
+    private val _isInvoiceList = MutableStateFlow<InvoiceUiState>(InvoiceUiState.Loading)
+    val isInvoiceUiState : StateFlow<InvoiceUiState> = _isInvoiceList.asStateFlow()
     private val _isQueryAllInvoice = MutableStateFlow("")
     val isQueryAllInvoice : StateFlow<String> = _isQueryAllInvoice.asStateFlow()
 
@@ -31,58 +30,53 @@ class InvoiceListViewModel @Inject constructor(
     val isQueryPaidInvoice : StateFlow<String> = _isQueryPaidInvoice.asStateFlow()
     private val _isQueryUnpaidInvoice = MutableStateFlow("")
     val isQueryUnpaidInvoice : StateFlow<String> = _isQueryUnpaidInvoice.asStateFlow()
-    fun fetchInvoiceList(){
+
+    // kotlin
+    fun fetchAndFilterInvoices(
+        searchId: String = "",
+        filter: PaymentFilter = PaymentFilter.ALL,
+    ) {
         viewModelScope.launch {
             try {
                 val response = api.invoiceVendor()
-                _isInvoiceList.value = response.data.vendorInvoices.invoiceItem ?: emptyList()
-                Log.d("InvoiceListViewModel" , "Fetched invoice data: ${_isInvoiceList.value} items" )
+                val fullList = response.data.vendorInvoices.invoiceItem ?: emptyList()
+
+                // store the search query for the active tab
+                when (filter) {
+                    PaymentFilter.ALL -> _isQueryAllInvoice.value = searchId
+                    PaymentFilter.PAID -> _isQueryPaidInvoice.value = searchId
+                    PaymentFilter.UNPAID -> _isQueryUnpaidInvoice.value = searchId
+                }
+
+                // 1) Filter by Payment Status
+                val byPayment = when (filter) {
+                    PaymentFilter.ALL -> fullList
+                    PaymentFilter.PAID -> fullList.filter {
+                        it.status.equals(SpeedizPaidStatus.Paid.status, ignoreCase = true)
+                    }
+                    PaymentFilter.UNPAID -> fullList.filter {
+                        it.status.equals(SpeedizPaidStatus.Unpaid.status, ignoreCase = true)
+                    }
+                }
+
+                // 2) pick saved search query for the tab and trim
+                val searchQuery = when (filter) {
+                    PaymentFilter.ALL -> _isQueryAllInvoice.value
+                    PaymentFilter.PAID -> _isQueryPaidInvoice.value
+                    PaymentFilter.UNPAID -> _isQueryUnpaidInvoice.value
+                }.trim()
+
+                // 3) Filter by invoiceNumber
+                val filtered = if (searchQuery.isEmpty()) {
+                    byPayment
+                } else {
+                    byPayment.filter { invoice ->
+                        (invoice.invoiceNumber ?: "").contains(searchQuery, ignoreCase = true)
+                    }
+                }
+                _isInvoiceList.value = InvoiceUiState.Success(filtered)
             } catch (e: Exception) {
-                Log.d("InvoiceListViewModel" , "Error fetching invoice data: ${e.message}" )
-            }
-        }
-    }
-    fun searchInvoiceById(searchId: String, filter: PaymentFilter) {
-        when (filter) {
-            PaymentFilter.ALL -> {
-                _isQueryAllInvoice.value = searchId
-            }
-            PaymentFilter.PAID -> {
-                _isQueryPaidInvoice.value = searchId
-            }
-            PaymentFilter.UNPAID -> {
-                _isQueryUnpaidInvoice.value = searchId
-            }
-        }
-    }
-
-    fun getFilteredInvoices(filter: PaymentFilter): List<InvoiceResponse.Data.VendorInvoices.InvoiceItems> {
-        val allInvoices = _isInvoiceList.value
-
-        // 1️⃣ Filter by Payment Status
-        val byPayment = when (filter) {
-            PaymentFilter.ALL -> allInvoices
-            PaymentFilter.PAID -> allInvoices.filter {
-                it.status.equals(SpeedizPaidStatus.Paid.status, ignoreCase = true)
-            }
-            PaymentFilter.UNPAID -> allInvoices.filter {
-                it.status.equals(SpeedizPaidStatus.Unpaid.status, ignoreCase = true)
-            }
-        }
-
-        // 2️⃣ Pick the correct searchQuery for the tab
-        val searchQuery = when (filter) {
-            PaymentFilter.ALL -> _isQueryAllInvoice.value
-            PaymentFilter.PAID -> _isQueryPaidInvoice.value
-            PaymentFilter.UNPAID -> _isQueryUnpaidInvoice.value
-        }.trim()
-
-        // 3️⃣ Filter by Invoice ID
-        return if (searchQuery.isEmpty()) {
-            byPayment
-        } else {
-            byPayment.filter { invoice ->
-                (invoice.invoiceNumber ?: "").contains(searchQuery, ignoreCase = true)
+                Log.d("InvoiceListVM", "Error fetching invoices: ${e.message}")
             }
         }
     }

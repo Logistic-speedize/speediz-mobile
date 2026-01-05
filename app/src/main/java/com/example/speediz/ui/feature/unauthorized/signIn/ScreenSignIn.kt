@@ -106,6 +106,8 @@ fun ScreenSignIn(
                             ""
                         }
                     },
+                    singleLine = true,
+                    maxLines = 1
                 )
                 Spacer( modifier = Modifier.padding(8.dp))
                 OutlinedTextField(
@@ -124,7 +126,9 @@ fun ScreenSignIn(
                         } else {
                             ""
                         }
-                    }
+                    },
+                    singleLine = true,
+                    maxLines = 1
                 )
                 Spacer( modifier = Modifier.padding(8.dp))
                 Text(

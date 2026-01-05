@@ -128,7 +128,8 @@ fun ScreenPackage(
             SearchBox(
                 onChange = {
                     searchText = it
-                }
+                },
+                placeHolder = "Search by id"
             )
 
             Spacer(modifier = Modifier.height(28.dp))

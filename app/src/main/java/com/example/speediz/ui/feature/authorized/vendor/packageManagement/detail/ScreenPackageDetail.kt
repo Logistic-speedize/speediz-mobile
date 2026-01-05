@@ -48,7 +48,7 @@ fun ScreenPackageDetail(
                 title = {
                     androidx.compose.material3.Text(
                         text = "Package Detail",
-                        style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {

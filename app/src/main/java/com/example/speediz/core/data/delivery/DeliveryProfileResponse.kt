@@ -12,7 +12,7 @@ data class DeliveryProfileResponse(
         data class  User(
             val id: Int ,
             val role: Int = 4,
-            val email: String,
+            val email: String = "",
             @SerializedName("account_status")
             val accountStatus: String = "",
         )
@@ -24,22 +24,20 @@ data class DeliveryProfileResponse(
             val lastName: String = "",
             @SerializedName("driver_type")
             val driverType: String = "",
-            @SerializedName("driver_description")
-            val driverDescription: String = "",
             @SerializedName("dob")
             val dob: String,
             @SerializedName("gender")
-            val gender: String,
+            val gender: String = "",
             @SerializedName("zone")
-            val zone: String,
+            val zone: String = "",
             @SerializedName("contact_number")
-            val contactNumber: String,
+            val contactNumber: String = "",
             @SerializedName("telegram_contact")
-            val telegramContact: String,
+            val telegramContact: String? = null,
             @SerializedName("image")
             val imageProfile: String ?= null,
             @SerializedName("address")
-            val address: String
+            val address: String ?= null
         )
     }
 }
