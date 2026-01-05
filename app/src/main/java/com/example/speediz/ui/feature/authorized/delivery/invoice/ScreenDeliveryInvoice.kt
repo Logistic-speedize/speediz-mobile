@@ -180,7 +180,8 @@ fun ScreenDeliveryInvoice(
 @Composable
 fun SearchBox(
     onChange: (String) -> Unit = { },
-    value: String = ""
+    value: String = "",
+    placeHolder: String = "Search invoice..."
 ) {
     val displayText = rememberSaveable { mutableStateOf(value) }
     Box(
@@ -198,7 +199,7 @@ fun SearchBox(
             },
             placeholder = {
                 Text(
-                    text = "Search invoice...",
+                    text = placeHolder,
                     color = Color.Gray,
                     fontSize = 14.sp
                 )

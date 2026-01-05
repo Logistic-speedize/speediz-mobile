@@ -3,6 +3,10 @@ package com.example.speediz.ui.feature.authorized.vendor.packageManagement.creat
 
 import android.text.style.TtsSpan
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speediz.core.data.vendor.CreatePackageRequest
@@ -22,30 +26,26 @@ class CreatePackageViewModel @Inject constructor(
     private val _createPackageUIState = MutableStateFlow<CreatePackageUIState>(CreatePackageUIState.Loading)
     val createPackageUIState: StateFlow<CreatePackageUIState> = _createPackageUIState.asStateFlow()
 
-    private val _receiverPhone = MutableStateFlow("")
-    var receiverPhone: StateFlow<String> = _receiverPhone.asStateFlow()
+    var receiverPhone by mutableStateOf("")
 
-    private val _receiverName = MutableStateFlow("")
-    var receiverName: StateFlow<String> = _receiverName.asStateFlow()
+    var receiverName by mutableStateOf("")
 
-    private val _packageType = MutableStateFlow("")
-    var packageType: StateFlow<String> = _packageType.asStateFlow()
+    var packageType by mutableStateOf("")
 
-    private val _packagePrice = MutableStateFlow(0.0)
-    var packagePrice: StateFlow<Double> = _packagePrice.asStateFlow()
+    var packagePrice by mutableDoubleStateOf(0.0)
 
-    private val _customerLocation = MutableStateFlow("")
-    var customerLocation: StateFlow<String> = _customerLocation.asStateFlow()
+    var customerLocation by mutableStateOf("")
 
     private val _receiverLat = MutableStateFlow(0.0)
-    var receiverLat: StateFlow<Double> = _receiverLat.asStateFlow()
+    var receiverLat = _receiverLat.value
+
 
     private val _receiverLng = MutableStateFlow(0.0)
-    var receiverLng: StateFlow<Double> = _receiverLng.asStateFlow()
+    var receiverLngValue = _receiverLng.value
 
     // Update methods called by UI to set values before validation
     fun setReceiverPhone(value: String): String {
-        _receiverPhone.value = value
+        receiverPhone = value
         var message = ""
         when {
             value.isBlank() -> {
@@ -57,8 +57,8 @@ class CreatePackageViewModel @Inject constructor(
         }
         return message
     }
-    fun setReceiverName(value: String): String {
-        _receiverName.value = value
+    fun onReceiverNameChange(value: String): String {
+        receiverName = value
         val onlyLettersRegex = Regex("^[A-Za-z\\s]+$")
         var message = ""
         when {
@@ -71,8 +71,8 @@ class CreatePackageViewModel @Inject constructor(
         }
         return message
     }
-    fun setPackageType(value: String): String {
-        _packageType.value = value
+    fun onPackageTypeChange(value: String): String {
+        packageType = value
         var message = ""
         when {
             value.isBlank() -> {
@@ -81,8 +81,8 @@ class CreatePackageViewModel @Inject constructor(
         }
         return message
     }
-    fun setPackagePrice(value: Double): String {
-        _packagePrice.value = value
+    fun onPackagePriceChange(value: Double): String {
+        packagePrice = value
         var message = ""
         when {
             value <= 0.0 -> {
@@ -94,8 +94,8 @@ class CreatePackageViewModel @Inject constructor(
         }
         return message
     }
-    fun setCustomerLocation(value: String): String {
-        _customerLocation.value = value
+    fun onCustomerLocationChange(value: String): String {
+        customerLocation = value
         var message = ""
         when {
             value.isBlank() -> {
@@ -104,30 +104,32 @@ class CreatePackageViewModel @Inject constructor(
         }
         return message
     }
-    fun setReceiverLat(value: Double){}
-    fun setReceiverLng(value: Double) { _receiverLng.value = value }
 
-    fun onValidation(
-        phone: String,
-        name: String,
-        type: String,
-        price: Double,
-        location: String,
-        lat: Double,
-        lng: Double
-    ): Boolean {
-
-        val nameRegex = Regex("^[A-Za-z\\s]+$")
-
-        return when {
-            phone.isBlank() || phone.length !in 6..14 -> false
-            name.isBlank() || !nameRegex.matches(name) -> false
-            type.isBlank() -> false
-            price !in 0.0..<1000000.0 -> false
-            location.isBlank() -> false
-            lat == 0.0 || lng == 0.0 -> false
-            else -> true
+    fun onPhoneChanged(value: String): String {
+        this.receiverPhone = value
+        var message = ""
+        if (receiverPhone.isEmpty()) {
+            message =  "Phone number is required"
         }
+        else if (receiverPhone.length !in 6..14) {
+            message = "Phone number must be between 6 and 14 digits"
+        }
+        return message
+    }
+
+
+    fun onValidate(): Boolean{
+        val phoneError = setReceiverPhone(receiverPhone)
+        val nameError = onReceiverNameChange(receiverName)
+        val typeError = onPackageTypeChange(packageType)
+        val priceError = onPackagePriceChange(packagePrice)
+        val locationError = onCustomerLocationChange(customerLocation)
+
+        return phoneError.isEmpty() &&
+                nameError.isEmpty() &&
+                typeError.isEmpty() &&
+                priceError.isEmpty() &&
+                locationError.isEmpty()
     }
 
     fun createPackage(request: CreatePackageRequest) {

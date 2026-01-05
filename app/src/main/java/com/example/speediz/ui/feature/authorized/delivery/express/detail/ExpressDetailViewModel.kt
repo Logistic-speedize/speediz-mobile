@@ -54,21 +54,18 @@ class ExpressDetailViewModel @Inject constructor(
 
     fun getCompletedStatus(request: CompletedStatusRequest) {
         viewModelScope.launch {
-            _completedStatus.value = StatusUiState.Loading
-
             try {
                 val response = repository.completedStatusExpress(request)
                 _completedStatus.value = StatusUiState.Success(response.message.toString())
             } catch (e: Exception) {
                 _completedStatus.value = StatusUiState.Error(e.message ?: "Unknown Error")
+                Log.d("ExpressViewModel" , "Error completing status: ${e.message}" )
             }
         }
     }
 
     fun getCancelStatus(request: StatusRequest) {
         viewModelScope.launch {
-            _cancelStatus.value = StatusUiState.Loading
-
             try {
                 val response = repository.cancelStatusExpress(request)
                 _cancelStatus.value = StatusUiState.Success(response.message.toString())

@@ -55,24 +55,17 @@ fun ScreenInvoice(
     onBack: () -> Unit
 ) {
     val viewModel = hiltViewModel<InvoiceListViewModel>()
-    val invoiceList by viewModel.isInvoiceList.collectAsState()
+    val invoiceUiState by viewModel.isInvoiceUiState.collectAsState()
 
     var selectedFilter by remember { mutableStateOf(PaymentFilter.ALL) }
     var searchText by remember { mutableStateOf("") }
 
-    // Fetch on first enter
-    LaunchedEffect(Unit) {
-        viewModel.fetchInvoiceList()
+    LaunchedEffect(searchText, selectedFilter) {
+        viewModel.fetchAndFilterInvoices(
+            searchId = searchText,
+            filter = selectedFilter
+        )
     }
-    LaunchedEffect(searchText) {
-        viewModel.searchInvoiceById(searchText, selectedFilter)
-    }
-
-    // Filter based on current tab + search text
-    val filteredInvoices = remember(invoiceList, selectedFilter, viewModel.isQueryAllInvoice.value, viewModel.isQueryPaidInvoice.value, viewModel.isQueryUnpaidInvoice.value) {
-        viewModel.getFilteredInvoices(selectedFilter)
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -115,36 +108,49 @@ fun ScreenInvoice(
                         "Unpaid" -> PaymentFilter.UNPAID
                         else -> PaymentFilter.ALL
                     }
-
-                    // Trigger filter with existing search text
-                    viewModel.searchInvoiceById(searchText, selectedFilter)
                 }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Invoices Listing
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(filteredInvoices) { invoice ->
-                    val statusColor = when (invoice.status.lowercase()) {
-                        SpeedizPaidStatus.Paid.status.lowercase() -> Color(0xFF4CAF50)
-                        SpeedizPaidStatus.Unpaid.status.lowercase() -> Color(0xFFF44336)
-                        else -> Color.Gray
+            when (invoiceUiState) {
+                is InvoiceUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
+                }
+                is InvoiceUiState.Success -> {
+                    val invoices = invoiceUiState as InvoiceUiState.Success
+                    // Invoices Listing
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(invoices.data) { invoice ->
+                            val statusColor = when (invoice.status.lowercase()) {
+                                SpeedizPaidStatus.Paid.status.lowercase() -> Color(0xFF4CAF50)
+                                SpeedizPaidStatus.Unpaid.status.lowercase() -> Color(0xFFF44336)
+                                else -> Color.Gray
+                            }
 
-                    InvoiceItem(
-                        invoiceId = invoice.invoiceNumber.toString(),
-                        status = invoice.status,
-                        statusColor = statusColor,
-                        onClick = {
-                            onNavigateTo(invoice.id.toString())
+                            InvoiceItem(
+                                invoiceId = invoice.invoiceNumber.toString(),
+                                status = invoice.status,
+                                statusColor = statusColor,
+                                onClick = {
+                                    onNavigateTo(invoice.id.toString())
+                                }
+                            )
                         }
-                    )
+                    }
+                }
+                else -> {
+                    // Handle other states if necessary
                 }
             }
         }

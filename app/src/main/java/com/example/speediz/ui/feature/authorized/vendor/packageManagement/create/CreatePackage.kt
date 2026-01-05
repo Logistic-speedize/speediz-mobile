@@ -68,9 +68,10 @@ fun ScreenCreatePackage(
     val viewModel = hiltViewModel<CreatePackageViewModel>()
     val uiState by viewModel.createPackageUIState.collectAsState()
 
-    var phone by rememberSaveable { mutableStateOf("") }
-    var name by rememberSaveable { mutableStateOf("") }
-    var price by rememberSaveable { mutableStateOf("") }
+    var isPhone by rememberSaveable { mutableStateOf(false) }
+    var isReceiverName by rememberSaveable { mutableStateOf(false) }
+    var isPrice by rememberSaveable { mutableStateOf(false) }
+    var isPackageType by rememberSaveable { mutableStateOf(false) }
     var packageExpanded by remember { mutableStateOf(false) }
     var location by rememberSaveable { mutableStateOf("") }
     var latitude by rememberSaveable { mutableStateOf("") }
@@ -86,24 +87,11 @@ fun ScreenCreatePackage(
         SpeedizPackageType.Other,
     )
     var selectedPackageType by remember { mutableStateOf(packageTypeList.first()) }
-    var isGetLocation by remember { mutableStateOf(false) }
-    var isEnableSubmit by remember { mutableStateOf(false) }
     LaunchedEffect(location) {
         val result = geocodeAddress(currentLocal, location)
         if (result != null) {
             latitude = result.first.toString()
             longitude = result.second.toString()
-            viewModel.setReceiverLat(latitude.toDouble())
-            viewModel.setReceiverLng(longitude.toDouble())
-            isEnableSubmit = viewModel.onValidation(
-                phone = phone,
-                name = name,
-                type = selectedPackageType.type,
-                price = price.toDoubleOrNull() ?: 0.0,
-                location = location,
-                lat = latitude.toDoubleOrNull() ?: 0.0,
-                lng = longitude.toDoubleOrNull() ?: 0.0
-            )
         }
     }
 
@@ -123,13 +111,6 @@ fun ScreenCreatePackage(
             else -> {
                 // No action needed for Loading or other states
             }
-//            else -> {
-//                Toast.makeText(
-//                    currentLocal,
-//                    (uiState as? CreatePackageUIState.Error)?.message ?: "",
-//                    Toast.LENGTH_SHORT
-//                )
-//            }
         }
     }
 
@@ -173,14 +154,21 @@ fun ScreenCreatePackage(
             // Phone number
             CompactTextField(
                 label = "Receiver’s Phone Number",
-                value = phone,
+                value = viewModel.receiverPhone,
                 onValueChange = {
-                    phone = it
+                    if (isPhone) isPhone = false
+                    viewModel.onPhoneChanged(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions =  KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
+                supportingText = {
+                    val message = viewModel.setReceiverPhone(viewModel.receiverPhone)
+                    if (isPhone) {
+                        Text(text = message, fontSize = 12.sp, color = Color.Red)
+                    }
+                }
             //    errorMessage =  viewModel.setReceiverPhone(phone)
             )
 
@@ -189,14 +177,21 @@ fun ScreenCreatePackage(
             // Receiver name
             CompactTextField(
                 label = "Receiver’s Name",
-                value = name,
+                value = viewModel.receiverName,
                 onValueChange = {
-                    name = it
+                    if (isReceiverName) isReceiverName = false
+                    viewModel.onReceiverNameChange(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions =  KeyboardOptions(
                     keyboardType = KeyboardType.Ascii
                 ),
+                supportingText = {
+                    val message = viewModel.onReceiverNameChange(viewModel.receiverName)
+                    if (isReceiverName) {
+                        Text(text = message, fontSize = 12.sp, color = Color.Red)
+                    }
+                }
              //   errorMessage =  viewModel.setReceiverName(name)
             )
 
@@ -208,15 +203,22 @@ fun ScreenCreatePackage(
 
             Box {
                 OutlinedTextField(
-                    value = selectedPackageType.type,
+                    value = viewModel.packageType,
                     onValueChange = {
-                        viewModel.setPackageType(it)
+                        if (isPackageType) isPackageType = false
+                        viewModel.onPackageTypeChange(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { packageExpanded = !packageExpanded }) {
                             Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    },
+                    supportingText = {
+                        val message = viewModel.onPackageTypeChange(viewModel.packageType)
+                        if (isPackageType) {
+                            Text(text = message, fontSize = 12.sp, color = Color.Red)
                         }
                     }
                 )
@@ -230,6 +232,7 @@ fun ScreenCreatePackage(
                             text = { Text(packageType.type) },
                             onClick = {
                                 selectedPackageType = packageType
+                                viewModel.onPackageTypeChange(selectedPackageType.type)
                                 packageExpanded = false
                             }
                         )
@@ -242,9 +245,10 @@ fun ScreenCreatePackage(
             // Price
             CompactTextField(
                 label = "Package Price",
-                value = price,
+                value = viewModel.packagePrice.toString(),
                 onValueChange = {
-                    price = it
+                    if (isPrice) isPrice = false
+                    viewModel.onPackagePriceChange(it.toDoubleOrNull() ?: 0.0)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
@@ -264,6 +268,7 @@ fun ScreenCreatePackage(
                 value = location,
                 onValueChange = {
                     location = "Phnom Penh, $it"
+                    viewModel.onCustomerLocationChange(it)
                     Log.d( "CreatePackage", "ScreenCreatePackage: Location $location" )
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -284,11 +289,11 @@ fun ScreenCreatePackage(
                 onClick = {
                     viewModel.createPackage(
                         CreatePackageRequest(
-                            price = price.toDouble(),
-                            customerFirstName = name,
-                            customerLastName = name,
-                            customerPhone = phone,
-                            customerLocation = location,
+                            price = viewModel.packagePrice,
+                            customerFirstName = viewModel.receiverName,
+                            customerLastName = viewModel.receiverName,
+                            customerPhone = viewModel.receiverPhone,
+                            customerLocation = viewModel.customerLocation,
                             customerLatitude = latitude.toDoubleOrNull() ?: 0.0,
                             customerLongitude = longitude.toDoubleOrNull() ?: 0.0
                         )
@@ -301,7 +306,7 @@ fun ScreenCreatePackage(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
-                enabled = isEnableSubmit
+                enabled = viewModel.onValidate()
             ) {
                 Text("Create", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
