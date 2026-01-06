@@ -8,7 +8,7 @@ data class StatusRequest(
 )
 
 data class PickUpStatusRequest(
-    val id: Int,
+    val id: String,
     val lng: Double,
     val lat: Double
 )

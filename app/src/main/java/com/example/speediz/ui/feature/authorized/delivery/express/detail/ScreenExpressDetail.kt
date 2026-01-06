@@ -496,7 +496,7 @@ fun ExpressDetail(
             onConfirm = { it ->
                 getCurrentLocation(context) { lat, lng ->
                     val request = PickUpStatusRequest(
-                        id = expressDetail?.id ?: 0,
+                        id = expressDetail?.id.toString(),
                         lng = lng,
                         lat = lat
                     )

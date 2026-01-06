@@ -53,8 +53,7 @@ fun ScreenAccount(
     val viewModel = hiltViewModel<AccountVM>()
     val accountViewModel = hiltViewModel<SignInViewModel>()
     val profileDataState by viewModel.profileUIState.collectAsState()
-   // val isLoggedOut by accountViewModel.isLoggedIn.collectAsState()
-    var isLoggedOut = remember { mutableStateOf(false) }
+    val isLoggedOut = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchProfileData()

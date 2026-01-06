@@ -11,10 +11,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VendorAccountVM @Inject constructor(
-    private val repository: VendorProfileRepository
+    private val repository: VendorProfileRepository,
 ): ViewModel() {
     private var _profileUIState = MutableStateFlow<VendorProfileState>(VendorProfileState.Loading)
     val profileUIState get() = _profileUIState
+
+    private var _isLogOut = MutableStateFlow(false)
+    val isLogOut get() = _isLogOut
 
     fun fetchProfileData() {
         viewModelScope.launch {
